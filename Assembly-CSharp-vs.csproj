@@ -46,8 +46,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ScriptMainInput.cs" />
-     <Compile Include="Assets\ScriptShipController.cs" />
+     <Compile Include="Assets\Scripts\ScriptMainInput.cs" />
+     <Compile Include="Assets\Scripts\ScriptModule.cs" />
+     <Compile Include="Assets\Scripts\ScriptShipController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
