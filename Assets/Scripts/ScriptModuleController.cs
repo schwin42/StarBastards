@@ -3,7 +3,8 @@ using System.Collections;
 
 public class ScriptModuleController : MonoBehaviour {
 
-	public GameObject hullModule;
+	public GameObject augmentModule;
+	public GameObject defenseModule;
 	public GameObject weaponModule;
 
 	// Use this for initialization
@@ -14,13 +15,18 @@ public class ScriptModuleController : MonoBehaviour {
 
 
 			GameObject hotMod = gameObject;
-			if(Random.value * 5 <= 4.5)
+			float hotRand = Random.value * 3;
+			if(hotRand <= 1)
 			{
-				 hotMod = Instantiate (hullModule) as GameObject;
-				Debug.Log ("hull module");
-			} else {
+				 hotMod = Instantiate (augmentModule) as GameObject;
+				//Debug.Log ("hull module");
+			} else if(hotRand <= 2){
 				 hotMod = Instantiate (weaponModule) as GameObject;
-				Debug.Log ("weapon module");
+				//Debug.Log ("weapon module");
+			} else if(hotRand <= 3){
+				hotMod = Instantiate (defenseModule) as GameObject;
+			} else {
+				Debug.LogError ("Random leak.");
 			}
 
 			hotMod.transform.position = new Vector2(Random.value * 60 - 30, Random.value * 40 - 20);

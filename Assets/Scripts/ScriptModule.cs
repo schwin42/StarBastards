@@ -5,9 +5,8 @@ public enum ModuleType
 {
 	None,
 	Weapon,
-	Upgrade,
-	Shield,
-	Hull,
+	Augment,
+	Defense,
 	Pilot
 }
 
@@ -147,7 +146,7 @@ public class ScriptModule : MonoBehaviour {
 		Vector2 lastVelocity = moduleOwner.rigidbody2D.velocity;
 		Destroy(moduleOwner.rigidbody2D);
 		transform.parent = moduleOwner.transform;
-		Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
+		//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
 		transform.localPosition = coordinates;
 		transform.localRotation = Quaternion.identity;
 		shipSpaceCoordinates = coordinates;
@@ -177,7 +176,7 @@ public class ScriptModule : MonoBehaviour {
 		ship.rigidbody2D.mass = moduleOwner.rigidbodyMass;
 		ship.rigidbody2D.drag = moduleOwner.rigidbodyLinearDrag;
 		ship.rigidbody2D.angularDrag = moduleOwner.rigidbodyAngularDrag;
-		transform.parent.rigidbody2D.velocity = lastVelocity;
+		transform.parent.rigidbody2D.velocity = newVelocity;
 
 	}
 

@@ -1,3 +1,9 @@
+/*
+KNOWN ISSUES:
+//On occasion, player 01 thrust effect does not trigger due to isThrusting not being set to true
+//On occasion, module assimilation does not work properly
+*/
+
 using UnityEngine;
 using System.Collections;
 
