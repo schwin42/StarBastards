@@ -1,6 +1,6 @@
 /*
 KNOWN ISSUES:
-//On occasion, player 01 thrust effect does not trigger due to isThrusting not being set to true
+//On occasion, player 01 thrust effect does not trigger due to isThrusting not being set to true. Fixed?
 //On occasion, module assimilation does not work properly
 */
 
@@ -32,16 +32,19 @@ public class ScriptShipController : MonoBehaviour {
 
 	//Private variables
 	private ScriptMainInput scriptMainInput;
+	private ScriptShipSheet scriptShipSheet;
 	private Vector2 forwardDirection;
 	//private GameObject newBullet = null;
 
 	//Status
+	[System.NonSerialized]
 	public bool isThrusting = false;
 
 	// Use this for initialization
 	void Start () {
 	
 		scriptMainInput = GetComponent<ScriptMainInput>();
+		scriptShipSheet = GetComponent<ScriptShipSheet>();
 
 		rigidbodyMass = rigidbody2D.mass;
 		rigidbodyLinearDrag = rigidbody2D.drag;
@@ -84,5 +87,47 @@ public class ScriptShipController : MonoBehaviour {
 		//transform.rotation = Quaternion.Euler(0, 
 		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
 	}
+
+	//void ReadShipToSchematic(ScriptShipController ship)
+	//{
+	//
+	//}
+
+	public void AddModule(ScriptModule addedModule, Vector2 coordinates)
+	{
+		Destroy (addedModule.rigidbody2D); //Destroy module's rigidbody
+		addedModule.moduleOwner = this; //Mark this ship as new owner
+		Vector2 lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
+		Destroy(rigidbody2D); //Destroy rigidbody for replacement
+		addedModule.transform.parent = transform; //Make new module child to ship
+		//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
+		addedModule.transform.localPosition = coordinates; //Set position
+		addedModule.transform.localRotation = Quaternion.identity; //Set rotation
+		addedModule.shipSpaceCoordinates = coordinates; //Log coordinates
+		tag = "Ship"; //Tag as part of ship
+		StartCoroutine(ResetShipRigidbody(lastVelocity)); //Add and configure rigidbody component
+		if(addedModule.moduleType == ModuleType.Weapon) //Ready weapon
+		{
+			addedModule.canShoot = true;
+		}
+	}
+
+	IEnumerator ResetShipRigidbody(Vector2 lastVelocity)
+	{
+		yield return 0;
+		gameObject.AddComponent<Rigidbody2D>();
+
+		//Recalculate mass and update velocity appropriately
+		
+		Vector2 newVelocity = lastVelocity;
+		
+		rigidbodyMass ++; //magic number
+		rigidbody2D.mass = rigidbodyMass;
+		rigidbody2D.drag = rigidbodyLinearDrag;
+		rigidbody2D.angularDrag = rigidbodyAngularDrag;
+		rigidbody2D.velocity = newVelocity;
+		
+	}
+
 
 }

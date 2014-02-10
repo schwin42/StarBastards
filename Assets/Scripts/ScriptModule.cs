@@ -5,9 +5,18 @@ public enum ModuleType
 {
 	None,
 	Weapon,
-	Augment,
+	Assist,
 	Defense,
 	Pilot
+}
+
+public enum ModuleSubtype
+{
+	None,
+	Power,
+	Range,
+	Number,
+
 }
 
 public enum ProjectileType
@@ -113,7 +122,8 @@ public class ScriptModule : MonoBehaviour {
 				Vector2 assimilationCoordinates = shipSpaceCoordinates + coordinatesOffset;
 
 			//Debug.Log ("Hit neutral");
-				collision.gameObject.GetComponent<ScriptModule>().SetOwner (gameObject, assimilationCoordinates);
+				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), assimilationCoordinates);
+				//collision.gameObject.GetComponent<ScriptModule>().SetOwner (gameObject, assimilationCoordinates);
 
 			}
 		} 
@@ -138,7 +148,7 @@ public class ScriptModule : MonoBehaviour {
 		}
 
 	}
-
+				/*
 	void SetOwner(GameObject assimilatingModule, Vector2 coordinates)
 	{
 		Destroy (rigidbody2D);
@@ -159,26 +169,7 @@ public class ScriptModule : MonoBehaviour {
 
 		//Debug.Log ("assmodpos" + assimilatingModulePosition + "coordinates" + coordinates);
 	}
-
-	IEnumerator ResetShipRigidbody(Vector2 lastVelocity)
-	{
-		yield return 0;
-		GameObject ship = transform.parent.gameObject;
-		transform.parent.gameObject.AddComponent<Rigidbody2D>();
-
-
-
-		//Recalculate mass and update velocity appropriately
-
-		Vector2 newVelocity = lastVelocity;
-
-			moduleOwner.rigidbodyMass ++; //magic number
-		ship.rigidbody2D.mass = moduleOwner.rigidbodyMass;
-		ship.rigidbody2D.drag = moduleOwner.rigidbodyLinearDrag;
-		ship.rigidbody2D.angularDrag = moduleOwner.rigidbodyAngularDrag;
-		transform.parent.rigidbody2D.velocity = newVelocity;
-
-	}
+*/
 
 	Vector2 RoundVector2(Vector2 unroundedVector)
 	{
