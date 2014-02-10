@@ -1,13 +1,14 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptShipController.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptHumanInput.cs">
     <Files>
-      <File FileName="Assets/Scripts/ScriptProjectile.cs" Line="24" Column="6" />
+      <File FileName="Assets/Scripts/ScriptProjectile.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ScriptModule.cs" Line="125" Column="76" />
-      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="106" Column="5" />
+      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ScriptModuleController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptMainInput.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptShipSheet.cs" Line="42" Column="9" />
+      <File FileName="Assets/Scripts/ScriptHumanInput.cs" Line="4" Column="30" />
+      <File FileName="Assets/Scripts/ScriptShipSheet.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ScriptShipIntelligence.cs" Line="6" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -1,17 +1,18 @@
 using UnityEngine;
 using System.Collections;
 
-public class ScriptMainInput : MonoBehaviour {
+public class ScriptHumanInput : MonoBehaviour {
 	
 	public float thrustInput = 0.0F;
 	public float turnInput = -9999F;
 	public bool queueFire = false;
 	public bool[] mainInput;
-	public string playerInput = "P01"; 
+	public string playerInput;
+	//private ScriptShipSheet scriptShipSheet;
 	
 	// Use this for initialization
 	void Start () {
-	
+	//	scriptShipSheet = GetComponent<ScriptShipSheet>();
 	}
 	
 	// Update is called once per frame
@@ -34,9 +35,9 @@ public class ScriptMainInput : MonoBehaviour {
 			//Debug.LogError("Invalid input for player 1: " + Input.GetButton ("P01Left").ToString() + Input.GetButton ("P01Right").ToString ());
 		}
 
-		if (Input.GetButtonDown ("P01FireA")) {
-			queueFire = true;
-				};
+		//if (Input.GetButtonDown ("P01FireA")) {
+		//	queueFire = true;
+		//		};
 
 	}
 }

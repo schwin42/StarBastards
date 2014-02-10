@@ -1,15 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum PlayerControl
+{
+	None,
+	Human,
+	Computer
+}
+
 public class ScriptModuleController : MonoBehaviour {
 
+	//Prefabs
 	public GameObject augmentModule;
 	public GameObject defenseModule;
 	public GameObject weaponModule;
 
+	private int nextModuleID = 0;
 	// Use this for initialization
 	void Start () {
-		for(int i = 0; i<25; i++)
+		for(int i = 0; i<50; i++)
 		{
 			//GameObject hotMod = Instantiate (modulePrefab) as GameObject;
 
@@ -29,8 +38,10 @@ public class ScriptModuleController : MonoBehaviour {
 				Debug.LogError ("Random leak.");
 			}
 
-			hotMod.transform.position = new Vector2(Random.value * 60 - 30, Random.value * 40 - 20);
+			hotMod.transform.position = new Vector2(Random.value * 100 - 50, Random.value * 100);
 			hotMod.transform.parent = this.gameObject.transform;
+			hotMod.GetComponent<ScriptModule>().moduleID = nextModuleID;
+			nextModuleID ++;
 			//Debug.Log (i);
 		}
 	}

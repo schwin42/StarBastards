@@ -9,6 +9,9 @@ using System.Collections;
 
 public class ScriptShipController : MonoBehaviour {
 
+	//Configurable
+	public PlayerControl playerControl = PlayerControl.None;
+	
 	//Inspector Assigned
 	public GameObject pilotModule;
 	public GameObject basicBullet;
@@ -31,7 +34,8 @@ public class ScriptShipController : MonoBehaviour {
 	public float rigidbodyAngularDrag;
 
 	//Private variables
-	private ScriptMainInput scriptMainInput;
+	private ScriptHumanInput scriptHumanInput;
+	private ScriptShipIntelligence scriptShipIntelligence;
 	private ScriptShipSheet scriptShipSheet;
 	private Vector2 forwardDirection;
 	//private GameObject newBullet = null;
@@ -43,7 +47,8 @@ public class ScriptShipController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
-		scriptMainInput = GetComponent<ScriptMainInput>();
+		scriptHumanInput = GetComponent<ScriptHumanInput>();
+		scriptShipIntelligence = GetComponent<ScriptShipIntelligence>();
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
 
 		rigidbodyMass = rigidbody2D.mass;
@@ -58,20 +63,42 @@ public class ScriptShipController : MonoBehaviour {
 		//Update pilot module velocity
 		if(rigidbody2D)
 		{
-		forwardDirection = transform.TransformDirection(Vector2.up);
-		rigidbody2D.AddForce(forwardDirection * scriptMainInput.thrustInput * thrustForceConstant * Time.fixedDeltaTime);
-		rigidbody2D.angularVelocity = scriptMainInput.turnInput * -turnSpeedConstant;
 
-		if(!isThrusting && scriptMainInput.thrustInput == 1)
+		forwardDirection = transform.TransformDirection(Vector2.up);
+
+			float thrustInput = 0;
+			float turnInput = 0;
+
+			if(playerControl == PlayerControl.Human)
 			{
-				isThrusting = true;
-				thrustEffect.enableEmission = true;
-			} 
-		if(isThrusting && scriptMainInput.thrustInput == 0)
+				thrustInput = scriptHumanInput.thrustInput;
+				turnInput = scriptHumanInput.turnInput;
+			} else if(playerControl == PlayerControl.Computer)
 			{
-				isThrusting = false;
-				thrustEffect.enableEmission = false;
+				thrustInput = scriptShipIntelligence.thrustInput;
+				turnInput = scriptShipIntelligence.turnInput;
+			} else {
+				Debug.Log ("No control selected for " + this);
 			}
+
+
+				rigidbody2D.AddForce(forwardDirection * thrustInput * thrustForceConstant * Time.fixedDeltaTime);
+				rigidbody2D.angularVelocity = turnInput * -turnSpeedConstant;
+
+				if(!isThrusting && thrustInput == 1)
+				{
+					isThrusting = true;
+					thrustEffect.enableEmission = true;
+				} 
+				if(isThrusting && thrustInput == 0)
+				{
+					isThrusting = false;
+					thrustEffect.enableEmission = false;
+				}
+	
+	
+
+
 
 		}
 		//Update parent object position
@@ -104,7 +131,7 @@ public class ScriptShipController : MonoBehaviour {
 		addedModule.transform.localPosition = coordinates; //Set position
 		addedModule.transform.localRotation = Quaternion.identity; //Set rotation
 		addedModule.shipSpaceCoordinates = coordinates; //Log coordinates
-		tag = "Ship"; //Tag as part of ship
+		addedModule.tag = "Ship"; //Tag as part of ship
 		StartCoroutine(ResetShipRigidbody(lastVelocity)); //Add and configure rigidbody component
 		if(addedModule.moduleType == ModuleType.Weapon) //Ready weapon
 		{

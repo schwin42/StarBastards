@@ -46,11 +46,12 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\ScriptMainInput.cs" />
+     <Compile Include="Assets\Scripts\ScriptHumanInput.cs" />
      <Compile Include="Assets\Scripts\ScriptModule.cs" />
      <Compile Include="Assets\Scripts\ScriptModuleController.cs" />
      <Compile Include="Assets\Scripts\ScriptProjectile.cs" />
      <Compile Include="Assets\Scripts\ScriptShipController.cs" />
+     <Compile Include="Assets\Scripts\ScriptShipIntelligence.cs" />
      <Compile Include="Assets\Scripts\ScriptShipSheet.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

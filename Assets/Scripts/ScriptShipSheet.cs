@@ -3,6 +3,9 @@ using System.Collections;
 //using System.Collections.Generic;
 
 
+
+
+
 public class Node
 {
 	public ScriptModule module;
@@ -38,6 +41,9 @@ public class Schematic
 
 public class ScriptShipSheet : MonoBehaviour {
 
+
+
+
 	static private int maxY = 1000;
 	static private int maxX = 1000;
 
@@ -51,5 +57,7 @@ public class ScriptShipSheet : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
+
+
 	}
 }

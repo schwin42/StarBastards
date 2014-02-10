@@ -31,6 +31,7 @@ public enum ProjectileType
 public class ScriptModule : MonoBehaviour {
 
 	public string moduleName;
+	public int moduleID;
 	public ScriptShipController moduleOwner = null; //Null indicates module is neutral
 	public Vector2 shipSpaceCoordinates; //Location of owned module relative to pilot module
 
