@@ -44,7 +44,7 @@ public class ScriptShipIntelligence : MonoBehaviour {
 		if(intelligenceDirective == IntelligenceDirective.AcquireTarget)
 		{
 			target = AcquireTarget();
-			Debug.Log (target.GetComponent<ScriptModule>().moduleID);
+			//Debug.Log (target.GetComponent<ScriptModule>().moduleID);
 			if(target)
 			{
 				intelligenceDirective = IntelligenceDirective.AlignToTarget;
@@ -96,7 +96,7 @@ public class ScriptShipIntelligence : MonoBehaviour {
 			turnInput = 1;
 		} else if(discrepancyAngle <= 10)
 		{
-			Debug.Log (discrepancyAngle);
+			//Debug.Log (discrepancyAngle);
 			turnInput = 0;
 		}
 

@@ -51,7 +51,9 @@ public class ScriptShipSheet : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-	
+		//foreach (GameObject module in transform) {
+
+		//		}
 	}
 	
 	// Update is called once per frame

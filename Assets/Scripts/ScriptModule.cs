@@ -32,8 +32,9 @@ public class ScriptModule : MonoBehaviour {
 
 	public string moduleName;
 	public int moduleID;
+	//[System.NonSerialized]
 	public ScriptShipController moduleOwner = null; //Null indicates module is neutral
-	public Vector2 shipSpaceCoordinates; //Location of owned module relative to pilot module
+	public Vector2 moduleNodeCoordinates; //Location of owned module relative to pilot module
 
 	public ModuleType moduleType = ModuleType.None;
 
@@ -55,7 +56,7 @@ public class ScriptModule : MonoBehaviour {
 	void Start () {
 		if(transform.parent)
 		{
-			moduleOwner = transform.parent.gameObject.GetComponent<ScriptShipController>();
+			moduleOwner = transform.root.gameObject.GetComponent<ScriptShipController>();
 		}
 	}
 	
@@ -108,7 +109,7 @@ public class ScriptModule : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D collision)
 	{
-		Debug.Log(gameObject.name);
+		//Debug.Log(gameObject.name);
 
 		//Debug.Log ("Collided");
 		if(moduleOwner != null)
@@ -118,12 +119,12 @@ public class ScriptModule : MonoBehaviour {
 				ContactPoint2D contact = collision.contacts[0];
 				Vector2 normal = contact.normal;
 				Vector2 inverseNormal = transform.InverseTransformDirection(normal);
-				Vector2 roundNormal = RoundVector2(inverseNormal);
-				Vector2 coordinatesOffset = RoundNormalToCoordinates(IgnoreCorners(roundNormal));
-				Vector2 assimilationCoordinates = shipSpaceCoordinates + coordinatesOffset;
+				Vector2 roundNormal = RoundVector2(inverseNormal); 
+				Vector2 nodeCoordinatesOffset = IgnoreCorners(roundNormal) * -1; //Further adjustments
+				Vector2 assimilationNodeCoordinates = moduleNodeCoordinates + nodeCoordinatesOffset;
 
 			//Debug.Log ("Hit neutral");
-				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), assimilationCoordinates);
+				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), assimilationNodeCoordinates);
 				//collision.gameObject.GetComponent<ScriptModule>().SetOwner (gameObject, assimilationCoordinates);
 
 			}
@@ -135,20 +136,7 @@ public class ScriptModule : MonoBehaviour {
 
 	}
 
-	void RemoveOwner()
-	{
-		gameObject.AddComponent<Rigidbody2D>();
-		moduleOwner = null;
-		transform.parent = null;
-		//transform.localPosition = Vector2.zero;
-		shipSpaceCoordinates = Vector3.zero;
-		tag = "NeutralModule";
-		if(moduleType == ModuleType.Weapon)
-		{
-			canShoot = false;
-		}
 
-	}
 				/*
 	void SetOwner(GameObject assimilatingModule, Vector2 coordinates)
 	{
@@ -181,10 +169,7 @@ public class ScriptModule : MonoBehaviour {
 		return roundVector;
 	}
 
-	Vector2 RoundNormalToCoordinates(Vector2 roundNormal)
-	{
-		return -roundNormal * 2;
-	}
+
 
 	Vector2 IgnoreCorners(Vector2 coordinates)
 	{
@@ -199,7 +184,7 @@ public class ScriptModule : MonoBehaviour {
 				hotVector.y = 0;
 			}
 		}
-		Debug.Log (coordinates + " " + hotVector);
+		//Debug.Log (coordinates + " " + hotVector);
 		return hotVector;
 	}
 
