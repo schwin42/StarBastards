@@ -1,10 +1,3 @@
-/*
-KNOWN ISSUES:
-//On occasion, player 01 thrust effect does not trigger due to isThrusting not being set to true. Fixed?
-//On occasion, module is assimilated at coordinates of existing module
-//For unknown reason, each ship's rotation increases by 90 or so on start
-*/
-
 using UnityEngine;
 using System.Collections;
 
@@ -24,7 +17,7 @@ public class ScriptShipController : MonoBehaviour {
 	public float thrustForceConstant = 10.0F;
 	public float turnSpeedConstant = 1.0F;
 	public float bulletForceConstant = 10.0F;
-	public float topSpeed = 10.0F; 
+	//public float topSpeed = 10.0F; 
 
 	//Cached from inspector
 	[System.NonSerialized]
@@ -41,7 +34,7 @@ public class ScriptShipController : MonoBehaviour {
 	private ScriptShipIntelligence scriptShipIntelligence;
 	private ScriptShipSheet scriptShipSheet;
 	private ScriptModuleController scriptModuleController;
-	private Vector2 forwardDirection;
+	//private Vector2 forwardDirection;
 	private bool rigidbodyResetPending = false;
 	private Vector2 lastVelocity;
 	//public Rigidbody2D rigidCharacter;
@@ -60,6 +53,7 @@ public class ScriptShipController : MonoBehaviour {
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
 		shipModuleContainer = transform.FindChild ("ContainerModule");
 		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController> ();
+
 
 		//Set controlling rigidbody
 		//if (scriptModuleController.moduleRigidbodyMode) {
@@ -98,14 +92,8 @@ public class ScriptShipController : MonoBehaviour {
 	
 	// Update is called once per frame
 
-	void FixedUpdate () {
-		//Update pilot module velocity
-		if (rigidbody2D) {
-
-			//Temporary variables
-			forwardDirection = transform.TransformDirection (Vector2.up);
-			Rigidbody2D hotRigid = null;
-					
+	void FixedUpdate () 
+	{			
 
 						float thrustInput = 0;
 						float turnInput = 0;
@@ -124,13 +112,36 @@ public class ScriptShipController : MonoBehaviour {
 	
 			if(scriptModuleController.moduleRigidbodyMode)
 			{
-				hotRigid = pilotModule.rigidbody2D;
-				Debug.Log ("pilot rigidbody mode");
+				//rigidCharacter = pilotModule.rigidbody2D;
+			Vector2 pilotModuleForward = pilotModule.transform.TransformDirection(Vector2.up);
+			//Debug.Log ("Pilot forward: " + pilotModuleForward);
+			UpdateVelocity(thrustInput, turnInput, pilotModule.rigidbody2D, pilotModuleForward);
+				//Debug.Log ("pilot rigidbody mode");
 			} else {
-				hotRigid = rigidbody2D;
+			Vector2 upVector = Vector2.up;
+				Vector2 shipForward = transform.TransformDirection (upVector);
+			//Debug.Log ("Ship forward: " + shipForward + "Up: " + upVector + Time.frameCount);
+			if(rigidbody2D)
+			{
+				//Debug.Log (thrustInput + turnInput + rigidbody2D.gameObject.name + forwardDirection + Time.frameCount);
+				UpdateVelocity(thrustInput, turnInput, rigidbody2D, shipForward);
+			} else if(rigidbodyResetPending){
+				Debug.Log ("Reset");
+				gameObject.AddComponent<Rigidbody2D> ();
+				rigidbodyResetPending = false;
+				//Cache rigidbody
+				Vector2 newVelocity = lastVelocity;
+				rigidbody2D.mass = rigidbodyMass;
+				rigidbody2D.drag = rigidbodyLinearDrag;
+				rigidbody2D.angularDrag = rigidbodyAngularDrag;
+				rigidbody2D.velocity = newVelocity;
 			}
-				  	hotRigid.AddForce (forwardDirection * thrustInput * thrustForceConstant * Time.fixedDeltaTime);
-					hotRigid.angularVelocity = turnInput * -turnSpeedConstant;
+
+			}
+			
+			//Debug.Log (rigidCharacter.gameObject.name + hotForce);
+			//Debug.Log ("Turn input: " + turnInput);
+		//	hotRigid.angularVelocity = 90;
 
 						if (!isThrusting && thrustInput == 1) {
 								isThrusting = true;
@@ -140,21 +151,11 @@ public class ScriptShipController : MonoBehaviour {
 								isThrusting = false;
 								thrustEffect.enableEmission = false;
 						}
-				} else if(rigidbodyResetPending){
-			gameObject.AddComponent<Rigidbody2D> ();
+				//} else if(rigidbodyResetPending){
+	
 
-			rigidbodyResetPending = false;
 
-			//Recalculate mass and update velocity appropriately
-			
-			Vector2 newVelocity = lastVelocity;
-			
-			
-			rigidbody2D.mass = rigidbodyMass;
-			rigidbody2D.drag = rigidbodyLinearDrag;
-			rigidbody2D.angularDrag = rigidbodyAngularDrag;
-			rigidbody2D.velocity = newVelocity;
-				}
+				
 		//Update parent object position
 		//transform.position = pilotModule.transform.position;
 		//transform.rotation = pilotModule.transform.rotation;
@@ -167,7 +168,9 @@ public class ScriptShipController : MonoBehaviour {
 		//inputTest = scriptMainInput.turnInput;
 		//transform.rotation = Quaternion.Euler(0, 
 		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
+
 	}
+
 
 	//void ReadShipToSchematic(ScriptShipController ship)
 	//{
@@ -210,9 +213,9 @@ public class ScriptShipController : MonoBehaviour {
 		scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
 		Vector2 worldCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
 		addedModule.transform.localPosition = worldCoordinates; //Set position
-		Debug.Log (addedModule.transform.eulerAngles);
+		//Debug.Log (addedModule.transform.eulerAngles);
 		addedModule.transform.localRotation = Quaternion.identity; //Set rotation
-		Debug.Log (addedModule.transform.eulerAngles);
+		//Debug.Log (addedModule.transform.eulerAngles);
 		addedModule.tag = "Ship"; //Tag as part of ship
 		scriptModule.moduleOwner = this; //Mark this ship as new owner
 
@@ -232,12 +235,13 @@ public class ScriptShipController : MonoBehaviour {
 			}
 				} else {
 					//Destroy module's rigidbody
-						if (addedModule.rigidbody2D) {
-								Destroy (addedModule.gameObject.rigidbody2D); 
+			if (addedModule.rigidbody2D) {
+				Destroy (addedModule.gameObject.rigidbody2D); 
 						}
 			//Ship rigidbody
 			lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
 			Destroy(rigidbody2D); //Destroy rigidbody for replacement
+			Debug.Log ("Destroyed ship rigidbody");
 			rigidbodyResetPending = true;
 				}
 
@@ -301,5 +305,11 @@ public class ScriptShipController : MonoBehaviour {
 		}
 	}
 
-
+	void UpdateVelocity(float thrustInput, float turnInput, Rigidbody2D hotRigid, Vector2 hotForward)
+	{
+		Vector2 hotForce = hotForward * thrustInput * thrustForceConstant * Time.fixedDeltaTime;
+		hotRigid.AddForce(hotForce);
+		hotRigid.angularVelocity = turnInput * -turnSpeedConstant;
+		Debug.Log (hotForce + " " + hotRigid.velocity);
+	}
 }

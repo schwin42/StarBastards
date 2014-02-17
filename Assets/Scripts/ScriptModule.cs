@@ -126,9 +126,9 @@ public class ScriptModule : MonoBehaviour {
 				Vector2 roundNormal = RoundVector2(inverseNormal); 
 				Vector2 nodeCoordinatesOffset = CalibrateCoordinates(roundNormal); //Further adjustments
 				Vector2 assimilationNodeCoordinates = moduleNodeCoordinates + nodeCoordinatesOffset;
-				Debug.Log ("Normal: " + normal + "; Inverse Normal: " + inverseNormal + "; Round Normal: " + roundNormal
-				           + "Node Coordinates Offset: " + nodeCoordinatesOffset + "; Assimilation Node Coordinates: " + assimilationNodeCoordinates
-				           + ".");
+				//Debug.Log ("Normal: " + normal + "; Inverse Normal: " + inverseNormal + "; Round Normal: " + roundNormal
+				  //         + "Node Coordinates Offset: " + nodeCoordinatesOffset + "; Assimilation Node Coordinates: " + assimilationNodeCoordinates
+				    //       + ".");
 
 			//Debug.Log ("Hit neutral");
 				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), gameObject, assimilationNodeCoordinates);
@@ -191,7 +191,7 @@ public class ScriptModule : MonoBehaviour {
 				hotVector.y = 0;
 			}
 		}
-
+		hotVector *= -1;
 		//Vector2 hotterVector = new Vector2(-hotVector.y, hotVector.x); //Rotate 90 degrees
 
 		//Debug.Log (coordinates + " " + hotVector);
