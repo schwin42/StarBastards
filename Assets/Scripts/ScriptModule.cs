@@ -58,9 +58,9 @@ public class ScriptModule : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		if(transform.parent)
+		if(tag == "Ship")
 		{
-			moduleOwner = transform.root.gameObject.GetComponent<ScriptShipController>();
+			moduleOwner = transform.parent.parent.gameObject.GetComponent<ScriptShipController>();
 		}
 	}
 	
@@ -124,8 +124,11 @@ public class ScriptModule : MonoBehaviour {
 				Vector2 normal = contact.normal;
 				Vector2 inverseNormal = transform.InverseTransformDirection(normal);
 				Vector2 roundNormal = RoundVector2(inverseNormal); 
-				Vector2 nodeCoordinatesOffset = IgnoreCorners(roundNormal) * -1; //Further adjustments
+				Vector2 nodeCoordinatesOffset = CalibrateCoordinates(roundNormal); //Further adjustments
 				Vector2 assimilationNodeCoordinates = moduleNodeCoordinates + nodeCoordinatesOffset;
+				Debug.Log ("Normal: " + normal + "; Inverse Normal: " + inverseNormal + "; Round Normal: " + roundNormal
+				           + "Node Coordinates Offset: " + nodeCoordinatesOffset + "; Assimilation Node Coordinates: " + assimilationNodeCoordinates
+				           + ".");
 
 			//Debug.Log ("Hit neutral");
 				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), gameObject, assimilationNodeCoordinates);
@@ -175,9 +178,9 @@ public class ScriptModule : MonoBehaviour {
 
 
 
-	Vector2 IgnoreCorners(Vector2 coordinates)
+	Vector2 CalibrateCoordinates(Vector2 coordinates)
 	{
-
+		//Once traversable grid is ready, require check for possible directions (of the two) that is empty
 		Vector2 hotVector = coordinates;
 		if(Mathf.Abs (coordinates.x) + Mathf.Abs(coordinates.y) == 2)
 		{
@@ -188,6 +191,9 @@ public class ScriptModule : MonoBehaviour {
 				hotVector.y = 0;
 			}
 		}
+
+		//Vector2 hotterVector = new Vector2(-hotVector.y, hotVector.x); //Rotate 90 degrees
+
 		//Debug.Log (coordinates + " " + hotVector);
 		return hotVector;
 	}

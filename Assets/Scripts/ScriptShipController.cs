@@ -44,6 +44,7 @@ public class ScriptShipController : MonoBehaviour {
 	private Vector2 forwardDirection;
 	private bool rigidbodyResetPending = false;
 	private Vector2 lastVelocity;
+	//public Rigidbody2D rigidCharacter;
 	//private GameObject newBullet = null;
 
 	//Status
@@ -59,6 +60,13 @@ public class ScriptShipController : MonoBehaviour {
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
 		shipModuleContainer = transform.FindChild ("ContainerModule");
 		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController> ();
+
+		//Set controlling rigidbody
+		//if (scriptModuleController.moduleRigidbodyMode) {
+		//				rigidCharacter = pilotModule.rigidbody2D;
+		//		} else {
+			//rigidCharacter = this.rigidbody2D;
+		//		}
 
 		//Cache starting rigidbody values from inspector
 		rigidbodyMass = rigidbody2D.mass;
@@ -85,6 +93,7 @@ public class ScriptShipController : MonoBehaviour {
 		//rigidbody2D.velocity = Vector2.zero;
 		//rigidbody2D.angularVelocity = 0F;
 
+
 	}
 	
 	// Update is called once per frame
@@ -93,8 +102,10 @@ public class ScriptShipController : MonoBehaviour {
 		//Update pilot module velocity
 		if (rigidbody2D) {
 
-						forwardDirection = transform.TransformDirection (Vector2.up);
-						//Debug.Log (forwardDirection);
+			//Temporary variables
+			forwardDirection = transform.TransformDirection (Vector2.up);
+			Rigidbody2D hotRigid = null;
+					
 
 						float thrustInput = 0;
 						float turnInput = 0;
@@ -109,9 +120,17 @@ public class ScriptShipController : MonoBehaviour {
 								Debug.Log ("No control selected for " + this);
 						}
 
-
-						rigidbody2D.AddForce (forwardDirection * thrustInput * thrustForceConstant * Time.fixedDeltaTime);
-						rigidbody2D.angularVelocity = turnInput * -turnSpeedConstant;
+			//Update rigidbody of ship or pilot module
+	
+			if(scriptModuleController.moduleRigidbodyMode)
+			{
+				hotRigid = pilotModule.rigidbody2D;
+				Debug.Log ("pilot rigidbody mode");
+			} else {
+				hotRigid = rigidbody2D;
+			}
+				  	hotRigid.AddForce (forwardDirection * thrustInput * thrustForceConstant * Time.fixedDeltaTime);
+					hotRigid.angularVelocity = turnInput * -turnSpeedConstant;
 
 						if (!isThrusting && thrustInput == 1) {
 								isThrusting = true;
@@ -183,26 +202,49 @@ public class ScriptShipController : MonoBehaviour {
 		addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
 		//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
 
+		//Log event
+		scriptModule.ownTime = Time.frameCount;
+		scriptModule.captureModule = assimilatingObject;
+
 		//Update module
 		scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
 		Vector2 worldCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
 		addedModule.transform.localPosition = worldCoordinates; //Set position
+		Debug.Log (addedModule.transform.eulerAngles);
 		addedModule.transform.localRotation = Quaternion.identity; //Set rotation
+		Debug.Log (addedModule.transform.eulerAngles);
 		addedModule.tag = "Ship"; //Tag as part of ship
-		if (addedModule.rigidbody2D) {
-			Destroy (addedModule.gameObject.rigidbody2D); //Destroy module's rigidbody
-		}
 		scriptModule.moduleOwner = this; //Mark this ship as new owner
-		scriptModule.ownTime = Time.frameCount;
-		scriptModule.captureModule = assimilatingObject;
 
 		//Verify module
 		VerifyCoordinates (addedModule);
 
-		//Ship rigidbody
-		lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
-		Destroy(rigidbody2D); //Destroy rigidbody for replacement
-		rigidbodyResetPending = true;
+		//Handle Rigidbody
+
+		if (scriptModuleController.moduleRigidbodyMode) {
+			if(addedModule.moduleType != ModuleType.Pilot)
+			{
+			DistanceJoint2D hotJoint = addedModule.gameObject.AddComponent<DistanceJoint2D>();
+			hotJoint.connectedBody = assimilatingObject.rigidbody2D;
+			//	hotJoint.distance;
+			//	hotJoint.anchor;
+			//	hotJoint.connectedAnchor;
+			}
+				} else {
+					//Destroy module's rigidbody
+						if (addedModule.rigidbody2D) {
+								Destroy (addedModule.gameObject.rigidbody2D); 
+						}
+			//Ship rigidbody
+			lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
+			Destroy(rigidbody2D); //Destroy rigidbody for replacement
+			rigidbodyResetPending = true;
+				}
+
+
+
+
+
 
 	
 
@@ -251,12 +293,13 @@ public class ScriptShipController : MonoBehaviour {
 		foreach (ScriptModule otherMod in iterationScripts) {
 			if(hotMod.moduleNodeCoordinates == otherMod.moduleNodeCoordinates && hotMod != otherMod)
 			{
-				Debug.LogError(hotMod.moduleID + "'s coordinates conflict with " + otherMod.moduleID + ".");
+				Debug.LogError(hotMod.moduleID + "'s coordinates conflict with " + otherMod.moduleID + "'s.");
 			}
 		//	Vector3 vector3Position = module.transform.localPosition;
 		//	Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
 		//	AddModule(module, hotCoordinates);
 		}
 	}
+
 
 }

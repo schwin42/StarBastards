@@ -9,6 +9,8 @@ public class ScriptProjectile : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
+
+
 	}
 	
 	// Update is called once per frame
@@ -19,7 +21,7 @@ public class ScriptProjectile : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D collider)
 	{
 		//Debug.Log (collider.gameObject.name);
-		if(collider.gameObject.tag == "Ship" && collider.gameObject.transform.root.gameObject != owner)
+		if(collider.gameObject.tag == "Ship" && collider.gameObject.transform.parent.parent.gameObject != owner)
 		{
 			//Debug.Log (collider.tag + collider.gameObject.transform.parent.gameObject.name + owner);
 		//	Debug.Log ("Ship Location");

@@ -10,14 +10,25 @@ public enum PlayerControl
 
 public class ScriptModuleController : MonoBehaviour {
 
+	//Configurable
+	public bool moduleRigidbodyMode = true;
+
 	//Prefabs
 	public GameObject augmentModule;
 	public GameObject defenseModule;
 	public GameObject weaponModule;
 
+	//Objects
+	public GameObject[] ships;
+
 	private int nextModuleID = 0;
 	// Use this for initialization
 	void Start () {
+
+		//Temporary variables
+		//ships = GameObject.Find("ContainerShip").transform.;
+
+		//Generate neutral modules
 		for(int i = 0; i<50; i++)
 		{
 			//GameObject hotMod = Instantiate (modulePrefab) as GameObject;
@@ -43,9 +54,11 @@ public class ScriptModuleController : MonoBehaviour {
 			ScriptModule scriptModule = hotMod.GetComponent<ScriptModule>();
 			scriptModule.moduleID = GetNextID();
 			hotMod.name = "Module" + scriptModule.moduleID;
-			//GetNextID(hotMod.GetComponent<ScriptModule>());
+			//GetNextID(hotModS.GetComponent<ScriptModule>());
 			//Debug.Log (i);
 		}
+
+		SetModuleRigidbodies (moduleRigidbodyMode);
 	}
 	
 	// Update is called once per frame
@@ -58,5 +71,27 @@ public class ScriptModuleController : MonoBehaviour {
 		int returnID = nextModuleID;
 		nextModuleID++;
 		return returnID;
+	}
+
+	void SetModuleRigidbodies(bool value)
+	{
+		//Remove ship rigidbodies
+		foreach (GameObject ship in ships) {
+			if(value)
+			{
+			if(ship.rigidbody2D){
+				Debug.Log ("Destroyed" + ship.name + "'s rigidbody2D");
+				Destroy(ship.rigidbody2D);
+				}
+			} else {
+				ScriptShipController scriptShipController = ship.GetComponent<ScriptShipController>();
+				GameObject targetModule = scriptShipController.pilotModule;
+
+				Destroy(targetModule.rigidbody2D);
+			}
+				}
+		//Change code to not remove module rigidbodies on collect 
+		//Add joints connecting the modules on collect
+
 	}
 }
