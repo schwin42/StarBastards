@@ -40,8 +40,10 @@ public class ScriptModuleController : MonoBehaviour {
 
 			hotMod.transform.position = new Vector2(Random.value * 100 - 50, Random.value * 100);
 			hotMod.transform.parent = this.gameObject.transform;
-			hotMod.GetComponent<ScriptModule>().moduleID = nextModuleID;
-			nextModuleID ++;
+			ScriptModule scriptModule = hotMod.GetComponent<ScriptModule>();
+			scriptModule.moduleID = GetNextID();
+			hotMod.name = "Module" + scriptModule.moduleID;
+			//GetNextID(hotMod.GetComponent<ScriptModule>());
 			//Debug.Log (i);
 		}
 	}
@@ -49,5 +51,12 @@ public class ScriptModuleController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+	public int GetNextID()
+	{
+		int returnID = nextModuleID;
+		nextModuleID++;
+		return returnID;
 	}
 }

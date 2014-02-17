@@ -22,7 +22,7 @@ public class ScriptProjectile : MonoBehaviour {
 		if(collider.gameObject.tag == "Ship" && collider.gameObject.transform.root.gameObject != owner)
 		{
 			//Debug.Log (collider.tag + collider.gameObject.transform.parent.gameObject.name + owner);
-			Debug.Log ("Ship Location");
+		//	Debug.Log ("Ship Location");
 			collider.gameObject.GetComponent<ScriptModule>().hitPoints -= projectileDamage;
 			Destroy (gameObject);
 		}

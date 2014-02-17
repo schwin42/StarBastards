@@ -40,6 +40,7 @@ public class ScriptShipController : MonoBehaviour {
 	private ScriptHumanInput scriptHumanInput;
 	private ScriptShipIntelligence scriptShipIntelligence;
 	private ScriptShipSheet scriptShipSheet;
+	private ScriptModuleController scriptModuleController;
 	private Vector2 forwardDirection;
 	private bool rigidbodyResetPending = false;
 	private Vector2 lastVelocity;
@@ -57,18 +58,20 @@ public class ScriptShipController : MonoBehaviour {
 		scriptShipIntelligence = GetComponent<ScriptShipIntelligence>();
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
 		shipModuleContainer = transform.FindChild ("ContainerModule");
+		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController> ();
 
 		//Cache starting rigidbody values from inspector
 		rigidbodyMass = rigidbody2D.mass;
 		rigidbodyLinearDrag = rigidbody2D.drag;
 		rigidbodyAngularDrag = rigidbody2D.angularDrag;
 
-		//Add starting modules
+		//Register starting modules
 		ScriptModule[] iterationScripts = shipModuleContainer.GetComponentsInChildren<ScriptModule> ();
 		foreach (ScriptModule module in iterationScripts) {
+			module.moduleID = scriptModuleController.GetNextID();
 			Vector3 vector3Position = module.transform.localPosition;
 			Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
-			AddModule(module, hotCoordinates);
+			AddModule(module, null, hotCoordinates);
 			}
 
 		//for (int i = 0; i < shipModuleContainer.childCount; i++) {
@@ -155,6 +158,8 @@ public class ScriptShipController : MonoBehaviour {
 
 	void RemoveModule()
 	{
+
+		//UNDER CONSTRUCTION
 	//	gameObject.AddComponent<Rigidbody2D>();
 	//	moduleOwner = null;
 	//	transform.parent = null;
@@ -169,35 +174,39 @@ public class ScriptShipController : MonoBehaviour {
 	}
 
 
-	public void AddModule(ScriptModule addedModule, Vector2 nodeCoordinates)
+	public void AddModule(ScriptModule addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
+		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
-		Debug.Log (addedModule);
-		if (addedModule.rigidbody2D) {
-						Destroy (addedModule.gameObject.rigidbody2D); //Destroy module's rigidbody
-				}
-		scriptModule.moduleOwner = this; //Mark this ship as new owner
-		//Debug.Log ("Owner " + scriptModule.moduleOwner);
-		lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
-		Destroy(rigidbody2D); //Destroy rigidbody for replacement
-		//rigidbodyMass ++; //Increment rigidbody (magic number)
-		rigidbodyResetPending = true;
 
+		//Set ship as parent
 		addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
 		//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
 
 		//Update module
 		scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
-
 		Vector2 worldCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
 		addedModule.transform.localPosition = worldCoordinates; //Set position
 		addedModule.transform.localRotation = Quaternion.identity; //Set rotation
-		//Debug.Log ("Node coordinates: " + nodeCoordinates + ", World position: " + worldCoordinates + ", Local position: " + addedModule.transform.localPosition);
-		//Debug.Log ("Local position: " + addedModule.transform.localPosition);
-
 		addedModule.tag = "Ship"; //Tag as part of ship
+		if (addedModule.rigidbody2D) {
+			Destroy (addedModule.gameObject.rigidbody2D); //Destroy module's rigidbody
+		}
+		scriptModule.moduleOwner = this; //Mark this ship as new owner
+		scriptModule.ownTime = Time.frameCount;
+		scriptModule.captureModule = assimilatingObject;
 
-		//StartCoroutine(ResetShipRigidbody(lastVelocity)); //Add and configure rigidbody component
+		//Verify module
+		VerifyCoordinates (addedModule);
+
+		//Ship rigidbody
+		lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
+		Destroy(rigidbody2D); //Destroy rigidbody for replacement
+		rigidbodyResetPending = true;
+
+	
+
+		//Ready module
 		if(scriptModule.moduleType == ModuleType.Weapon) //Ready weapon
 		{
 			scriptModule.canShoot = true;
@@ -233,6 +242,21 @@ public class ScriptShipController : MonoBehaviour {
 	Vector2 LocalPositionToNodeCoordinates(Vector2 localPosition)
 	{
 		return localPosition / ratioOfNodeToSpace;
+	}
+
+	void VerifyCoordinates(ScriptModule hotMod)
+	{
+		//Throw error iff hotMod's coordinates match another child object of this ship's  module container
+		ScriptModule[] iterationScripts = shipModuleContainer.GetComponentsInChildren<ScriptModule> ();
+		foreach (ScriptModule otherMod in iterationScripts) {
+			if(hotMod.moduleNodeCoordinates == otherMod.moduleNodeCoordinates && hotMod != otherMod)
+			{
+				Debug.LogError(hotMod.moduleID + "'s coordinates conflict with " + otherMod.moduleID + ".");
+			}
+		//	Vector3 vector3Position = module.transform.localPosition;
+		//	Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
+		//	AddModule(module, hotCoordinates);
+		}
 	}
 
 }

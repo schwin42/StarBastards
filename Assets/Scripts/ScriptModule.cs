@@ -51,6 +51,10 @@ public class ScriptModule : MonoBehaviour {
 
 	//Status
 	public bool canShoot = false;
+
+	//Error-checking
+	public int ownTime = -9999;
+	public GameObject captureModule;
 	
 	// Use this for initialization
 	void Start () {
@@ -124,7 +128,7 @@ public class ScriptModule : MonoBehaviour {
 				Vector2 assimilationNodeCoordinates = moduleNodeCoordinates + nodeCoordinatesOffset;
 
 			//Debug.Log ("Hit neutral");
-				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), assimilationNodeCoordinates);
+				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), gameObject, assimilationNodeCoordinates);
 				//collision.gameObject.GetComponent<ScriptModule>().SetOwner (gameObject, assimilationCoordinates);
 
 			}
