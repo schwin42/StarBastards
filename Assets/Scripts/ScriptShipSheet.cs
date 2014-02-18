@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-//using System.Collections.Generic;
+using System.Collections.Generic;
 
 
 
@@ -12,10 +12,14 @@ public class Node
 	public ModuleType moduleType;
 
 	private bool isChecked;
+	private bool isEmpty;
+	private List<Node> isConnectedTo = new List<Node>();
+	private Vector2 nodeCoordinates;
 
 	public Node()
 	{
 		module = null;
+		isEmpty = true;
 	}
 
 }
@@ -54,6 +58,8 @@ public class ScriptShipSheet : MonoBehaviour {
 		//foreach (GameObject module in transform) {
 
 		//		}
+
+		//InitializeGrid ();
 	}
 	
 	// Update is called once per frame
@@ -62,4 +68,15 @@ public class ScriptShipSheet : MonoBehaviour {
 
 
 	}
+	/*
+	void InitializeGrid()
+	{
+		for (int i = 0; i < schematic.Length; i++) {
+			for(int j = 0; j < schematic.Length; j++)
+			{
+				schematic[i, j] = new Node();
+			}
+				}
+	}
+	*/
 }
