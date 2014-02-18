@@ -67,7 +67,7 @@ public class ScriptShipController : MonoBehaviour {
 		rigidbodyLinearDrag = rigidbody2D.drag;
 		rigidbodyAngularDrag = rigidbody2D.angularDrag;
 
-		//Register starting modules
+		//Register starting modules, update to add joints if applicable
 		ScriptModule[] iterationScripts = shipModuleContainer.GetComponentsInChildren<ScriptModule> ();
 		foreach (ScriptModule module in iterationScripts) {
 			module.moduleID = scriptModuleController.GetNextID();
@@ -75,7 +75,6 @@ public class ScriptShipController : MonoBehaviour {
 			Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
 			AddModule(module, null, hotCoordinates);
 			}
-
 		//for (int i = 0; i < shipModuleContainer.childCount; i++) {
 		//	GameObject hotMod = shipModuleContainer.GetChild(i).gameObject;
 		//	Vector3 vector3Position = hotMod.transform.localPosition;
@@ -222,7 +221,7 @@ public class ScriptShipController : MonoBehaviour {
 		//Verify module
 		VerifyCoordinates (addedModule);
 
-		//Handle Rigidbody
+		//Mode handler
 
 		if (scriptModuleController.moduleRigidbodyMode) {
 			if(addedModule.moduleType != ModuleType.Pilot)
