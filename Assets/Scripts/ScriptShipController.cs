@@ -73,14 +73,14 @@ public class ScriptShipController : MonoBehaviour {
 			module.moduleID = scriptModuleController.GetNextID();
 			Vector3 vector3Position = module.transform.localPosition;
 			Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
-			AddModule(module, null, hotCoordinates);
+			AddModule(module, gameObject, hotCoordinates);
 			}
 		//for (int i = 0; i < shipModuleContainer.childCount; i++) {
 		//	GameObject hotMod = shipModuleContainer.GetChild(i).gameObject;
 		//	Vector3 vector3Position = hotMod.transform.localPosition;
 		//	Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
 		//	AddModule(hotMod.gameObject, hotCoordinates);
-		//	}
+		//}
 
 		//Set rigidbody velocity to zero
 		//rigidbody2D.velocity = Vector2.zero;
@@ -200,40 +200,53 @@ public class ScriptShipController : MonoBehaviour {
 		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
 
-		//Set ship as parent
-		addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
-		//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
+		if (addedModule.moduleType != ModuleType.Pilot) {
+						//Set ship as parent
+						addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
+						//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
 
-		//Log event
-		scriptModule.ownTime = Time.frameCount;
-		scriptModule.captureModule = assimilatingObject;
+						//Log event
+						scriptModule.ownTime = Time.frameCount;
+						scriptModule.captureModule = assimilatingObject;
 
-		//Update module
-		scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
-		Vector2 worldCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
-		addedModule.transform.localPosition = worldCoordinates; //Set position
-		//Debug.Log (addedModule.transform.eulerAngles);
-		addedModule.transform.localRotation = Quaternion.identity; //Set rotation
-		//Debug.Log (addedModule.transform.eulerAngles);
-		addedModule.tag = "Ship"; //Tag as part of ship
-		scriptModule.moduleOwner = this; //Mark this ship as new owner
+						//Update module
+			scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
+						addedModule.tag = "Ship"; //Tag as part of ship
+						scriptModule.moduleOwner = this; //Mark this ship as new owner
 
-		//Verify module
-		VerifyCoordinates (addedModule);
-
+						//Verify module
+						VerifyCoordinates (addedModule);
+				} 
 		//Mode handler
 
 		if (scriptModuleController.moduleRigidbodyMode) {
 			if(addedModule.moduleType != ModuleType.Pilot)
 			{
+
+				//Positioning
+				Vector2 localCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
+				Vector2 worldCoordinates = pilotModule.transform.TransformDirection(localCoordinates); //Set position
+				Debug.Log ("Local coordinates" + localCoordinates + "; World position: " + worldCoordinates);
+				addedModule.transform.position = worldCoordinates + new Vector2(pilotModule.transform.position.x, pilotModule.transform.position.y);
+				addedModule.transform.localRotation = Quaternion.identity; //Set rotation
+
+				//Rigidbody
 			DistanceJoint2D hotJoint = addedModule.gameObject.AddComponent<DistanceJoint2D>();
 			hotJoint.connectedBody = assimilatingObject.rigidbody2D;
-			//	hotJoint.distance;
+				hotJoint.collideConnected = true;
+			hotJoint.distance = 2;
 			//	hotJoint.anchor;
 			//	hotJoint.connectedAnchor;
 			}
 				} else {
-					//Destroy module's rigidbody
+
+			//Positioning
+
+			Vector2 localCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
+			addedModule.transform.localPosition = localCoordinates; //Set position
+			addedModule.transform.localRotation = Quaternion.identity; //Set rotation
+
+					//Rigidbody
 			if (addedModule.rigidbody2D) {
 				Destroy (addedModule.gameObject.rigidbody2D); 
 						}
@@ -309,6 +322,6 @@ public class ScriptShipController : MonoBehaviour {
 		Vector2 hotForce = hotForward * thrustInput * thrustForceConstant * Time.fixedDeltaTime;
 		hotRigid.AddForce(hotForce);
 		hotRigid.angularVelocity = turnInput * -turnSpeedConstant;
-		Debug.Log (hotForce + " " + hotRigid.velocity);
+		//Debug.Log (hotForce + " " + hotRigid.velocity);
 	}
 }
