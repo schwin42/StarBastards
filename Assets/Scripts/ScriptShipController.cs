@@ -37,6 +37,7 @@ public class ScriptShipController : MonoBehaviour {
 	//private Vector2 forwardDirection;
 	private bool rigidbodyResetPending = false;
 	private Vector2 lastVelocity;
+	private AudioSource audioSource;
 	//public Rigidbody2D rigidCharacter;
 	//private GameObject newBullet = null;
 
@@ -53,6 +54,7 @@ public class ScriptShipController : MonoBehaviour {
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
 		shipModuleContainer = transform.FindChild ("ContainerModule");
 		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController> ();
+		audioSource = GetComponent<AudioSource>();
 
 
 		//Set controlling rigidbody
@@ -200,6 +202,8 @@ public class ScriptShipController : MonoBehaviour {
 		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
 
+
+		//Register non-starting modules
 		if (addedModule.moduleType != ModuleType.Pilot) {
 						//Set ship as parent
 						addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
@@ -216,6 +220,9 @@ public class ScriptShipController : MonoBehaviour {
 
 						//Verify module
 						VerifyCoordinates (addedModule);
+
+			//Play sound effect
+			audioSource.Play();
 				} 
 		//Mode handler
 
@@ -256,13 +263,6 @@ public class ScriptShipController : MonoBehaviour {
 			Debug.Log ("Destroyed ship rigidbody");
 			rigidbodyResetPending = true;
 				}
-
-
-
-
-
-
-	
 
 		//Ready module
 		if(scriptModule.moduleType == ModuleType.Weapon) //Ready weapon

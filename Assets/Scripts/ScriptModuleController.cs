@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum PlayerControl
 {
@@ -19,14 +20,22 @@ public class ScriptModuleController : MonoBehaviour {
 	public GameObject weaponModule;
 
 	//Objects
-	public GameObject[] ships;
+	public Transform shipContainer;
+	private List<GameObject> ships = new List<GameObject>();
 
 	private int nextModuleID = 0;
 	// Use this for initialization
 	void Start () {
 
-		//Temporary variables
-		//ships = GameObject.Find("ContainerShip").transform.;
+		//Get objects
+		shipContainer = GameObject.Find ("ContainerShip").transform;
+
+		//Set ships
+		foreach(Transform child in shipContainer)
+		{
+			ships.Add (child.gameObject);
+		}
+		Debug.Log (ships.Count);
 
 		//Generate neutral modules
 		for(int i = 0; i<50; i++)

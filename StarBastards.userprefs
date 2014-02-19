@@ -1,12 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\ScriptShipSheet.cs">
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptModuleController.cs">
     <Files>
-      <File FileName="Assets\Scripts\ScriptShipController.cs" Line="237" Column="25" />
-      <File FileName="Assets\Scripts\ScriptModule.cs" Line="116" Column="3" />
-      <File FileName="Assets\Scripts\ScriptShipController.cs" Line="327" Column="2" />
-      <File FileName="Assets\Scripts\ScriptModuleController.cs" Line="52" Column="4" />
-      <File FileName="Assets\Scripts\ScriptShipSheet.cs" Line="62" Column="5" />
+      <File FileName="Assets/Scripts/ScriptModule.cs" Line="82" Column="54" />
+      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="57" Column="45" />
+      <File FileName="Assets/Scripts/ScriptModuleController.cs" Line="38" Column="27" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -79,7 +79,7 @@ public class ScriptModule : MonoBehaviour {
 				}
 			}
 
-			if(moduleType == ModuleType.Weapon)
+			if(moduleType == ModuleType.Weapon && moduleOwner.target)
 			{
 				Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
 				if(attackVector.magnitude <= weaponRange)
@@ -120,19 +120,17 @@ public class ScriptModule : MonoBehaviour {
 		{
 			if(collision.gameObject.tag == "NeutralModule")
 			{
+
+				//Calculate module location
 				ContactPoint2D contact = collision.contacts[0];
 				Vector2 normal = contact.normal;
 				Vector2 inverseNormal = transform.InverseTransformDirection(normal);
 				Vector2 roundNormal = RoundVector2(inverseNormal); 
 				Vector2 nodeCoordinatesOffset = CalibrateCoordinates(roundNormal); //Further adjustments
 				Vector2 assimilationNodeCoordinates = moduleNodeCoordinates + nodeCoordinatesOffset;
-				//Debug.Log ("Normal: " + normal + "; Inverse Normal: " + inverseNormal + "; Round Normal: " + roundNormal
-				  //         + "Node Coordinates Offset: " + nodeCoordinatesOffset + "; Assimilation Node Coordinates: " + assimilationNodeCoordinates
-				    //       + ".");
 
-			//Debug.Log ("Hit neutral");
+				//Collect module
 				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), gameObject, assimilationNodeCoordinates);
-				//collision.gameObject.GetComponent<ScriptModule>().SetOwner (gameObject, assimilationCoordinates);
 
 			}
 		} 
