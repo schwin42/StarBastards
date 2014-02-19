@@ -224,8 +224,9 @@ public class ScriptShipController : MonoBehaviour {
 			//Play sound effect
 			audioSource.Play();
 				} 
-		//Mode handler
 
+
+		//Mode handler
 		if (scriptModuleController.moduleRigidbodyMode) {
 			if(addedModule.moduleType != ModuleType.Pilot)
 			{
@@ -248,7 +249,6 @@ public class ScriptShipController : MonoBehaviour {
 				} else {
 
 			//Positioning
-
 			Vector2 localCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
 			addedModule.transform.localPosition = localCoordinates; //Set position
 			addedModule.transform.localRotation = Quaternion.identity; //Set rotation
@@ -260,7 +260,7 @@ public class ScriptShipController : MonoBehaviour {
 			//Ship rigidbody
 			lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
 			Destroy(rigidbody2D); //Destroy rigidbody for replacement
-			Debug.Log ("Destroyed ship rigidbody");
+			//Debug.Log ("Destroyed ship rigidbody");
 			rigidbodyResetPending = true;
 				}
 
@@ -269,6 +269,12 @@ public class ScriptShipController : MonoBehaviour {
 		{
 			scriptModule.canShoot = true;
 		}
+
+		//Add to grid
+		Vector2 gridNodeCoordinates = scriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
+		Node hotNode = new Node(addedModule);
+		Debug.Log (gridNodeCoordinates);
+		scriptShipSheet.schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
 	}
 	/*
 	IEnumerator ResetShipRigidbody(Vector2 lastVelocity)
@@ -324,4 +330,6 @@ public class ScriptShipController : MonoBehaviour {
 		hotRigid.angularVelocity = turnInput * -turnSpeedConstant;
 		//Debug.Log (hotForce + " " + hotRigid.velocity);
 	}
+
+
 }

@@ -35,7 +35,9 @@ public class ScriptModuleController : MonoBehaviour {
 		{
 			ships.Add (child.gameObject);
 		}
-		Debug.Log (ships.Count);
+		//Debug.Log (ships.Count);
+
+
 
 		//Generate neutral modules
 		for(int i = 0; i<50; i++)
@@ -103,4 +105,6 @@ public class ScriptModuleController : MonoBehaviour {
 		//Add joints connecting the modules on collect
 
 	}
+
+
 }
