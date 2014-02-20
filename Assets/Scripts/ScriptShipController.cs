@@ -127,7 +127,7 @@ public class ScriptShipController : MonoBehaviour {
 				//Debug.Log (thrustInput + turnInput + rigidbody2D.gameObject.name + forwardDirection + Time.frameCount);
 				UpdateVelocity(thrustInput, turnInput, rigidbody2D, shipForward);
 			} else if(rigidbodyResetPending){
-				Debug.Log ("Reset");
+			//	Debug.Log ("Reset");
 				gameObject.AddComponent<Rigidbody2D> ();
 				rigidbodyResetPending = false;
 				//Cache rigidbody

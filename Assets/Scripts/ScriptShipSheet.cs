@@ -11,7 +11,8 @@ public class Node
 	public ScriptModule module;
 	//public ModuleType moduleType;
 
-	private bool isChecked;
+	//public bool isChecked;
+	public bool isAdded;
 	public bool isEmpty;
 	public int snakeIndex;
 	//private List<Node> isConnectedTo = new List<Node>();
@@ -27,6 +28,7 @@ public class Node
 	{
 		module = scriptModuleArg;
 		isEmpty = false;
+
 	}
 
 }
@@ -35,7 +37,7 @@ public class ScriptShipSheet : MonoBehaviour {
 
 	public ScriptShipController scriptShipController;
 
-	private List<ScriptModule> pilotContiguousModules;
+	public List<ScriptModule> pilotContiguousModules;
 
 	static private int maxY = 50;
 	static private int maxX = 50;
@@ -59,10 +61,7 @@ public class ScriptShipSheet : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		if(Input.GetKeyDown("1"))
-		   {
-			GridStatus();
-		}
+
 
 	}
 
@@ -85,7 +84,7 @@ public class ScriptShipSheet : MonoBehaviour {
 	}
 
 	//Warning: very slow function
-	void GridStatus()
+	public void GridStatus()
 	{
 		int bound0 = schematic.GetUpperBound(0);
 		int bound1 = schematic.GetUpperBound(1);
@@ -115,57 +114,69 @@ public class ScriptShipSheet : MonoBehaviour {
 	}
 
 	//Get contiguous modules
-	List<ScriptModule> GetModulesContiguousToPilot()
+	public List<ScriptModule> GetModulesContiguousToPilot()
 	{
-		List<ScriptModule> pilotContiguousModules = new List<ScriptModule> ();
+		pilotContiguousModules = new List<ScriptModule> ();
 
 		ScriptModule pilotModule = scriptShipController.pilotModule.GetComponent<ScriptModule> ();
 
-		AddContiguousModules (pilotModule.moduleNodeCoordinates);
+		//AddContiguousModules (pilotModule.moduleNodeCoordinates);
 		//Set is checked to true - Module is checked only once it is added and all its adjacent modules are added to the queue
+
+		pilotContiguousModules.Add (pilotModule);
+		Vector2 pilotGridCoordinates = GetGridNodeCoordinates (pilotModule.moduleNodeCoordinates);
+		schematic[(int)pilotGridCoordinates.x, (int)pilotGridCoordinates.y].isAdded = true;
+
+		//Main iteration
+		for(int i = 0; i < pilotContiguousModules.Count; i++)
+		{
+			//Add adjacent modules to list and set as added and set current node as checked
+			AddContiguousModules(pilotContiguousModules[i].moduleNodeCoordinates);
 
 		}
 
-	void AddContiguousModules(Vector2 nodeWorldCoordinates)
+		//Clear temp variables
+		foreach(ScriptModule module in pilotContiguousModules)
+		{
+			Vector2 nodeGridCoordinates = GetGridNodeCoordinates (module.moduleNodeCoordinates);
+			Node hotNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+
+			//hotNode.isChecked = false;
+			hotNode.isAdded = false;
+		}
+
+		return pilotContiguousModules;
+
+		}
+
+	 void AddContiguousModules(Vector2 nodeWorldCoordinates)
 	{
 		Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
-		int nodeGridX = (int)nodeGridCoordinates.x;
-		int nodeGridY = (int)nodeGridCoordinates.y;
-		Node[] adjacentNodes = 
+		//int nodeGridX = (int)nodeGridCoordinates.x;
+		//int nodeGridY = (int)nodeGridCoordinates.y;
+		Vector2[] adjacentCoordinates = 
 		{
-			schematic [nodeGridX, nodeGridY + 1], //Up
-			schematic [nodeGridX, nodeGridY - 1], //Down
-			schematic [nodeGridX + 1, nodeGridY], //Right
-			schematic [nodeGridX - 1, nodeGridY] //Left
+			new Vector2(nodeGridCoordinates.x, nodeGridCoordinates.y + 1), //Up
+			new Vector2(nodeGridCoordinates.x, nodeGridCoordinates.y - 1), //Down
+			new Vector2(nodeGridCoordinates.x + 1, nodeGridCoordinates.y), //Right
+			new Vector2(nodeGridCoordinates.x - 1, nodeGridCoordinates.y) //Left
 		};
 
-		foreach (Node node in adjacentNodes) {
-			pilotContiguousModules.Add (node);
-
+		foreach (Vector2 adjacentVector2 in adjacentCoordinates) {
+			Debug.Log ((int)adjacentVector2.x + " " + (int)adjacentVector2.y);
+			Node adjacentNode = schematic[(int)adjacentVector2.x, (int)adjacentVector2.y];
+			if(adjacentNode.isEmpty || adjacentNode.isAdded)
+			{
+				Debug.Log ("PK Stand There");
+				//PK Stand There
+			} else {
+				Debug.Log ("Added");
+			pilotContiguousModules.Add (adjacentNode.module);
+				adjacentNode.isAdded = true;
+			}
+			//schematic [nodeGridX, nodeGridY].isChecked = true;
 				}
 
-		//Get nodes adjacent to node that are not empty and have not been checked
 
-		//Up
-		//if(schematic[nodeGridX, nodeGridY+1]
-
-
-		//Down
-
-		//Left
-
-		//Right
-
-
-		//1. Get nodes adjacent to pilot node that are not empty
-		//2. Get nodes adjacent to those nodes that are not empty
-		//3. Continue until there are no nodes remaining
-		//scriptShipController.pilotModule
-
-
-
-	//	foreach (ScriptModule module in transform.GetComponentsInChildren<ScriptModule>()) {
-
-	//			}
 	}
 }

@@ -25,6 +25,10 @@ public class ScriptModuleController : MonoBehaviour {
 
 	private int nextModuleID = 0;
 	// Use this for initialization
+
+	//Debug
+	public List<ScriptModule> pilotContiguousModules = new List<ScriptModule>();
+
 	void Start () {
 
 		//Get objects
@@ -74,7 +78,17 @@ public class ScriptModuleController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if(Input.GetKeyDown("1"))
+		{
+			foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
+			ship.GridStatus();
+		}
+		
+		if(Input.GetKeyDown("2"))
+		{
+			foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
+				pilotContiguousModules = ship.GetModulesContiguousToPilot();
+		}
 	}
 
 	public int GetNextID()
