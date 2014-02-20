@@ -13,6 +13,7 @@ public class Node
 
 	private bool isChecked;
 	public bool isEmpty;
+	public int snakeIndex;
 	//private List<Node> isConnectedTo = new List<Node>();
 	//private Vector2 nodeCoordinates;
 
@@ -29,30 +30,12 @@ public class Node
 	}
 
 }
-/*
-public class Schematic
-{
-	 //x list containing y list
-	//public int xLowerLimit;
-	//public int xUpper;
-	//public int yLowerLimit;
-	//public int yUpper;
-
-	public Schematic ()
-	{
-	//	List<Node> yList = new List<Node>{
-	//	xLowerLimit = 0;
-		//xUpper = 0;
-	//	yLowerLimit = 0;
-		//yUpper = 0;
-	}
-}
-*/
 
 public class ScriptShipSheet : MonoBehaviour {
 
+	public ScriptShipController scriptShipController;
 
-
+	private List<ScriptModule> pilotContiguousModules;
 
 	static private int maxY = 50;
 	static private int maxX = 50;
@@ -62,6 +45,9 @@ public class ScriptShipSheet : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
+
+		//Assign variables
+		scriptShipController = gameObject.GetComponent<ScriptShipController>();
 
 		//foreach (GameObject module in transform) {
 
@@ -85,7 +71,6 @@ public class ScriptShipSheet : MonoBehaviour {
 	//Temporary variables
 		int bound0 = schematic.GetUpperBound(0);
 		int bound1 = schematic.GetUpperBound(1);
-
 
 		for (int i = 0; i < bound0; i++) {
 			for(int j = 0; j < bound1; j++)
@@ -127,5 +112,60 @@ public class ScriptShipSheet : MonoBehaviour {
 		gridNodeCoordinates.y = nodeCoordinates.y + maxY;
 		//Debug.Log (gridNodeCoordinates);
 		return gridNodeCoordinates;
+	}
+
+	//Get contiguous modules
+	List<ScriptModule> GetModulesContiguousToPilot()
+	{
+		List<ScriptModule> pilotContiguousModules = new List<ScriptModule> ();
+
+		ScriptModule pilotModule = scriptShipController.pilotModule.GetComponent<ScriptModule> ();
+
+		AddContiguousModules (pilotModule.moduleNodeCoordinates);
+		//Set is checked to true - Module is checked only once it is added and all its adjacent modules are added to the queue
+
+		}
+
+	void AddContiguousModules(Vector2 nodeWorldCoordinates)
+	{
+		Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
+		int nodeGridX = (int)nodeGridCoordinates.x;
+		int nodeGridY = (int)nodeGridCoordinates.y;
+		Node[] adjacentNodes = 
+		{
+			schematic [nodeGridX, nodeGridY + 1], //Up
+			schematic [nodeGridX, nodeGridY - 1], //Down
+			schematic [nodeGridX + 1, nodeGridY], //Right
+			schematic [nodeGridX - 1, nodeGridY] //Left
+		};
+
+		foreach (Node node in adjacentNodes) {
+			pilotContiguousModules.Add (node);
+
+				}
+
+		//Get nodes adjacent to node that are not empty and have not been checked
+
+		//Up
+		//if(schematic[nodeGridX, nodeGridY+1]
+
+
+		//Down
+
+		//Left
+
+		//Right
+
+
+		//1. Get nodes adjacent to pilot node that are not empty
+		//2. Get nodes adjacent to those nodes that are not empty
+		//3. Continue until there are no nodes remaining
+		//scriptShipController.pilotModule
+
+
+
+	//	foreach (ScriptModule module in transform.GetComponentsInChildren<ScriptModule>()) {
+
+	//			}
 	}
 }
