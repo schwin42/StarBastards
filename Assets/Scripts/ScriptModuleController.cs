@@ -13,6 +13,7 @@ public class ScriptModuleController : MonoBehaviour {
 
 	//Configurable
 	public bool moduleRigidbodyMode = true;
+	public float startingForceConstant = 10;
 
 	//Prefabs
 	public GameObject augmentModule;
@@ -61,7 +62,7 @@ public class ScriptModuleController : MonoBehaviour {
 			} else if(hotRand <= 3){
 				hotMod = Instantiate (defenseModule) as GameObject;
 			} else {
-				Debug.LogError ("Random leak.");
+				Debug.LogError ("Bug in random number generator.");
 			}
 
 			hotMod.transform.position = new Vector2(Random.value * 100 - 50, Random.value * 100);
@@ -69,6 +70,9 @@ public class ScriptModuleController : MonoBehaviour {
 			ScriptModule scriptModule = hotMod.GetComponent<ScriptModule>();
 			scriptModule.moduleID = GetNextID();
 			hotMod.name = "Module" + scriptModule.moduleID;
+
+			Vector2 normalizedRandomForce = new Vector2(Random.value * 2 - 1, Random.value * 2 - 1); 
+			hotMod.rigidbody2D.AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
 			//GetNextID(hotModS.GetComponent<ScriptModule>());
 			//Debug.Log (i);
 		}

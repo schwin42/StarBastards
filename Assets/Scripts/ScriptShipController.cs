@@ -1,10 +1,26 @@
 using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
+public class Activation
+{
+	public int activationID;
+	public ModuleType moduleType; //Gadget type
+	public int damage = 10;
+	public float shotDelay = 1; //In seconds
+	public int shotForce = 2000;
+	public int size = 0;
+	public int scatterAngle = 0;
+	public bool canShoot;
+	public float shotTimer;
+
+}
+
 public class ScriptShipController : MonoBehaviour {
 
 	//Configurable
 	public PlayerControl playerControl = PlayerControl.None;
+	public Activation activation = new Activation();
 	
 	//Inspector Assigned
 	public GameObject pilotModule;
@@ -102,6 +118,7 @@ public class ScriptShipController : MonoBehaviour {
 						if (playerControl == PlayerControl.Human) {
 								thrustInput = scriptHumanInput.thrustInput;
 								turnInput = scriptHumanInput.turnInput;
+			//Debug.Log ("Human");
 						} else if (playerControl == PlayerControl.Computer) {
 								thrustInput = scriptShipIntelligence.thrustInput;
 								turnInput = scriptShipIntelligence.turnInput;
@@ -117,6 +134,7 @@ public class ScriptShipController : MonoBehaviour {
 			Vector2 pilotModuleForward = pilotModule.transform.TransformDirection(Vector2.up);
 			//Debug.Log ("Pilot forward: " + pilotModuleForward);
 			UpdateVelocity(thrustInput, turnInput, pilotModule.rigidbody2D, pilotModuleForward);
+
 				//Debug.Log ("pilot rigidbody mode");
 			} else {
 			Vector2 upVector = Vector2.up;
@@ -126,6 +144,7 @@ public class ScriptShipController : MonoBehaviour {
 			{
 				//Debug.Log (thrustInput + turnInput + rigidbody2D.gameObject.name + forwardDirection + Time.frameCount);
 				UpdateVelocity(thrustInput, turnInput, rigidbody2D, shipForward);
+				Debug.Log ("Velocity Updated: " + thrustInput + ", " + turnInput);
 			} else if(rigidbodyResetPending){
 			//	Debug.Log ("Reset");
 				gameObject.AddComponent<Rigidbody2D> ();
@@ -170,6 +189,8 @@ public class ScriptShipController : MonoBehaviour {
 		//transform.rotation = Quaternion.Euler(0, 
 		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
 
+
+		UpdateActivation (activation);
 	}
 
 
@@ -273,7 +294,7 @@ public class ScriptShipController : MonoBehaviour {
 		//Add to grid
 		Vector2 gridNodeCoordinates = scriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
 		Node hotNode = new Node(addedModule);
-		Debug.Log (gridNodeCoordinates);
+	//	Debug.Log (gridNodeCoordinates);
 		scriptShipSheet.schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
 	}
 	/*
@@ -331,5 +352,39 @@ public class ScriptShipController : MonoBehaviour {
 		//Debug.Log (hotForce + " " + hotRigid.velocity);
 	}
 
+	void UpdateActivation(Activation activation)
+	{
+	//	if(moduleType == ModuleType.Weapon && moduleOwner.target)
+	//	{
+		//	Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
+		Vector2 attackVector = pilotModule.transform.TransformDirection (Vector2.up);
+		//	if(attackVector.magnitude <= weaponRange)
+			//{
+				if(activation.canShoot)
+				{
+					activation.canShoot = false;
+			Vector3 bulletPosition = pilotModule.transform.position;
+					GameObject hotBullet = Instantiate (basicBullet, bulletPosition, transform.rotation) as GameObject;
+			Debug.Log (transform.position);
+			ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
+					scriptProjectile.projectileDamage = activation.damage;
+					scriptProjectile.owner = gameObject;
+					hotBullet.rigidbody2D.AddForce(attackVector * activation.shotForce); //Magic number
+					activation.shotTimer = 0;
+				} else {
+					activation.shotTimer += Time.deltaTime;
+					if(activation.shotTimer >= activation.shotDelay)
+					{
+						activation.canShoot = true;
+					}
+				}
+		//	} else {
+		//		if(!canShoot)
+		//		{
+		//			canShoot = true;
+		//		}
+			//}
+		//}
+	}
 
 }
