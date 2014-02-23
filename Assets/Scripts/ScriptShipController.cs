@@ -111,34 +111,35 @@ public class ScriptShipController : MonoBehaviour {
 
 	void FixedUpdate () 
 	{			
+		//Temporary variables
+		float thrustInput = 0;
+		float turnInput = 0;
 
-						float thrustInput = 0;
-						float turnInput = 0;
+		//Assign input
+		if (playerControl == PlayerControl.Human) {
 
-						if (playerControl == PlayerControl.Human) {
-								thrustInput = scriptHumanInput.thrustInput;
-								turnInput = scriptHumanInput.turnInput;
+			thrustInput = scriptHumanInput.thrustInput;
+			turnInput = scriptHumanInput.turnInput;
 			//Debug.Log ("Human");
-						} else if (playerControl == PlayerControl.Computer) {
-								thrustInput = scriptShipIntelligence.thrustInput;
-								turnInput = scriptShipIntelligence.turnInput;
-						} else {
-								Debug.Log ("No control selected for " + this);
-						}
+		} else if (playerControl == PlayerControl.Computer) {
+			thrustInput = scriptShipIntelligence.thrustInput;
+			turnInput = scriptShipIntelligence.turnInput;
+		} else {
+			Debug.Log ("No control selected for " + this);
+		}
 
-			//Update rigidbody of ship or pilot module
-	
-			if(scriptModuleController.moduleRigidbodyMode)
-			{
+			//Update position
+
+		if(scriptModuleController.moduleRigidbodyMode)
+		{
 				//rigidCharacter = pilotModule.rigidbody2D;
 			Vector2 pilotModuleForward = pilotModule.transform.TransformDirection(Vector2.up);
 			//Debug.Log ("Pilot forward: " + pilotModuleForward);
 			UpdateVelocity(thrustInput, turnInput, pilotModule.rigidbody2D, pilotModuleForward);
-
 				//Debug.Log ("pilot rigidbody mode");
-			} else {
+		} else {
 			Vector2 upVector = Vector2.up;
-				Vector2 shipForward = transform.TransformDirection (upVector);
+			Vector2 shipForward = transform.TransformDirection (upVector);
 			//Debug.Log ("Ship forward: " + shipForward + "Up: " + upVector + Time.frameCount);
 			if(rigidbody2D)
 			{
@@ -157,7 +158,7 @@ public class ScriptShipController : MonoBehaviour {
 				rigidbody2D.velocity = newVelocity;
 			}
 
-			}
+		}
 			
 			//Debug.Log (rigidCharacter.gameObject.name + hotForce);
 			//Debug.Log ("Turn input: " + turnInput);
