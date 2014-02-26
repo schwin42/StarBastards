@@ -18,24 +18,23 @@ public class Activation
 
 public class ScriptShipController : MonoBehaviour {
 
-	//Configurable
+//Configurable
 	public PlayerControl playerControl = PlayerControl.None;
 	public Activation activation = new Activation();
+	//Motion
+	public float thrustForceConstant = 10.0F;
+	public float turnSpeedConstant = 1.0F;
+//	public float bulletForceConstant = 10.0F;
+	//public float topSpeed = 10.0F; 
+	public float teleportDelay = 1.0F;
 	
-	//Inspector Assigned
+//Inspector Assigned
 	public GameObject pilotModule;
 	public GameObject basicBullet;
 	public ParticleSystem thrustEffect;
 	public GameObject target;
-
-
-	//Configurable variables
-	public float thrustForceConstant = 10.0F;
-	public float turnSpeedConstant = 1.0F;
-	public float bulletForceConstant = 10.0F;
-	//public float topSpeed = 10.0F; 
-
-	//Cached from inspector
+	
+//Cached from inspector
 	[System.NonSerialized]
 	public float rigidbodyMass;
 	[System.NonSerialized]
@@ -43,7 +42,7 @@ public class ScriptShipController : MonoBehaviour {
 	[System.NonSerialized]
 	public float rigidbodyAngularDrag;
 
-	//Private variables
+//Private variables
 	private float ratioOfNodeToSpace = 2F;
 	private Transform shipModuleContainer;
 	private ScriptHumanInput scriptHumanInput;
@@ -56,10 +55,12 @@ public class ScriptShipController : MonoBehaviour {
 	private AudioSource audioSource;
 	//public Rigidbody2D rigidCharacter;
 	//private GameObject newBullet = null;
+	private float teleportTimer = 0f;
 
-	//Status
+//Status
 	[System.NonSerialized]
 	public bool isThrusting = false;
+	public bool justTeleported = false;
 
 	// Use this for initialization
 	void Start () {
@@ -145,7 +146,7 @@ public class ScriptShipController : MonoBehaviour {
 			{
 				//Debug.Log (thrustInput + turnInput + rigidbody2D.gameObject.name + forwardDirection + Time.frameCount);
 				UpdateVelocity(thrustInput, turnInput, rigidbody2D, shipForward);
-				Debug.Log ("Velocity Updated: " + thrustInput + ", " + turnInput);
+			//	Debug.Log ("Velocity Updated: " + thrustInput + ", " + turnInput);
 			} else if(rigidbodyResetPending){
 			//	Debug.Log ("Reset");
 				gameObject.AddComponent<Rigidbody2D> ();
@@ -192,6 +193,19 @@ public class ScriptShipController : MonoBehaviour {
 
 
 		UpdateActivation (activation);
+
+		if(justTeleported)
+		{
+			if(teleportTimer >= teleportDelay)
+			{
+				justTeleported = false;
+				Debug.Log ("Teleported status off " + Time.time);
+				teleportTimer = 0;
+				//gameObject.layer = 0;
+			} else {
+			teleportTimer += Time.deltaTime;
+			}
+			}
 	}
 
 
@@ -358,6 +372,8 @@ public class ScriptShipController : MonoBehaviour {
 	//	if(moduleType == ModuleType.Weapon && moduleOwner.target)
 	//	{
 		//	Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
+		if(pilotModule)
+		{
 		Vector2 attackVector = pilotModule.transform.TransformDirection (Vector2.up);
 		//	if(attackVector.magnitude <= weaponRange)
 			//{
@@ -366,7 +382,7 @@ public class ScriptShipController : MonoBehaviour {
 					activation.canShoot = false;
 			Vector3 bulletPosition = pilotModule.transform.position;
 					GameObject hotBullet = Instantiate (basicBullet, bulletPosition, transform.rotation) as GameObject;
-			Debug.Log (transform.position);
+			//Debug.Log (transform.position);
 			ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
 					scriptProjectile.projectileDamage = activation.damage;
 					scriptProjectile.owner = gameObject;
@@ -386,6 +402,7 @@ public class ScriptShipController : MonoBehaviour {
 		//		}
 			//}
 		//}
+	}
 	}
 
 }
