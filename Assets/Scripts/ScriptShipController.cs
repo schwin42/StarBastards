@@ -60,7 +60,8 @@ public class ScriptShipController : MonoBehaviour {
 //Status
 	[System.NonSerialized]
 	public bool isThrusting = false;
-	public bool justTeleported = false;
+	//public bool justTeleported = false;
+	public Direction teleportDirection = Direction.None;
 
 	// Use this for initialization
 	void Start () {
@@ -194,12 +195,12 @@ public class ScriptShipController : MonoBehaviour {
 
 		UpdateActivation (activation);
 
-		if(justTeleported)
+		if(teleportDirection != Direction.None)
 		{
 			if(teleportTimer >= teleportDelay)
 			{
-				justTeleported = false;
-				Debug.Log ("Teleported status off " + Time.time);
+				teleportDirection = Direction.None;
+				Debug.Log ("Teleported status none " + Time.time);
 				teleportTimer = 0;
 				//gameObject.layer = 0;
 			} else {
