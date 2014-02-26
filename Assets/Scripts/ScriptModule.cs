@@ -35,10 +35,15 @@ public class ScriptModule : MonoBehaviour {
 	//[System.NonSerialized]
 	public ScriptShipController moduleOwner = null; //Null indicates module is neutral
 	public Vector2 moduleNodeCoordinates; //Location of owned module relative to pilot module
+	public Transform spaceController;
+
+	//Scriptable
+	private float ejectionForceConstant = 3000F;
 
 	public ModuleType moduleType = ModuleType.None;
 
-	public int hitPoints;
+	public int maxHP = 10;
+	public int currentHP;
 
 	//Weapon stats
 	public ProjectileType projectileType = ProjectileType.None;
@@ -58,6 +63,7 @@ public class ScriptModule : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
+
 		if(tag == "Ship")
 		{
 			moduleOwner = transform.parent.parent.gameObject.GetComponent<ScriptShipController>();
@@ -69,16 +75,21 @@ public class ScriptModule : MonoBehaviour {
 	if(moduleOwner != null)
 		{
 
-			if(hitPoints <= 0)
+			if(currentHP <= 0)
 			{
 				if(moduleType == ModuleType.Pilot)
 				{
-					Destroy (gameObject);
+					Destroy (moduleOwner.gameObject);
+					ScriptModule[] iterationScripts = moduleOwner.shipModuleContainer.GetComponentsInChildren<ScriptModule>();
+					foreach(ScriptModule hotMod in iterationScripts){
+						hotMod.RemoveModule();
+					}
 				} else {
-					Destroy (gameObject);
+					RemoveModule();
 				}
 			}
 
+			/*
 			if(moduleType == ModuleType.Weapon && moduleOwner.target)
 			{
 				Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
@@ -107,6 +118,8 @@ public class ScriptModule : MonoBehaviour {
 					}
 				}
 			}
+
+			*/
 		}
 
 	}
@@ -196,6 +209,32 @@ public class ScriptModule : MonoBehaviour {
 		return hotVector;
 	}
 
+	void RemoveModule()
+	{
+		moduleOwner = null;
+		transform.parent = spaceController;
+		tag = "NeutralModule";
+			if(moduleType == ModuleType.Weapon)
+			{
+				canShoot = false;
+			}
+
+		gameObject.AddComponent<Rigidbody2D>();
+		//Set rigidbody values
+		Vector2 ejectionForce = new Vector2((Random.value -0.5F) * ejectionForceConstant, (Random.value -0.5F) * ejectionForceConstant);
+		rigidbody2D.AddForce(ejectionForce);
+
+
+
+	//	//transform.localPosition = Vector2.zero;
+	//	shipSpaceCoordinates = Vector3.zero;
+
+	//	if(moduleType == ModuleType.Weapon)
+	//	{
+	//		canShoot = false;
+	//	}
+	
+	}
 
 
 }

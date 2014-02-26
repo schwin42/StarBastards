@@ -46,8 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ScriptBoundary.cs" />
-     <Compile Include="Assets\ScriptSpace.cs" />
+     <Compile Include="Assets\Scripts\ScriptBoundary.cs" />
      <Compile Include="Assets\Scripts\ScriptHumanInput.cs" />
      <Compile Include="Assets\Scripts\ScriptModule.cs" />
      <Compile Include="Assets\Scripts\ScriptModuleController.cs" />
@@ -55,6 +54,7 @@
      <Compile Include="Assets\Scripts\ScriptShipController.cs" />
      <Compile Include="Assets\Scripts\ScriptShipIntelligence.cs" />
      <Compile Include="Assets\Scripts\ScriptShipSheet.cs" />
+     <Compile Include="Assets\Scripts\ScriptSpace.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

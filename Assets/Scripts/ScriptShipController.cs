@@ -33,7 +33,10 @@ public class ScriptShipController : MonoBehaviour {
 	public GameObject basicBullet;
 	public ParticleSystem thrustEffect;
 	public GameObject target;
-	
+
+//Objects
+	public Transform shipModuleContainer;
+
 //Cached from inspector
 	[System.NonSerialized]
 	public float rigidbodyMass;
@@ -44,7 +47,6 @@ public class ScriptShipController : MonoBehaviour {
 
 //Private variables
 	private float ratioOfNodeToSpace = 2F;
-	private Transform shipModuleContainer;
 	private ScriptHumanInput scriptHumanInput;
 	private ScriptShipIntelligence scriptShipIntelligence;
 	private ScriptShipSheet scriptShipSheet;
@@ -200,7 +202,7 @@ public class ScriptShipController : MonoBehaviour {
 			if(teleportTimer >= teleportDelay)
 			{
 				teleportDirection = Direction.None;
-				Debug.Log ("Teleported status none " + Time.time);
+			//	Debug.Log ("Teleported status none " + Time.time);
 				teleportTimer = 0;
 				//gameObject.layer = 0;
 			} else {
@@ -216,8 +218,8 @@ public class ScriptShipController : MonoBehaviour {
 	//}
 
 
-	void RemoveModule()
-	{
+	//void RemoveModule(ScriptModule moduleToRemove)
+	//{
 
 		//UNDER CONSTRUCTION
 	//	gameObject.AddComponent<Rigidbody2D>();
@@ -231,11 +233,12 @@ public class ScriptShipController : MonoBehaviour {
 	//		canShoot = false;
 	//	}
 		
-	}
+	//}
 
 
 	public void AddModule(ScriptModule addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
+		Debug.Log (addedModule.moduleID);
 		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
 
@@ -254,6 +257,7 @@ public class ScriptShipController : MonoBehaviour {
 			scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
 						addedModule.tag = "Ship"; //Tag as part of ship
 						scriptModule.moduleOwner = this; //Mark this ship as new owner
+			scriptModule.currentHP = scriptModule.maxHP; //Set starting HP
 
 						//Verify module
 						VerifyCoordinates (addedModule);
