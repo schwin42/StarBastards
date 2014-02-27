@@ -238,7 +238,7 @@ public class ScriptShipController : MonoBehaviour {
 
 	public void AddModule(ScriptModule addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
-		Debug.Log (addedModule.moduleID);
+		//Debug.Log (addedModule.moduleID);
 		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
 

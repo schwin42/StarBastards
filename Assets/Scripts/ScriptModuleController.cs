@@ -14,15 +14,24 @@ public class ScriptModuleController : MonoBehaviour {
 	//Configurable
 	public bool moduleRigidbodyMode = true;
 	public float startingForceConstant = 10;
+	public float ejectionLinearForceConstant = 1000F;
+	public float ejectionAngularForceConstant = 1000F;
 
 	//Prefabs
 	public GameObject augmentModule;
 	public GameObject defenseModule;
 	public GameObject weaponModule;
+	public GameObject explosionEffect;
+
+
+
+	//Transforms
+	public Transform shipContainer;
+	public Transform spaceContainer;
 
 	//Objects
-	public Transform shipContainer;
 	private List<GameObject> ships = new List<GameObject>();
+
 
 	private int nextModuleID = 0;
 	// Use this for initialization
@@ -33,7 +42,7 @@ public class ScriptModuleController : MonoBehaviour {
 	void Start () {
 
 		//Get objects
-		shipContainer = GameObject.Find ("ContainerShip").transform;
+		//shipContainer = GameObject.Find ("ContainerShip").transform;
 
 		//Set ships
 		foreach(Transform child in shipContainer)
@@ -122,6 +131,29 @@ public class ScriptModuleController : MonoBehaviour {
 		//Change code to not remove module rigidbodies on collect 
 		//Add joints connecting the modules on collect
 
+	}
+
+	public void RemoveModule(ScriptModule hotMod)
+	{
+		hotMod.moduleOwner = null;
+		hotMod.transform.parent = spaceContainer;
+		hotMod.tag = "NeutralModule";
+		if(hotMod.moduleType == ModuleType.Weapon)
+		{
+			hotMod.canShoot = false;
+		}
+		
+		hotMod.gameObject.AddComponent<Rigidbody2D>();
+		//Set rigidbody values
+
+
+		Vector2 ejectionLinearForce = new Vector2((Random.value -0.5F) * ejectionLinearForceConstant, (Random.value -0.5F) * ejectionLinearForceConstant);
+		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
+		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
+		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
+
+		//Explosion effect
+		Instantiate(explosionEffect, hotMod.transform.position, Quaternion.identity);
 	}
 
 

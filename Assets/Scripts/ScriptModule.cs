@@ -35,10 +35,14 @@ public class ScriptModule : MonoBehaviour {
 	//[System.NonSerialized]
 	public ScriptShipController moduleOwner = null; //Null indicates module is neutral
 	public Vector2 moduleNodeCoordinates; //Location of owned module relative to pilot module
-	public Transform spaceController;
+	//public Transform spaceController;
+	//public GameObject explosionEffect;
 
 	//Scriptable
-	private float ejectionForceConstant = 3000F;
+
+	//Inspector objects
+	public ScriptModuleController scriptModuleController;
+
 
 	public ModuleType moduleType = ModuleType.None;
 
@@ -64,6 +68,9 @@ public class ScriptModule : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+		//Acquire transforms
+		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController>();
+
 		if(tag == "Ship")
 		{
 			moduleOwner = transform.parent.parent.gameObject.GetComponent<ScriptShipController>();
@@ -82,10 +89,10 @@ public class ScriptModule : MonoBehaviour {
 					Destroy (moduleOwner.gameObject);
 					ScriptModule[] iterationScripts = moduleOwner.shipModuleContainer.GetComponentsInChildren<ScriptModule>();
 					foreach(ScriptModule hotMod in iterationScripts){
-						hotMod.RemoveModule();
+						scriptModuleController.RemoveModule(hotMod);
 					}
 				} else {
-					RemoveModule();
+					scriptModuleController.RemoveModule(this);
 				}
 			}
 
@@ -209,20 +216,7 @@ public class ScriptModule : MonoBehaviour {
 		return hotVector;
 	}
 
-	void RemoveModule()
-	{
-		moduleOwner = null;
-		transform.parent = spaceController;
-		tag = "NeutralModule";
-			if(moduleType == ModuleType.Weapon)
-			{
-				canShoot = false;
-			}
 
-		gameObject.AddComponent<Rigidbody2D>();
-		//Set rigidbody values
-		Vector2 ejectionForce = new Vector2((Random.value -0.5F) * ejectionForceConstant, (Random.value -0.5F) * ejectionForceConstant);
-		rigidbody2D.AddForce(ejectionForce);
 
 
 
@@ -234,7 +228,7 @@ public class ScriptModule : MonoBehaviour {
 	//		canShoot = false;
 	//	}
 	
-	}
+
 
 
 }

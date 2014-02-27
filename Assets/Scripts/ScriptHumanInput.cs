@@ -1,12 +1,22 @@
 using UnityEngine;
 using System.Collections;
 
+public enum ControlType
+{
+	Keyboard,
+	Touch
+}
+
 public class ScriptHumanInput : MonoBehaviour {
+
+	//Configurable
+	public ControlType controlType;
 	
+	//Internal
 	public float thrustInput = 0.0F;
 	public float turnInput = -9999F;
 	public bool queueFire = false;
-	public bool[] mainInput;
+	public bool[] mainInput = new bool[]{false, false};
 	public string playerInput;
 	//private ScriptShipSheet scriptShipSheet;
 	
@@ -17,11 +27,19 @@ public class ScriptHumanInput : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+
+		if(controlType == ControlType.Keyboard)
+		{
+
 		thrustInput = Input.GetAxis(playerInput + "Thrust");
 		mainInput = new bool[]{Input.GetButton (playerInput + "Left"), Input.GetButton (playerInput + "Right")};
 		//float p1LeftDown = Input.GetButton ("P01Left");
 		//float p1RightDown = Input.GetButton ("P01Right");
+		} else if (controlType == ControlType.Touch){
+	
+		} else {
+			Debug.Log ("No control type selected for " + playerInput);
+		}
 
 		if (mainInput[0] == false && mainInput[1] == false) {
 			turnInput = 0F;
