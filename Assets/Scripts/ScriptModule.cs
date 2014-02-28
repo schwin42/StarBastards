@@ -43,6 +43,8 @@ public class ScriptModule : MonoBehaviour {
 	//Inspector objects
 	public ScriptModuleController scriptModuleController;
 
+	//Acquired objects
+	//public Renderer renderer;
 
 	public ModuleType moduleType = ModuleType.None;
 
@@ -68,13 +70,21 @@ public class ScriptModule : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		//Acquire transforms
+		//Acquire objects
 		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController>();
+		//renderer = GetComponent<Renderer>();
+		//material = GetComponent<Material>();
 
 		if(tag == "Ship")
 		{
 			moduleOwner = transform.parent.parent.gameObject.GetComponent<ScriptShipController>();
 		}
+
+	//	if(moduleType == ModuleType.Pilot)
+	//	{
+			//renderer.material.color = moduleOwner.playerColor;
+	//	}
+
 	}
 	
 	// Update is called once per frame

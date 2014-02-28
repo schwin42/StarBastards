@@ -20,6 +20,7 @@ public class ScriptShipController : MonoBehaviour {
 
 //Configurable
 	public PlayerControl playerControl = PlayerControl.None;
+	public Color playerColor;
 	public Activation activation = new Activation();
 	//Motion
 	public float thrustForceConstant = 10.0F;

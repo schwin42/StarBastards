@@ -16,6 +16,7 @@ public class ScriptHumanInput : MonoBehaviour {
 	public float thrustInput = 0.0F;
 	public float turnInput = -9999F;
 	public bool queueFire = false;
+	[System.NonSerialized]
 	public bool[] mainInput = new bool[]{false, false};
 	public string playerInput;
 	//private ScriptShipSheet scriptShipSheet;
@@ -37,6 +38,8 @@ public class ScriptHumanInput : MonoBehaviour {
 		//float p1RightDown = Input.GetButton ("P01Right");
 		} else if (controlType == ControlType.Touch){
 	
+			//Wait for input from button script
+
 		} else {
 			Debug.Log ("No control type selected for " + playerInput);
 		}

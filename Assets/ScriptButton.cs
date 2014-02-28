@@ -6,7 +6,8 @@ public enum InputType
 	None,
 Left,
 	Thrust,
-	Right
+	Right,
+	Reset
 }
 
 public class ScriptButton : MonoBehaviour {
@@ -15,19 +16,22 @@ public class ScriptButton : MonoBehaviour {
 	public InputType inputType;
 	public Color defaultButtonColor;
 	public Color activeButtonColor;
-	public Rect inputRect;
+	//public Rect inputRect;
 
-	//Objects
+	//Inspector-assigned
 	public ScriptHumanInput scriptHumanInput;
 
 	//Retrieved
 	SpriteRenderer spriteRenderer;
 
+	//Status
+	//public bool isTouched = false;
 
 	// Use this for initialization
 	void Start () {
 
 		spriteRenderer = GetComponent<SpriteRenderer>();
+		spriteRenderer.color = defaultButtonColor;
 	
 	}
 	
@@ -35,41 +39,55 @@ public class ScriptButton : MonoBehaviour {
 	void Update () {
 	
 	}
-
+	/*
 	void OnMouseDown()
 	{
 		//Debug.Log ("buttondown");
-		spriteRenderer.color = activeButtonColor;
 
+	}
+
+	void OnMouseUp()
+	{
+
+	}
+*/
+	void OnTouch()
+	{
+		spriteRenderer.color = activeButtonColor;
+		
 		switch(inputType)
 		{
-		//case InputType.P00Left:
+			//case InputType.P00Left:
 		case InputType.Left:
 			scriptHumanInput.mainInput[0] = true;
 			//Debug.Log (scriptHumanInput.mainInput[0]);
 			break;
-
+			
 		case InputType.Thrust:
 			scriptHumanInput.thrustInput = 1;
 			//Debug.Log (scriptHumanInput.mainInput[0]);
 			break;
-
+			
 		case InputType.Right:
 			scriptHumanInput.mainInput[1] = true;
 			//Debug.Log (scriptHumanInput.mainInput[0]);
 			break;
 
+		case InputType.Reset:
+			Application.LoadLevel("SceneMain");
+			break;
+			
 		}
 	}
 
-	void OnMouseUp()
+	void OnRelease()
 	{
 		spriteRenderer.color = defaultButtonColor;
-
+		
 		switch(inputType)
 		{
 		case InputType.Left:
-		scriptHumanInput.mainInput[0] = false;
+			scriptHumanInput.mainInput[0] = false;
 			break;
 		case InputType.Thrust:
 			scriptHumanInput.thrustInput = 0;
