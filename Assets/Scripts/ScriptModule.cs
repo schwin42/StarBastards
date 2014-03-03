@@ -215,7 +215,7 @@ public class ScriptModule : MonoBehaviour {
 		if(Mathf.Abs (coordinates.x) + Mathf.Abs(coordinates.y) == 2)
 		{
 			ScriptShipSheet scriptShipSheet = moduleOwner.GetComponent<ScriptShipSheet>();
-			Debug.Log (coordinates + " checked for adjacent");
+			Debug.Log (coordinates + " checked for adjacent at " + Time.time);
 			Vector2 prospectiveOffsetX = new Vector2(hotVector.x, 0F);
 			Vector2 prospectiveCoordinatesX = moduleNodeCoordinates + prospectiveOffsetX;
 			Vector2 prospectiveGridCoordinatesX = scriptShipSheet.GetGridNodeCoordinates(prospectiveCoordinatesX);
