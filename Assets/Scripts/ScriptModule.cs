@@ -18,7 +18,7 @@ public enum ModuleSubtype
 	Number,
 
 }
-
+/*
 public enum ProjectileType
 {
 	None,
@@ -27,7 +27,7 @@ public enum ProjectileType
 	Spread, 
 	Bomb
 }
-
+*/
 public class ScriptModule : MonoBehaviour {
 
 	public string moduleName;
@@ -52,20 +52,21 @@ public class ScriptModule : MonoBehaviour {
 	public int currentHP;
 
 	//Weapon stats
-	public ProjectileType projectileType = ProjectileType.None;
-	public float weaponRange;
-	public int weaponDamage;
-	public float shotsPerSecond;
-	public float trackingSpeed;
-	public float projectileSpeed;
-	public float shotTimer;
+	//public ProjectileType projectileType = ProjectileType.None;
+	//public float weaponRange;
+	//public int weaponDamage;
+	//public float shotsPerSecond;
+	//public float trackingSpeed;
+	//public float projectileSpeed;
+	//public float shotTimer;
 
 	//Status
-	public bool canShoot = false;
+	//public bool canShoot = false;
 
 	//Error-checking
 	public int ownTime = -9999;
 	public GameObject captureModule;
+	//public Vector2 captureDirection;
 	
 	// Use this for initialization
 	void Start () {
@@ -157,6 +158,7 @@ public class ScriptModule : MonoBehaviour {
 				Vector2 inverseNormal = transform.InverseTransformDirection(normal);
 				Vector2 roundNormal = RoundVector2(inverseNormal); 
 				Vector2 nodeCoordinatesOffset = CalibrateCoordinates(roundNormal); //Further adjustments
+				//Debug.Log ("Inverse normal: " + inverseNormal + " , Node coordinates offset: " + nodeCoordinatesOffset + ", Time: " + Time.time);
 				Vector2 assimilationNodeCoordinates = moduleNodeCoordinates + nodeCoordinatesOffset;
 
 				//Collect module
@@ -205,21 +207,44 @@ public class ScriptModule : MonoBehaviour {
 	}
 
 
-
+	//Unadjusted offset -> adjusted offset
 	Vector2 CalibrateCoordinates(Vector2 coordinates)
 	{
-		//Once traversable grid is ready, require check for possible directions (of the two) that is empty
-		Vector2 hotVector = coordinates;
+		//Reverse direction for unknown yet necessary reason
+		Vector2 hotVector = coordinates *= -1;
 		if(Mathf.Abs (coordinates.x) + Mathf.Abs(coordinates.y) == 2)
 		{
-			if(Random.value > 0.5F)
+			ScriptShipSheet scriptShipSheet = moduleOwner.GetComponent<ScriptShipSheet>();
+			Debug.Log (coordinates + " checked for adjacent");
+			Vector2 prospectiveOffsetX = new Vector2(hotVector.x, 0F);
+			Vector2 prospectiveCoordinatesX = moduleNodeCoordinates + prospectiveOffsetX;
+			Vector2 prospectiveGridCoordinatesX = scriptShipSheet.GetGridNodeCoordinates(prospectiveCoordinatesX);
+			if(scriptShipSheet.schematic[(int)prospectiveGridCoordinatesX.x, (int)prospectiveGridCoordinatesX.y].isEmpty)
 			{
-				hotVector.x = 0;
+				hotVector = prospectiveOffsetX;
 			} else {
-				hotVector.y = 0;
+				Vector2 prospectiveOffsetY = new Vector2(0F, hotVector.y);
+				Vector2 prospectiveCoordinatesY = moduleNodeCoordinates + prospectiveOffsetY;
+				Vector2 prospectiveGridCoordinatesY = scriptShipSheet.GetGridNodeCoordinates(prospectiveCoordinatesY);
+				if(scriptShipSheet.schematic[(int)prospectiveGridCoordinatesY.x, (int)prospectiveGridCoordinatesY.y].isEmpty)
+				{
+					hotVector = prospectiveOffsetY;
+				} else {
+					Debug.LogError("No possible attach sites on " + coordinates);
+				}
 			}
+
+		//	Vector2 prospectiveDirectionY = new Vector2(0F, hotVector.y);
+
+
+			//if(Random.value > 0.5F)
+			//{
+			//	hotVector.x = 0;
+			//} else {
+			//	hotVector.y = 0;
+			//}
 		}
-		hotVector *= -1;
+		
 		//Vector2 hotterVector = new Vector2(-hotVector.y, hotVector.x); //Rotate 90 degrees
 
 		//Debug.Log (coordinates + " " + hotVector);

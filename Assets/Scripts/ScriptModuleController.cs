@@ -135,19 +135,23 @@ public class ScriptModuleController : MonoBehaviour {
 
 	public void RemoveModule(ScriptModule hotMod)
 	{
+		//Cache ejection vector
+		Vector2 pilotToEjectionVector = hotMod.gameObject.transform.position - hotMod.moduleOwner.pilotModule.transform.position;
+
 		hotMod.moduleOwner = null;
 		hotMod.transform.parent = spaceContainer;
 		hotMod.tag = "NeutralModule";
-		if(hotMod.moduleType == ModuleType.Weapon)
-		{
-			hotMod.canShoot = false;
-		}
+		//if(hotMod.moduleType == ModuleType.Weapon)
+		//{
+		//	hotMod.canShoot = false;
+		//}
 		
 		hotMod.gameObject.AddComponent<Rigidbody2D>();
-		//Set rigidbody values
+		//Set rigidbody properties...
 
-
-		Vector2 ejectionLinearForce = new Vector2((Random.value -0.5F) * ejectionLinearForceConstant, (Random.value -0.5F) * ejectionLinearForceConstant);
+		//Add rigidbody velocity
+		//Vector2 ejectionLinearForce = new Vector2((Random.value -0.5F) * ejectionLinearForceConstant, (Random.value -0.5F) * ejectionLinearForceConstant);
+		Vector2 ejectionLinearForce = pilotToEjectionVector * ejectionLinearForceConstant;
 		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
 		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
 		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);

@@ -213,63 +213,40 @@ public class ScriptShipController : MonoBehaviour {
 	}
 
 
-	//void ReadShipToSchematic(ScriptShipController ship)
-	//{
-	//
-	//}
-
-
-	//void RemoveModule(ScriptModule moduleToRemove)
-	//{
-
-		//UNDER CONSTRUCTION
-	//	gameObject.AddComponent<Rigidbody2D>();
-	//	moduleOwner = null;
-	//	transform.parent = null;
-	//	//transform.localPosition = Vector2.zero;
-	//	shipSpaceCoordinates = Vector3.zero;
-	//	tag = "NeutralModule";
-	//	if(moduleType == ModuleType.Weapon)
-	//	{
-	//		canShoot = false;
-	//	}
-		
-	//}
-
-
+	//Should be migrated to module controller
 	public void AddModule(ScriptModule addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
 		//Debug.Log (addedModule.moduleID);
 		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
 
-
 		//Register non-starting modules
 		if (addedModule.moduleType != ModuleType.Pilot) {
-						//Set ship as parent
-						addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
-						//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
+			//Set ship as parent
+			addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
+			//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
 
-						//Log event
-						scriptModule.ownTime = Time.frameCount;
-						scriptModule.captureModule = assimilatingObject;
+			//Log event
+			scriptModule.ownTime = Time.frameCount;
+			scriptModule.captureModule = assimilatingObject;
 
-						//Update module
+			//Update module
 			scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
-						addedModule.tag = "Ship"; //Tag as part of ship
-						scriptModule.moduleOwner = this; //Mark this ship as new owner
+			addedModule.tag = "Ship"; //Tag as part of ship
+			scriptModule.moduleOwner = this; //Mark this ship as new owner
 			scriptModule.currentHP = scriptModule.maxHP; //Set starting HP
 
-						//Verify module
-						VerifyCoordinates (addedModule);
+			//Verify module
+			VerifyCoordinates (addedModule);
 
 			//Play sound effect
 			audioSource.Play();
-				} 
+		} 
 
 
 		//Mode handler
-		if (scriptModuleController.moduleRigidbodyMode) {
+		if (scriptModuleController.moduleRigidbodyMode) 
+		{
 			if(addedModule.moduleType != ModuleType.Pilot)
 			{
 
@@ -281,36 +258,37 @@ public class ScriptShipController : MonoBehaviour {
 				addedModule.transform.localRotation = Quaternion.identity; //Set rotation
 
 				//Rigidbody
-			DistanceJoint2D hotJoint = addedModule.gameObject.AddComponent<DistanceJoint2D>();
-			hotJoint.connectedBody = assimilatingObject.rigidbody2D;
+				DistanceJoint2D hotJoint = addedModule.gameObject.AddComponent<DistanceJoint2D>();
+				hotJoint.connectedBody = assimilatingObject.rigidbody2D;
 				hotJoint.collideConnected = true;
-			hotJoint.distance = 2;
+				hotJoint.distance = 2;
 			//	hotJoint.anchor;
 			//	hotJoint.connectedAnchor;
 			}
-				} else {
+		} else {
 
 			//Positioning
 			Vector2 localCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
 			addedModule.transform.localPosition = localCoordinates; //Set position
 			addedModule.transform.localRotation = Quaternion.identity; //Set rotation
 
-					//Rigidbody
-			if (addedModule.rigidbody2D) {
+			//Rigidbody
+			if (addedModule.rigidbody2D) 
+			{
 				Destroy (addedModule.gameObject.rigidbody2D); 
-						}
+			}
 			//Ship rigidbody
 			lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
 			Destroy(rigidbody2D); //Destroy rigidbody for replacement
 			//Debug.Log ("Destroyed ship rigidbody");
 			rigidbodyResetPending = true;
-				}
+		}
 
 		//Ready module
-		if(scriptModule.moduleType == ModuleType.Weapon) //Ready weapon
-		{
-			scriptModule.canShoot = true;
-		}
+		//if(scriptModule.moduleType == ModuleType.Weapon) //Ready weapon
+		//{
+		//	scriptModule.canShoot = true;
+		//}
 
 		//Add to grid
 		Vector2 gridNodeCoordinates = scriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
