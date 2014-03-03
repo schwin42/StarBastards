@@ -65,6 +65,7 @@ public class ScriptShipController : MonoBehaviour {
 	public bool isThrusting = false;
 	//public bool justTeleported = false;
 	public Direction teleportDirection = Direction.None;
+	public bool shipIsActive = true;
 
 	// Use this for initialization
 	void Start () {
@@ -115,7 +116,10 @@ public class ScriptShipController : MonoBehaviour {
 	// Update is called once per frame
 
 	void FixedUpdate () 
-	{			
+	{		
+
+		if(shipIsActive)
+		{
 		//Temporary variables
 		float thrustInput = 0;
 		float turnInput = 0;
@@ -168,7 +172,7 @@ public class ScriptShipController : MonoBehaviour {
 			//Debug.Log (rigidCharacter.gameObject.name + hotForce);
 			//Debug.Log ("Turn input: " + turnInput);
 		//	hotRigid.angularVelocity = 90;
-
+		//if(canThrust)
 						if (!isThrusting && thrustInput == 1) {
 								isThrusting = true;
 								thrustEffect.enableEmission = true;
@@ -178,7 +182,7 @@ public class ScriptShipController : MonoBehaviour {
 								thrustEffect.enableEmission = false;
 						}
 				//} else if(rigidbodyResetPending){
-	
+		
 
 
 				
@@ -210,6 +214,7 @@ public class ScriptShipController : MonoBehaviour {
 			teleportTimer += Time.deltaTime;
 			}
 			}
+		}
 	}
 
 

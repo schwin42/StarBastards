@@ -26,6 +26,7 @@ public class ScriptProjectile : MonoBehaviour {
 			//Debug.Log (collider.tag + collider.gameObject.transform.parent.gameObject.name + owner);
 		//	Debug.Log ("Ship Location");
 			collider.gameObject.GetComponent<ScriptModule>().currentHP -= projectileDamage;
+			//Destroy self
 			Destroy (gameObject);
 		}
 	}

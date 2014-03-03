@@ -97,11 +97,16 @@ public class ScriptModule : MonoBehaviour {
 			{
 				if(moduleType == ModuleType.Pilot)
 				{
-					Destroy (moduleOwner.gameObject);
+					//Cache owner
+					GameObject hotShip = moduleOwner.gameObject;
+					moduleOwner.shipIsActive = false;
+
 					ScriptModule[] iterationScripts = moduleOwner.shipModuleContainer.GetComponentsInChildren<ScriptModule>();
 					foreach(ScriptModule hotMod in iterationScripts){
 						scriptModuleController.RemoveModule(hotMod);
 					}
+					tag = "Debris";
+				//	Destroy(hotShip);
 				} else {
 					scriptModuleController.RemoveModule(this);
 				}
