@@ -2,59 +2,48 @@
 using System.Collections;
 using System.Collections.Generic;
 
-
-
-
 [System.Serializable]
+//Node within x-y grid
 public class Node
 {
-	public ScriptModule module;
-	//public ModuleType moduleType;
-
-	//public bool isChecked;
-	public bool isAdded;
-	public bool isEmpty;
+	public ScriptModule module; //Gameobject at this node in the grid, if any
+	public bool isAdded;  //True indicates this node has been checked off
+	public bool isEmpty; //Whether a module exists in this node
 	public int snakeIndex;
-	//private List<Node> isConnectedTo = new List<Node>();
-	//private Vector2 nodeCoordinates;
 
+	//Empty node constructor
 	public Node()
 	{
 		module = null;
 		isEmpty = true;
 	}
 
+	//Occupied node constructor
 	public Node(ScriptModule scriptModuleArg)
 	{
 		module = scriptModuleArg;
 		isEmpty = false;
-
 	}
-
 }
 
 public class ScriptShipSheet : MonoBehaviour {
 
 	public ScriptShipController scriptShipController;
 
-	public List<ScriptModule> pilotContiguousModules;
+	public List<ScriptModule> pilotContiguousModules; //Modules connected to first module
 
-	static private int maxY = 50;
-	static private int maxX = 50;
+	static private int maxX = 50; //Max positive and negative x-value
+	static private int maxY = 50; //Max positive and negative y-value
 
-	//[System.Serializable]
+	//Grid as 2D array
 	public Node[,] schematic = new Node[maxX*2,maxY*2];
 	
 	// Use this for initialization
 	void Start () {
 
-		//Assign variables
+		//Acquire scripts
 		scriptShipController = gameObject.GetComponent<ScriptShipController>();
-
-		//foreach (GameObject module in transform) {
-
-		//		}
-
+		
 		InitializeGrid ();
 	}
 	
@@ -71,19 +60,15 @@ public class ScriptShipSheet : MonoBehaviour {
 		int bound0 = schematic.GetUpperBound(0);
 		int bound1 = schematic.GetUpperBound(1);
 
+		//Create a node for each pair of coordinates
 		for (int i = 0; i < bound0; i++) {
 			for(int j = 0; j < bound1; j++)
 			{
 				schematic[i, j] = new Node();
 			}
 				}
-
-		/*
-
-		*/
 	}
 
-	//Warning: very slow function
 	public void GridStatus()
 	{
 		int bound0 = schematic.GetUpperBound(0);
@@ -98,12 +83,12 @@ public class ScriptShipSheet : MonoBehaviour {
 				{
 					moduleString = hotNode.module.gameObject.name;
 				}
-				Debug.Log ("Node(" + i + ", " + j + "): Empty? " + hotNode.isEmpty + ", Module: " + moduleString);
-				//.module.gameObject.name);
+				//Debug.Log ("Node(" + i + ", " + j + "): Empty? " + hotNode.isEmpty + ", Module: " + moduleString);
 			}
 		}
 	}
-	
+
+	//Convert real world coordinates to absolute grid coordinates
 	public Vector2 GetGridNodeCoordinates(Vector2 nodeCoordinates)
 	{
 		Vector2 gridNodeCoordinates = Vector2.zero;
@@ -113,16 +98,14 @@ public class ScriptShipSheet : MonoBehaviour {
 		return gridNodeCoordinates;
 	}
 
-	//Get contiguous modules
+	//Return list of modules that are connected to first module
 	public List<ScriptModule> GetModulesContiguousToPilot()
 	{
+		//Temporary variables
 		pilotContiguousModules = new List<ScriptModule> ();
-
 		ScriptModule pilotModule = scriptShipController.pilotModule.GetComponent<ScriptModule> ();
 
-		//AddContiguousModules (pilotModule.moduleNodeCoordinates);
-		//Set is checked to true - Module is checked only once it is added and all its adjacent modules are added to the queue
-
+		//Breadth-first search
 		pilotContiguousModules.Add (pilotModule);
 		Vector2 pilotGridCoordinates = GetGridNodeCoordinates (pilotModule.moduleNodeCoordinates);
 		schematic[(int)pilotGridCoordinates.x, (int)pilotGridCoordinates.y].isAdded = true;
@@ -130,9 +113,8 @@ public class ScriptShipSheet : MonoBehaviour {
 		//Main iteration
 		for(int i = 0; i < pilotContiguousModules.Count; i++)
 		{
-			//Add adjacent modules to list and set as added and set current node as checked
+			//Add adjacent modules to list and set as added
 			AddContiguousModules(pilotContiguousModules[i].moduleNodeCoordinates);
-
 		}
 
 		//Clear temp variables
@@ -144,16 +126,13 @@ public class ScriptShipSheet : MonoBehaviour {
 			//hotNode.isChecked = false;
 			hotNode.isAdded = false;
 		}
-
 		return pilotContiguousModules;
-
-		}
+	}
 
 	 void AddContiguousModules(Vector2 nodeWorldCoordinates)
 	{
 		Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
-		//int nodeGridX = (int)nodeGridCoordinates.x;
-		//int nodeGridY = (int)nodeGridCoordinates.y;
+
 		Vector2[] adjacentCoordinates = 
 		{
 			new Vector2(nodeGridCoordinates.x, nodeGridCoordinates.y + 1), //Up
@@ -167,15 +146,12 @@ public class ScriptShipSheet : MonoBehaviour {
 			Node adjacentNode = schematic[(int)adjacentVector2.x, (int)adjacentVector2.y];
 			if(adjacentNode.isEmpty || adjacentNode.isAdded)
 			{
-				Debug.Log ("PK Stand There");
-				//PK Stand There
+				//Do nothing
 			} else {
-				Debug.Log ("Added");
 			pilotContiguousModules.Add (adjacentNode.module);
 				adjacentNode.isAdded = true;
 			}
-			//schematic [nodeGridX, nodeGridY].isChecked = true;
-				}
+		}
 
 
 	}

@@ -1,14 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptModule.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\ScriptProjectile.cs">
     <Files>
-      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptModuleController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptProjectile.cs" Line="29" Column="18" />
-      <File FileName="Assets/Scripts/ScriptModule.cs" Line="146" Column="28" />
-      <File FileName="Assets/Scripts/ScriptHumanInput.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptShipSheet.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptClickButton.cs" Line="16" Column="14" />
+      <File FileName="Assets\Scripts\ScriptShipController.cs" Line="376" Column="58" />
+      <File FileName="Assets\Scripts\ScriptModule.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\ScriptModuleController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\ScriptShipController.cs" Line="400" Column="2" />
+      <File FileName="Assets\Scripts\ScriptProjectile.cs" Line="33" Column="25" />
+      <File FileName="Assets\Scripts\ScriptHumanInput.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\ScriptShipSheet.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\ScriptClickButton.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

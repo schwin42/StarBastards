@@ -52,6 +52,7 @@ public class ScriptShipController : MonoBehaviour {
 	private ScriptShipIntelligence scriptShipIntelligence;
 	private ScriptShipSheet scriptShipSheet;
 	private ScriptModuleController scriptModuleController;
+	private Transform dynamicObjectsContainer;
 	//private Vector2 forwardDirection;
 	private bool rigidbodyResetPending = false;
 	private Vector2 lastVelocity;
@@ -77,6 +78,7 @@ public class ScriptShipController : MonoBehaviour {
 		shipModuleContainer = transform.FindChild ("ContainerModule");
 		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController> ();
 		audioSource = GetComponent<AudioSource>();
+		dynamicObjectsContainer = GameObject.Find ("ContainerDynamicObjects").transform;
 
 
 		//Set controlling rigidbody
@@ -371,6 +373,7 @@ public class ScriptShipController : MonoBehaviour {
 					activation.canShoot = false;
 			Vector3 bulletPosition = pilotModule.transform.position;
 					GameObject hotBullet = Instantiate (basicBullet, bulletPosition, transform.rotation) as GameObject;
+				hotBullet.transform.parent = dynamicObjectsContainer;
 			//Debug.Log (transform.position);
 			ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
 					scriptProjectile.projectileDamage = activation.damage;
