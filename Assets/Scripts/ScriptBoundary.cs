@@ -27,8 +27,8 @@ public class ScriptBoundary : MonoBehaviour {
 	
 	}
 
-	void OnTriggerEnter2D(Collider2D collider)
-	{
-		scriptSpace.WrapAround(collider.gameObject, direction);
-	}
+//	void OnTriggerEnter2D(Collider2D collider)
+//	{
+//		scriptSpace.WrapAround(collider.gameObject, direction);
+//	}
 }

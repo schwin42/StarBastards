@@ -98,7 +98,7 @@ public class ScriptModule : MonoBehaviour {
 				if(moduleType == ModuleType.Pilot)
 				{
 					//Cache owner
-					GameObject hotShip = moduleOwner.gameObject;
+					//GameObject hotShip = moduleOwner.gameObject;
 					moduleOwner.shipIsActive = false;
 
 					ScriptModule[] iterationScripts = moduleOwner.shipModuleContainer.GetComponentsInChildren<ScriptModule>();

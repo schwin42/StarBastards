@@ -74,7 +74,7 @@ public class ScriptModuleController : MonoBehaviour {
 				Debug.LogError ("Bug in random number generator.");
 			}
 
-			hotMod.transform.position = new Vector2(Random.value * 100 - 50, Random.value * 100);
+			hotMod.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
 			hotMod.transform.parent = this.gameObject.transform;
 			ScriptModule scriptModule = hotMod.GetComponent<ScriptModule>();
 			scriptModule.moduleID = GetNextID();

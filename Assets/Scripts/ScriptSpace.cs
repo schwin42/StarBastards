@@ -1,24 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ScriptSpace : MonoBehaviour {
 
+	public Transform shipContainer;
+	public List<ScriptShipController> shipsAtStart;
+
 	//Configurable
-	public GameObject upperBoundary;
-	public GameObject rightBoundary;
-	public GameObject lowerBoundary;
-	public GameObject leftBoundary;
+	public float cameraScaleConstant = 1;
+//	public float cameraScaleOffset = 0;
+	public float cameraSizeMin = 10;
+	public float cameraSizeMax = Mathf.Infinity;
+
+	//Configurable
+	//public GameObject upperBoundary;
+	//public GameObject rightBoundary;
+	//public GameObject lowerBoundary;
+	//public GameObject leftBoundary;
 
 	// Use this for initialization
 	void Start () {
 	
+		foreach(ScriptShipController ship in shipContainer.GetComponentsInChildren<ScriptShipController>())
+		{
+			shipsAtStart.Add (ship);
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
-	}
+		UpdateCameraWindow();
 
+	}
+	/*
 	public void WrapAround(GameObject thing, Direction direction)
 	{
 		if(thing.tag == "Ship")
@@ -79,5 +95,24 @@ public class ScriptSpace : MonoBehaviour {
 			//	Debug.Log ("Ignore boundary " + Time.time);
 			//}
 	}
+	}
+*/
+	void UpdateCameraWindow()
+	{
+		if(shipsAtStart.Count > 1)
+		{
+			Vector2 firstShipToSecond = shipsAtStart[1].transform.position - shipsAtStart[0].transform.position;
+			Vector2 cameraCenterPosition = (Vector2)shipsAtStart[0].transform.position + firstShipToSecond / 2;
+			float absLargerDistance = Mathf.Max(Mathf.Abs (firstShipToSecond.x), Mathf.Abs (firstShipToSecond.y) );
+			float newCameraSize = Mathf.Clamp((absLargerDistance * cameraScaleConstant), cameraSizeMin, cameraSizeMax);
+			//Debug.Log (absLargerDistance);
+			camera.orthographicSize = newCameraSize;
+			Debug.Log ("First ship to second: " +firstShipToSecond + ", Camera center position: "
+			           + cameraCenterPosition + ", Abs larger distance: " + absLargerDistance + ", New camera size: " + newCameraSize);
+			transform.position = new Vector3(cameraCenterPosition.x, cameraCenterPosition.y, transform.position.z);
+
+
+		//Debug.Log (firstShipToSecond);
+		}
 	}
 }

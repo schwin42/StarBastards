@@ -378,7 +378,8 @@ public class ScriptShipController : MonoBehaviour {
 			ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
 					scriptProjectile.projectileDamage = activation.damage;
 					scriptProjectile.owner = gameObject;
-					hotBullet.rigidbody2D.AddForce(attackVector * activation.shotForce); //Magic number
+				hotBullet.rigidbody2D.velocity = rigidbody2D.velocity;	
+				hotBullet.rigidbody2D.AddForce(attackVector * activation.shotForce); //Magic number
 					activation.shotTimer = 0;
 				} else {
 					activation.shotTimer += Time.deltaTime;

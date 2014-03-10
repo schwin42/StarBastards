@@ -78,7 +78,7 @@ public class ScriptShipSheet : MonoBehaviour {
 			for(int j = 0; j < bound1; j++)
 			{
 				Node hotNode = schematic[i, j];
-				string moduleString = "None";
+				string moduleString;
 				if(hotNode.module)
 				{
 					moduleString = hotNode.module.gameObject.name;
@@ -126,6 +126,7 @@ public class ScriptShipSheet : MonoBehaviour {
 			//hotNode.isChecked = false;
 			hotNode.isAdded = false;
 		}
+		Debug.Log (pilotContiguousModules.Count);
 		return pilotContiguousModules;
 	}
 
@@ -142,7 +143,7 @@ public class ScriptShipSheet : MonoBehaviour {
 		};
 
 		foreach (Vector2 adjacentVector2 in adjacentCoordinates) {
-			Debug.Log ((int)adjacentVector2.x + " " + (int)adjacentVector2.y);
+			//Debug.Log ((int)adjacentVector2.x + " " + (int)adjacentVector2.y);
 			Node adjacentNode = schematic[(int)adjacentVector2.x, (int)adjacentVector2.y];
 			if(adjacentNode.isEmpty || adjacentNode.isAdded)
 			{
