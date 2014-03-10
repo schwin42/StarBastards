@@ -21,7 +21,7 @@ public class ScriptModuleController : MonoBehaviour {
 	public GameObject augmentModule;
 	public GameObject defenseModule;
 	public GameObject weaponModule;
-	public GameObject explosionEffect;
+
 
 
 
@@ -156,8 +156,7 @@ public class ScriptModuleController : MonoBehaviour {
 		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
 		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
 
-		//Explosion effect
-		Instantiate(explosionEffect, hotMod.transform.position, Quaternion.identity);
+
 	}
 
 

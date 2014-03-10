@@ -5,6 +5,7 @@ public class ScriptProjectile : MonoBehaviour {
 
 	public int projectileDamage;
 	public GameObject owner;
+	public GameObject explosionEffect;
 
 	// Use this for initialization
 	void Start () {
@@ -23,12 +24,14 @@ public class ScriptProjectile : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D collider)
 	{
-		//Debug.Log (collider.gameObject.name);
+		Debug.Log (collider.gameObject.name);
 		if(collider.gameObject.tag == "Ship" && collider.gameObject.transform.parent.parent.gameObject != owner)
 		{
-			//Debug.Log (collider.tag + collider.gameObject.transform.parent.gameObject.name + owner);
-		//	Debug.Log ("Ship Location");
+		//Debug.Log (collider.tag + collider.gameObject.transform.parent.gameObject.name + owner);
+		//	Debug.Log ("Ship Location"
 			collider.gameObject.GetComponent<ScriptModule>().currentHP -= projectileDamage;
+			//Explosion effect
+			Instantiate(explosionEffect, collider.transform.position, Quaternion.identity);
 			//Destroy self
 			Destroy (gameObject);
 		}

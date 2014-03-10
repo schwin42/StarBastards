@@ -71,6 +71,8 @@ public class ScriptModule : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+		currentHP = maxHP;
+
 		//Acquire objects
 		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController>();
 		//renderer = GetComponent<Renderer>();

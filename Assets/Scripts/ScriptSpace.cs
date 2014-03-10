@@ -107,8 +107,8 @@ public class ScriptSpace : MonoBehaviour {
 			float newCameraSize = Mathf.Clamp((absLargerDistance * cameraScaleConstant), cameraSizeMin, cameraSizeMax);
 			//Debug.Log (absLargerDistance);
 			camera.orthographicSize = newCameraSize;
-			Debug.Log ("First ship to second: " +firstShipToSecond + ", Camera center position: "
-			           + cameraCenterPosition + ", Abs larger distance: " + absLargerDistance + ", New camera size: " + newCameraSize);
+			//Debug.Log ("First ship to second: " +firstShipToSecond + ", Camera center position: "
+			  //         + cameraCenterPosition + ", Abs larger distance: " + absLargerDistance + ", New camera size: " + newCameraSize);
 			transform.position = new Vector3(cameraCenterPosition.x, cameraCenterPosition.y, transform.position.z);
 
 
