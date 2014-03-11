@@ -99,6 +99,7 @@ public class ScriptModule : MonoBehaviour {
 			{
 				if(moduleType == ModuleType.Pilot)
 				{
+					//Debug.Log (gameObject.name + "Destroyed.");
 					//Cache owner
 					//GameObject hotShip = moduleOwner.gameObject;
 					moduleOwner.shipIsActive = false;
@@ -152,10 +153,11 @@ public class ScriptModule : MonoBehaviour {
 	void OnCollisionEnter2D(Collision2D collision)
 	{
 		//Debug.Log(gameObject.name);
-
+		//Debug.Log (collision.gameObject.name);
 		//Debug.Log ("Collided");
 		if(moduleOwner != null)
 		{
+
 			if(collision.gameObject.tag == "NeutralModule")
 			{
 

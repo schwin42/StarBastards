@@ -365,6 +365,8 @@ public class ScriptShipController : MonoBehaviour {
 		//	Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
 		if(pilotModule)
 		{
+			if(activation.moduleType == ModuleType.Weapon)
+			{
 		Vector2 attackVector = pilotModule.transform.TransformDirection (Vector2.up);
 		//	if(attackVector.magnitude <= weaponRange)
 			//{
@@ -388,6 +390,7 @@ public class ScriptShipController : MonoBehaviour {
 						activation.canShoot = true;
 					}
 				}
+		}
 		//	} else {
 		//		if(!canShoot)
 		//		{

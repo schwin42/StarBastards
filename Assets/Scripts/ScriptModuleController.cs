@@ -22,9 +22,6 @@ public class ScriptModuleController : MonoBehaviour {
 	public GameObject defenseModule;
 	public GameObject weaponModule;
 
-
-
-
 	//Transforms
 	public Transform shipContainer;
 	public Transform spaceContainer;
@@ -102,6 +99,15 @@ public class ScriptModuleController : MonoBehaviour {
 			foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
 				pilotContiguousModules = ship.GetModulesContiguousToPilot();
 		}
+
+		if(Input.GetKeyDown("3")) //GetSnakes unit test
+		{
+			foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
+			{
+				ship.lazySnakes = ship.GetModuleSnakes();
+			}
+		}
+
 	}
 
 	public int GetNextID()

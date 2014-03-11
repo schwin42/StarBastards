@@ -24,7 +24,7 @@ public class ScriptProjectile : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D collider)
 	{
-		Debug.Log (collider.gameObject.name);
+		//Debug.Log (collider.gameObject.name);
 		if(collider.gameObject.tag == "Ship" && collider.gameObject.transform.parent.parent.gameObject != owner)
 		{
 		//Debug.Log (collider.tag + collider.gameObject.transform.parent.gameObject.name + owner);

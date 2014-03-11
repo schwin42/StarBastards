@@ -1,16 +1,16 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptModule.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptShipSheet.cs">
     <Files>
+      <File FileName="Assets/Scripts/ScriptProjectile.cs" Line="27" Column="1" />
       <File FileName="Assets/Scripts/ScriptSpace.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptModule.cs" Line="107" Column="50" />
-      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="381" Column="59" />
-      <File FileName="Assets/Scripts/ScriptModuleController.cs" Line="24" Column="1" />
-      <File FileName="Assets/Scripts/ScriptProjectile.cs" Line="27" Column="3" />
+      <File FileName="Assets/Scripts/ScriptModule.cs" Line="156" Column="5" />
+      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="368" Column="3" />
+      <File FileName="Assets/Scripts/ScriptModuleController.cs" Line="107" Column="27" />
+      <File FileName="Assets/Scripts/ScriptProjectile.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ScriptHumanInput.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptShipSheet.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ScriptShipSheet.cs" Line="47" Column="1" />
       <File FileName="Assets/Scripts/ScriptClickButton.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptSpace.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ScriptBoundary.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
