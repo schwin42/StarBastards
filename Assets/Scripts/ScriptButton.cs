@@ -22,7 +22,8 @@ public class ScriptButton : MonoBehaviour {
 	public ScriptHumanInput scriptHumanInput;
 
 	//Retrieved
-	SpriteRenderer spriteRenderer;
+	//SpriteRenderer spriteRenderer;
+	UISprite uiSprite;
 
 	//Status
 	//public bool isTouched = false;
@@ -30,8 +31,10 @@ public class ScriptButton : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		spriteRenderer = GetComponent<SpriteRenderer>();
-		spriteRenderer.color = defaultButtonColor;
+		uiSprite = GetComponent<UISprite>();
+		uiSprite.color = defaultButtonColor;
+		//spriteRenderer = GetComponent<SpriteRenderer>();
+		//spriteRenderer.color = defaultButtonColor;
 	
 	}
 	
@@ -53,8 +56,9 @@ public class ScriptButton : MonoBehaviour {
 */
 	void OnTouch()
 	{
-		spriteRenderer.color = activeButtonColor;
-		
+		//spriteRenderer.color = activeButtonColor;
+		uiSprite.color = activeButtonColor;
+
 		switch(inputType)
 		{
 			//case InputType.P00Left:
@@ -82,8 +86,9 @@ public class ScriptButton : MonoBehaviour {
 
 	void OnRelease()
 	{
-		spriteRenderer.color = defaultButtonColor;
-		
+		//spriteRenderer.color = defaultButtonColor;
+		uiSprite.color = defaultButtonColor;
+
 		switch(inputType)
 		{
 		case InputType.Left:

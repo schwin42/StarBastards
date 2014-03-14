@@ -2,7 +2,7 @@
 using System.Collections;
 
 [System.Serializable]
-public enum Direction
+public enum BoundaryDirection
 {
 	None,
 	Up,
@@ -15,7 +15,7 @@ public class ScriptBoundary : MonoBehaviour {
 
 	//Confirgurable
 	public ScriptSpace scriptSpace;
-	public Direction direction;
+	public BoundaryDirection direction;
 
 	// Use this for initialization
 	void Start () {
