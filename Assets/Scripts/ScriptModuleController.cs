@@ -51,7 +51,7 @@ public class ScriptModuleController : MonoBehaviour {
 
 
 		//Generate neutral modules
-		for(int i = 0; i<50; i++)
+		for(int i = 0; i<100; i++)
 		{
 			//GameObject hotMod = Instantiate (modulePrefab) as GameObject;
 

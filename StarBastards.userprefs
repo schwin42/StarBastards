@@ -1,16 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptButton.cs">
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptModuleController.cs">
     <Files>
-      <File FileName="Assets/Scripts/ScriptInterfaceController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptModuleController.cs" Line="1" Column="1" />
-      <File FileName="Assets/NGUI/Scripts/Interaction/UIPlayAnimation.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptBoundary.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptSpace.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ScriptShipIntelligence.cs" Line="31" Column="1" />
-      <File FileName="Assets/Scripts/ScriptButton.cs" Line="35" Column="1" />
-      <File FileName="Assets/Scripts/ControllerTouch.cs" Line="27" Column="1" />
+      <File FileName="Assets/Scripts/ScriptModuleController.cs" Line="54" Column="23" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
