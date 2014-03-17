@@ -249,16 +249,20 @@ public class ScriptShipSheet : MonoBehaviour {
 								}
 								else if(adjacentNode.snakeIndex >= 0){//B2: Adjacent node belongs to different snake	
 									Debug.Log ("12");
+									hotSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
 									//Assign node's snake id as root node snake
-									foreach(Node node in hotSnakes[adjacentNode.snakeIndex].constituentNodes)
+									List<Node> transferList = new List<Node>(hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
+									hotSnakes[adjacentNode.snakeIndex].constituentNodes = null; //Clear adjacent snake's nodes
+
+									foreach(Node transferNode in transferList)
 									{
-										hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(node);
+										Debug.Log("12 - root snake, adjacent snake, module:" + hotModNode.snakeIndex + ", " + adjacentNode.snakeIndex + ", " + transferNode.module.name);
+										hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(transferNode);
 										//node.snakeIndex = hotModNode.snakeIndex;
 									}
+									//Debug.Break ();
 									//hotSnakes[hotModNode.snakeIndex].constituentNodes.AddRange(
 									//	hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Add adjacent snake's modules to center snake
-									hotSnakes[adjacentNode.snakeIndex].constituentNodes = null; //Clear adjacent snake's nodes
-									hotSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark as dead
 								}
 								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
 							}
