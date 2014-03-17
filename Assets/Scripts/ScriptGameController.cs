@@ -9,7 +9,18 @@ public enum PlayerControl
 	Computer
 }
 
-public class ScriptModuleController : MonoBehaviour {
+public enum ControlType
+{
+	None,
+	Keyboard,
+	Touch,
+	Gamepad
+}
+
+public class ScriptGameController : MonoBehaviour {
+
+	//Configurable static Mode
+	public ControlType controlType;
 
 	//Configurable
 	public bool moduleRigidbodyMode = true;
@@ -28,6 +39,7 @@ public class ScriptModuleController : MonoBehaviour {
 
 	//Objects
 	private List<GameObject> ships = new List<GameObject>();
+	protected ScriptInterfaceController scriptInterfaceController;
 
 
 	private int nextModuleID = 0;
@@ -37,6 +49,10 @@ public class ScriptModuleController : MonoBehaviour {
 	public List<ScriptModule> pilotContiguousModules = new List<ScriptModule>();
 
 	void Start () {
+
+		scriptInterfaceController = GameObject.Find ("RootInterface").GetComponent<ScriptInterfaceController>();
+		//Debug.Log (scriptInterfaceController);
+		scriptInterfaceController.SetInterface(controlType);
 
 		//Get objects
 		//shipContainer = GameObject.Find ("ContainerShip").transform;

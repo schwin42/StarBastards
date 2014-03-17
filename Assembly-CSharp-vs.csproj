@@ -176,10 +176,10 @@
      <Compile Include="Assets\Scripts\ScriptBoundary.cs" />
      <Compile Include="Assets\Scripts\ScriptButton.cs" />
      <Compile Include="Assets\Scripts\ScriptClickButton.cs" />
+     <Compile Include="Assets\Scripts\ScriptGameController.cs" />
      <Compile Include="Assets\Scripts\ScriptHumanInput.cs" />
      <Compile Include="Assets\Scripts\ScriptInterfaceController.cs" />
      <Compile Include="Assets\Scripts\ScriptModule.cs" />
-     <Compile Include="Assets\Scripts\ScriptModuleController.cs" />
      <Compile Include="Assets\Scripts\ScriptProjectile.cs" />
      <Compile Include="Assets\Scripts\ScriptShipController.cs" />
      <Compile Include="Assets\Scripts\ScriptShipIntelligence.cs" />

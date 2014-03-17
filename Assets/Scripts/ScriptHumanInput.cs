@@ -1,16 +1,16 @@
 using UnityEngine;
 using System.Collections;
 
-public enum ControlType
-{
-	Keyboard,
-	Touch
-}
+//public enum ControlType
+//{
+//	Keyboard,
+//	Touch
+//}
 
 public class ScriptHumanInput : MonoBehaviour {
 
 	//Configurable
-	public ControlType controlType;
+	//public ControlType controlType;
 	
 	//Internal
 	public float thrustInput = 0.0F;
@@ -20,23 +20,27 @@ public class ScriptHumanInput : MonoBehaviour {
 	public bool[] mainInput = new bool[]{false, false};
 	public string playerInput;
 	//private ScriptShipSheet scriptShipSheet;
-	
+
+	//GameObjects
+	ScriptGameController scriptGameController;
+
 	// Use this for initialization
 	void Start () {
 	//	scriptShipSheet = GetComponent<ScriptShipSheet>();
+		scriptGameController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		if(controlType == ControlType.Keyboard)
+		if(scriptGameController.controlType == ControlType.Keyboard)
 		{
 
 		thrustInput = Input.GetAxis(playerInput + "Thrust");
 		mainInput = new bool[]{Input.GetButton (playerInput + "Left"), Input.GetButton (playerInput + "Right")};
 		//float p1LeftDown = Input.GetButton ("P01Left");
 		//float p1RightDown = Input.GetButton ("P01Right");
-		} else if (controlType == ControlType.Touch){
+		} else if (scriptGameController.controlType == ControlType.Touch){
 	
 			//Wait for input from button script
 

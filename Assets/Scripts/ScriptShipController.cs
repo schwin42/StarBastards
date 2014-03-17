@@ -51,7 +51,7 @@ public class ScriptShipController : MonoBehaviour {
 	private ScriptHumanInput scriptHumanInput;
 	private ScriptShipIntelligence scriptShipIntelligence;
 	private ScriptShipSheet scriptShipSheet;
-	private ScriptModuleController scriptModuleController;
+	private ScriptGameController scriptModuleController;
 	private Transform dynamicObjectsContainer;
 	//private Vector2 forwardDirection;
 	private bool rigidbodyResetPending = false;
@@ -76,7 +76,7 @@ public class ScriptShipController : MonoBehaviour {
 		scriptShipIntelligence = GetComponent<ScriptShipIntelligence>();
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
 		shipModuleContainer = transform.FindChild ("ContainerModule");
-		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController> ();
+		scriptModuleController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController> ();
 		audioSource = GetComponent<AudioSource>();
 		dynamicObjectsContainer = GameObject.Find ("ContainerDynamicObjects").transform;
 

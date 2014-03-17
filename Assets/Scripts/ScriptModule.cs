@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public enum ModuleType
@@ -41,7 +41,7 @@ public class ScriptModule : MonoBehaviour {
 	//Scriptable
 
 	//Inspector objects
-	public ScriptModuleController scriptModuleController;
+	public ScriptGameController scriptModuleController;
 
 	//Acquired objects
 	//public Renderer renderer;
@@ -74,7 +74,7 @@ public class ScriptModule : MonoBehaviour {
 		currentHP = maxHP;
 
 		//Acquire objects
-		scriptModuleController = GameObject.Find ("ControllerSpace").GetComponent<ScriptModuleController>();
+		scriptModuleController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController>();
 		//renderer = GetComponent<Renderer>();
 		//material = GetComponent<Material>();
 

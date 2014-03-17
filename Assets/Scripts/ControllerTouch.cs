@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class ControllerTouch : MonoBehaviour {
 
 	//Inspector-assigned
-	public Camera touchCamera; 
+	public Camera mainCamera; 
 
 	//Records
 	Dictionary<int, Collider> fingerIdToButton = new Dictionary<int, Collider>();
@@ -24,7 +24,7 @@ public class ControllerTouch : MonoBehaviour {
 			foreach(Touch touch in Input.touches)
 			{
 				//Debug.Log (touch.position);
-				Ray ray = touchCamera.ScreenPointToRay(touch.position);
+				Ray ray = mainCamera.ScreenPointToRay(touch.position);
 				//Debug.Log (ray.origin + " " + ray.direction);
 				//Debug.DrawRay(ray.origin, ray.direction, Color.white);
 				RaycastHit hit;

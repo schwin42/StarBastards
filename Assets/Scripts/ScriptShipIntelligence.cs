@@ -24,11 +24,11 @@ public class ScriptShipIntelligence : MonoBehaviour {
 
 
 	private ScriptShipSheet scriptShipSheet;
-	private Transform spaceController;
+	private Transform gameController;
 
 	// Use this for initialization
 	void Start () {
-		spaceController = GameObject.Find ("ControllerSpace").transform;
+		gameController = GameObject.Find ("ControllerGame").transform;
 	}
 	
 	// Update is called once per frame
@@ -66,7 +66,7 @@ public class ScriptShipIntelligence : MonoBehaviour {
 	{
 		float minimumDistance = 9999;
 		GameObject nearestModule = gameObject;
-		foreach(Transform module in spaceController)
+		foreach(Transform module in gameController)
 		{
 			Vector3 differenceVector = module.transform.position - transform.position;
 			float distance = differenceVector.magnitude;

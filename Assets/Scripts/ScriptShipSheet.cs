@@ -39,13 +39,17 @@ public class Snake
 		moduleType = moduleTypeArg;
 		snakeID = hotSnakes.Count;
 		hotSnakes.Add (this);
+		constituentNodes = new List<Node>();
 
 	}
 
-	public void AddNodeToSnake(Node hotNode, int snakeIndexArg)
+	public void AddNodeToSnake(Node hotNode)
 	{
+
 		constituentNodes.Add (hotNode);
-		hotNode.snakeIndex = snakeIndexArg;
+		hotNode.snakeIndex = snakeID;
+		Debug.Log (hotNode.module.name + " added to " + snakeID);
+	
 	}
 
 }
@@ -188,6 +192,11 @@ public class ScriptShipSheet : MonoBehaviour {
 			GetComponentsInChildren<ScriptModule>();
 		List<Snake> hotSnakes = new List<Snake>();
 		//int nextSnakeID = 0;
+
+		
+		//After loop ends, clear temporary variables
+		ClearOldNodeValues();
+
 		foreach(ScriptModule hotMod in childModules)
 		{
 			ModuleType targetType = hotMod.moduleType;
@@ -195,7 +204,7 @@ public class ScriptShipSheet : MonoBehaviour {
 			{
 			Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
 			Node hotModNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
-			Debug.Log (hotModNode.module.name);
+			//Debug.Log ("Root module: " + hotModNode.module.name);
 
 			//Check adjacent modules for like modules
 			Vector2[] adjacentDirections = 
@@ -213,54 +222,68 @@ public class ScriptShipSheet : MonoBehaviour {
 				{
 					//PK Stand There!
 				} else {
-					if(adjacentNode.module.moduleType == targetType)
-					{ //If module type matches center node
-					if(adjacentNode.snakeIndex == -1) //A. If adjacent node does not belong to snake
-					{
-							if(hotModNode.snakeIndex == -1) //B. If center node does not belong to snake
-							{
-							//Create new snake and add both to it
-							Snake hotSnake = new Snake(hotSnakes, targetType);
-							hotSnake.AddNodeToSnake(hotModNode, hotSnake.snakeID);
-							hotSnake.AddNodeToSnake(adjacentNode, hotSnake.snakeID);
-							} else if(hotModNode.snakeIndex >= 0) //B. If center node belongs to snake
-							{ 	
-							//Add adjacent node to center node's snake
-								hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(adjacentNode, hotModNode.snakeIndex);
-							} else {
-							Debug.LogError("Invalid snake index: " + hotModNode.snakeIndex);
-						}
-				
-						} else if(adjacentNode.snakeIndex >= 0)
-						{ //A. If adjacent node belongs to another snake 
+						if(adjacentNode.module.moduleType == targetType)
+						{ //If module type matches center node
+							Debug.Log ("Root module, adjacent module: " + hotModNode.module.name + ", " + adjacentNode.module.name);
 
-							if(hotModNode.snakeIndex == -1) //B. If center node does not belong to snake
-							{
-								//Add center node to adjacent node's snake
-								hotSnakes[adjacentNode.snakeIndex].AddNodeToSnake(hotModNode, adjacentNode.snakeIndex);
-							} else if(hotModNode.snakeIndex >= 0) //B. If center node belongs to snake
-							{ 	
-								//Add adjacent snake's modules to center snake
-								foreach(Node node in hotSnakes[adjacentNode.snakeIndex].constituentNodes)
-								        {
-									node.snakeIndex = hotModNode.snakeIndex;
+							if(hotModNode.snakeIndex == -1){ //A0: Center node does NOT belong to snake
+								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
+									Debug.Log ("00");
+									//Create new snake and add both to it
+									Snake hotSnake = new Snake(hotSnakes, targetType);
+									hotSnake.AddNodeToSnake(hotModNode);
+									hotSnake.AddNodeToSnake(adjacentNode);} 
+								else if(adjacentNode.snakeIndex >= 0){//B1: Adjacent node belongs to snake
+									Debug.Log ("01");
+									//Add center node to adjacent node's snake
+									hotSnakes[adjacentNode.snakeIndex].AddNodeToSnake(hotModNode);} 
+								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
+							} else if(hotModNode.snakeIndex >= 0){//A1: Center node belongs to snake
+								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
+									Debug.Log ("10");
+									//Add adjacent node to center node's snake
+									hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(adjacentNode);}
+								else if(adjacentNode.snakeIndex == hotModNode.snakeIndex){//B1: Adjacent node belongs to same snake
+									Debug.Log ("11");
+									//PK Stand There!
 								}
-								hotSnakes[hotModNode.snakeIndex].constituentNodes.AddRange(
-									hotSnakes[adjacentNode.snakeIndex].constituentNodes);
-								hotSnakes[adjacentNode.snakeIndex].constituentNodes = null;
-							} else {
-								Debug.LogError("Invalid snake index: " + hotModNode.snakeIndex);
+								else if(adjacentNode.snakeIndex >= 0){//B2: Adjacent node belongs to different snake	
+									Debug.Log ("12");
+									//Assign node's snake id as root node snake
+									foreach(Node node in hotSnakes[adjacentNode.snakeIndex].constituentNodes)
+									{
+										hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(node);
+										//node.snakeIndex = hotModNode.snakeIndex;
+									}
+									//hotSnakes[hotModNode.snakeIndex].constituentNodes.AddRange(
+									//	hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Add adjacent snake's modules to center snake
+									hotSnakes[adjacentNode.snakeIndex].constituentNodes = null; //Clear adjacent snake's nodes
+									hotSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark as dead
+								}
+								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
 							}
-						} else {
-							Debug.LogError("Invalid snake index: " + adjacentNode.snakeIndex);
-						}
+							else
+							{Debug.LogError ("Invalid root node index: " + hotModNode.snakeIndex);}
+
 				}
 				}
 			}
 		}
 		}
+
+
 		return hotSnakes;
 	}
 		
+	void ClearOldNodeValues()
+	{
+		foreach(ScriptModule hotMod in GetComponent<ScriptShipController>().shipModuleContainer.GetComponentsInChildren<ScriptModule>())
+		        {
+			Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
+			Node hotModNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+			hotModNode.snakeIndex = -1;
+			hotModNode.isAdded = false;
+		}
+	}
 
 }
