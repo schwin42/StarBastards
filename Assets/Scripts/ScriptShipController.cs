@@ -1,18 +1,27 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class Activation
 {
-	public int activationID;
+	public int activationID; //ID is unique to ship, not universe
 	public ModuleType moduleType; //Gadget type
+	public List<Node> constituentNodes; //Nodes that make up this activation
 	public int damage = 10;
 	public float shotDelay = 1; //In seconds
 	public int shotForce = 2000;
 	public int size = 0;
 	public int scatterAngle = 0;
-	public bool canShoot;
+	public bool canShoot = true;
 	public float shotTimer;
+
+	public Activation(int activationIDArg, ModuleType moduleTypeArg, List<Node> constituentNodesArg)
+	{
+		activationID = activationIDArg;
+		moduleType = moduleTypeArg;
+		constituentNodes = constituentNodesArg;
+		}
 
 }
 
@@ -21,7 +30,11 @@ public class ScriptShipController : MonoBehaviour {
 //Configurable
 	public PlayerControl playerControl = PlayerControl.None;
 	public Color playerColor;
-	public Activation activation = new Activation();
+	//public Activation activation = new Activation();
+
+//State
+	public List<Activation> currentActivations = new List<Activation> ();
+
 	//Motion
 	public float thrustForceConstant = 10.0F;
 	public float turnSpeedConstant = 1.0F;
@@ -116,6 +129,27 @@ public class ScriptShipController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
+	void Update()
+	{
+		//if(Input.GetKeyDown("3")) 
+	//	{
+			//foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
+			//{
+
+
+			currentActivations = scriptShipSheet.GetActivations();
+			foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
+						Node node = scriptShipSheet.GetNodeFromModule (module);
+						if (node.activationIndex == -1) {
+								module.SetActivation (false);
+						} else if (node.activationIndex >= 0) {
+								module.SetActivation (true);
+						} else {
+								Debug.Log ("Invalid activation id on " + node.module.name);
+						}
+				}
+
+		}
 
 	void FixedUpdate () 
 	{		
@@ -202,7 +236,7 @@ public class ScriptShipController : MonoBehaviour {
 		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
 
 
-		UpdateActivation (activation);
+		//UpdateActivation (activation);
 
 		if(teleportDirection != BoundaryDirection.None)
 		{

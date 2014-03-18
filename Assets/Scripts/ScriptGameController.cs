@@ -116,13 +116,7 @@ public class ScriptGameController : MonoBehaviour {
 				pilotContiguousModules = ship.GetModulesContiguousToPilot();
 		}
 
-		if(Input.GetKeyDown("3")) //GetSnakes unit test
-		{
-			foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
-			{
-				ship.lazySnakes = ship.GetModuleSnakes();
-			}
-		}
+
 
 	}
 

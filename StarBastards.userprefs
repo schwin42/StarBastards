@@ -1,9 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../PlasticSCM/SFG-Lobby/LobbyUnity/Assets/Scripts/ScriptInterfaceController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\ScriptShipSheet.cs">
     <Files>
-      <File FileName="../PlasticSCM/SFG-Lobby/LobbyUnity/Assets/Scripts/ScriptButton.cs" Line="1" Column="1" />
-      <File FileName="../PlasticSCM/SFG-Lobby/LobbyUnity/Assets/Scripts/ScriptInterfaceController.cs" Line="366" Column="1" />
+      <File FileName="Assets\Scripts\ScriptShipSheet.cs" Line="12" Column="48" />
+      <File FileName="Assets\Scripts\ScriptShipController.cs" Line="150" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

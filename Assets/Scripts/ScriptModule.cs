@@ -18,25 +18,23 @@ public enum ModuleSubtype
 	Number,
 
 }
-/*
-public enum ProjectileType
-{
-	None,
-	Beam, 
-	Pulse, 
-	Spread, 
-	Bomb
-}
-*/
+
+
+
 public class ScriptModule : MonoBehaviour {
 
 	public string moduleName;
 	public int moduleID;
 	//[System.NonSerialized]
+
+	//State
 	public ScriptShipController moduleOwner = null; //Null indicates module is neutral
 	public Vector2 moduleNodeCoordinates; //Location of owned module relative to pilot module
-	//public Transform spaceController;
-	//public GameObject explosionEffect;
+	public bool isActivated = false;
+
+	//Configurable
+	public Color defaultColor;
+	public Color activatedColor;
 
 	//Scriptable
 
@@ -44,25 +42,13 @@ public class ScriptModule : MonoBehaviour {
 	public ScriptGameController scriptModuleController;
 
 	//Acquired objects
-	//public Renderer renderer;
+	public SpriteRenderer spriteRenderer;
 
 	public ModuleType moduleType = ModuleType.None;
 
 	public int maxHP = 10;
 	public int currentHP;
-
-	//Weapon stats
-	//public ProjectileType projectileType = ProjectileType.None;
-	//public float weaponRange;
-	//public int weaponDamage;
-	//public float shotsPerSecond;
-	//public float trackingSpeed;
-	//public float projectileSpeed;
-	//public float shotTimer;
-
-	//Status
-	//public bool canShoot = false;
-
+	
 	//Error-checking
 	public int ownTime = -9999;
 	public GameObject captureModule;
@@ -71,22 +57,20 @@ public class ScriptModule : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+
 		currentHP = maxHP;
 
 		//Acquire objects
 		scriptModuleController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController>();
-		//renderer = GetComponent<Renderer>();
-		//material = GetComponent<Material>();
-
+		spriteRenderer = GetComponent<SpriteRenderer> ();
 		if(tag == "Ship")
 		{
 			moduleOwner = transform.parent.parent.gameObject.GetComponent<ScriptShipController>();
 		}
 
-	//	if(moduleType == ModuleType.Pilot)
-	//	{
-			//renderer.material.color = moduleOwner.playerColor;
-	//	}
+		//Colors
+		spriteRenderer.color = defaultColor;
+
 
 	}
 	
@@ -182,30 +166,6 @@ public class ScriptModule : MonoBehaviour {
 
 	}
 
-
-				/*
-	void SetOwner(GameObject assimilatingModule, Vector2 coordinates)
-	{
-		Destroy (rigidbody2D);
-		moduleOwner = assimilatingModule.transform.parent.gameObject.GetComponent<ScriptShipController>();
-		Vector2 lastVelocity = moduleOwner.rigidbody2D.velocity;
-		Destroy(moduleOwner.rigidbody2D);
-		transform.parent = moduleOwner.transform;
-		//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
-		transform.localPosition = coordinates;
-		transform.localRotation = Quaternion.identity;
-		shipSpaceCoordinates = coordinates;
-		tag = "Ship";
-		StartCoroutine(ResetShipRigidbody(lastVelocity));
-		if(moduleType == ModuleType.Weapon)
-		{
-		canShoot = true;
-		}
-
-		//Debug.Log ("assmodpos" + assimilatingModulePosition + "coordinates" + coordinates);
-	}
-*/
-
 	Vector2 RoundVector2(Vector2 unroundedVector)
 	{
 		int x = (int)Mathf.Round (unroundedVector.x);
@@ -261,7 +221,17 @@ public class ScriptModule : MonoBehaviour {
 	}
 
 
+	public void SetActivation(bool willBeActivated)
+	{
+		if (willBeActivated) {
+			spriteRenderer.color = activatedColor;
+			isActivated = true;
 
+				} else {
+			spriteRenderer.color = defaultColor;
+			isActivated = false;
+				}
+	}
 
 
 	//	//transform.localPosition = Vector2.zero;

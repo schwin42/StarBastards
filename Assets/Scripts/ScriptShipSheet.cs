@@ -9,7 +9,8 @@ public class Node
 	public ScriptModule module; //Gameobject at this node in the grid, if any
 	public bool isAdded;  //True indicates this node has been checked off
 	public bool isEmpty; //Whether a module exists in this node
-	public int snakeIndex = -1; //Negative index indicates null value
+	public int snakeIndex = -1; //Negative one for index indicates null value
+	public int activationIndex = -1; //Ditto
 
 	//Empty node constructor
 	public Node()
@@ -48,7 +49,7 @@ public class Snake
 
 		constituentNodes.Add (hotNode);
 		hotNode.snakeIndex = snakeID;
-		Debug.Log (hotNode.module.name + " added to " + snakeID);
+		//Debug.Log (hotNode.module.name + " added to " + snakeID);
 	
 	}
 
@@ -60,10 +61,13 @@ public class ScriptShipSheet : MonoBehaviour {
 
 	public List<ScriptModule> pilotContiguousModules; //Modules connected to first module
 
+
+	//Scriptable
 	static private int maxX = 50; //Max positive and negative x-value
 	static private int maxY = 50; //Max positive and negative y-value
+	private int minNodesForActivation = 3; //Number of contiguous modules required to form activation
 
-	public List<Snake> lazySnakes; //List of last known snakes
+	public List<Snake> lastSnakes; //List of last known snakes
 
 	//Grid as 2D array
 	public Node[,] schematic = new Node[maxX*2,maxY*2];
@@ -164,13 +168,7 @@ public class ScriptShipSheet : MonoBehaviour {
 	{
 		Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
 
-		Vector2[] adjacentCoordinates = 
-		{
-			new Vector2(nodeGridCoordinates.x, nodeGridCoordinates.y + 1), //Up
-			new Vector2(nodeGridCoordinates.x, nodeGridCoordinates.y - 1), //Down
-			new Vector2(nodeGridCoordinates.x + 1, nodeGridCoordinates.y), //Right
-			new Vector2(nodeGridCoordinates.x - 1, nodeGridCoordinates.y) //Left
-		};
+		Vector2[] adjacentCoordinates = GetAdjacentPoints (nodeGridCoordinates);
 
 		foreach (Vector2 adjacentVector2 in adjacentCoordinates) {
 			//Debug.Log ((int)adjacentVector2.x + " " + (int)adjacentVector2.y);
@@ -186,7 +184,7 @@ public class ScriptShipSheet : MonoBehaviour {
 	}
 
 
-	public List<Snake> GetModuleSnakes()
+	List<Snake> GetModuleSnakes()
 	{
 		ScriptModule[] childModules = GetComponent<ScriptShipController>().shipModuleContainer.
 			GetComponentsInChildren<ScriptModule>();
@@ -202,18 +200,12 @@ public class ScriptShipSheet : MonoBehaviour {
 			ModuleType targetType = hotMod.moduleType;
 			if(!(targetType == ModuleType.Pilot || targetType == ModuleType.None))
 			{
+				Node hotModNode = GetNodeFromModule(hotMod);
 			Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
-			Node hotModNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
 			//Debug.Log ("Root module: " + hotModNode.module.name);
 
 			//Check adjacent modules for like modules
-			Vector2[] adjacentDirections = 
-			{
-				new Vector2(nodeGridCoordinates.x, nodeGridCoordinates.y + 1), //Up
-				new Vector2(nodeGridCoordinates.x, nodeGridCoordinates.y - 1), //Down
-				new Vector2(nodeGridCoordinates.x + 1, nodeGridCoordinates.y), //Right
-				new Vector2(nodeGridCoordinates.x - 1, nodeGridCoordinates.y) //Left
-			};
+				Vector2[] adjacentDirections = GetAdjacentPoints(nodeGridCoordinates);
 		
 			foreach (Vector2 adjacentCoordinates in adjacentDirections) 
 			{
@@ -252,7 +244,7 @@ public class ScriptShipSheet : MonoBehaviour {
 									hotSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
 									//Assign node's snake id as root node snake
 									List<Node> transferList = new List<Node>(hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
-									hotSnakes[adjacentNode.snakeIndex].constituentNodes = null; //Clear adjacent snake's nodes
+									hotSnakes[adjacentNode.snakeIndex].constituentNodes = new List<Node>(); //Clear adjacent snake's nodes
 
 									foreach(Node transferNode in transferList)
 									{
@@ -275,7 +267,7 @@ public class ScriptShipSheet : MonoBehaviour {
 		}
 		}
 
-
+		lastSnakes = hotSnakes;
 		return hotSnakes;
 	}
 		
@@ -283,11 +275,53 @@ public class ScriptShipSheet : MonoBehaviour {
 	{
 		foreach(ScriptModule hotMod in GetComponent<ScriptShipController>().shipModuleContainer.GetComponentsInChildren<ScriptModule>())
 		        {
-			Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
-			Node hotModNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+			Node hotModNode = GetNodeFromModule(hotMod);
+			//Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
+			//Node hotModNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
 			hotModNode.snakeIndex = -1;
+			hotModNode.activationIndex = -1;
 			hotModNode.isAdded = false;
 		}
+	}
+
+	List<Activation> ConvertSnakesToActivations(List<Snake> hotSnakes)
+	{
+		List<Activation> hotActivations = new List<Activation> ();
+		foreach (Snake snake in hotSnakes) {
+			Debug.Log ("Node count >= min Nodes " + snake.constituentNodes.Count + ", " + minNodesForActivation);
+			if(snake.constituentNodes.Count >= minNodesForActivation)
+			{
+				hotActivations.Add (new Activation(snake.snakeID, snake.moduleType, snake.constituentNodes)); 
+				foreach(Node node in snake.constituentNodes)
+				{
+					node.activationIndex = hotActivations.Count - 1;
+				}
+			}
+				}
+				                    return hotActivations;
+	}
+
+	public List<Activation> GetActivations()
+	{
+		return ConvertSnakesToActivations(GetModuleSnakes ());
+	}
+
+	public Node GetNodeFromModule(ScriptModule module)
+	{
+		Vector2 nodeGridCoordinates = GetGridNodeCoordinates(module.moduleNodeCoordinates);
+		return schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+	}
+
+	Vector2[] GetAdjacentPoints(Vector2 startingPoint)
+	{
+		Vector2[] adjacentPoints = 
+		{
+			new Vector2(startingPoint.x, startingPoint.y + 1), //Up
+			new Vector2(startingPoint.x, startingPoint.y - 1), //Down
+			new Vector2(startingPoint.x + 1, startingPoint.y), //Right
+			new Vector2(startingPoint.x - 1, startingPoint.y) //Left
+		};
+		return adjacentPoints;
 	}
 
 }
