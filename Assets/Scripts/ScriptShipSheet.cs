@@ -301,6 +301,20 @@ public class ScriptShipSheet : MonoBehaviour {
 				                    return hotActivations;
 	}
 
+	List<Activation> ArmActivations (List<Activation> hotActivations)
+	{
+
+		foreach(Activation activation in hotActivations)
+		{
+			if(activation.moduleType == ModuleType.Weapon)
+			{
+				//Calculate activation stats
+			}
+		}
+
+		return hotActivations;
+	}
+
 	public List<Activation> GetActivations()
 	{
 		return ConvertSnakesToActivations(GetModuleSnakes ());

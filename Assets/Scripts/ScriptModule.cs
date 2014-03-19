@@ -13,17 +13,19 @@ public enum ModuleType
 public enum ModuleSubtype
 {
 	None,
+	Homing,
+	Radius,
 	Power,
-	Range,
+	Duration,
 	Number,
-
+	Speed
 }
 
 
 
 public class ScriptModule : MonoBehaviour {
 
-	public string moduleName;
+	//public string moduleName;
 	public int moduleID;
 	//[System.NonSerialized]
 
@@ -31,7 +33,9 @@ public class ScriptModule : MonoBehaviour {
 	public ScriptShipController moduleOwner = null; //Null indicates module is neutral
 	public Vector2 moduleNodeCoordinates; //Location of owned module relative to pilot module
 	public bool isActivated = false;
-
+	public ModuleType moduleType = ModuleType.None;
+	public ModuleSubtype moduleSubtype = ModuleSubtype.None;
+	
 	//Configurable
 	public Color defaultColor;
 	public Color activatedColor;
@@ -40,12 +44,14 @@ public class ScriptModule : MonoBehaviour {
 
 	//Inspector objects
 	public ScriptGameController scriptModuleController;
-
-	//Acquired objects
+	public GameObject moduleBox;
+	public TextMesh textMesh;
 	public SpriteRenderer spriteRenderer;
+	
+	//Acquired objects
 
-	public ModuleType moduleType = ModuleType.None;
 
+	
 	public int maxHP = 10;
 	public int currentHP;
 	
@@ -57,12 +63,13 @@ public class ScriptModule : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+		//moduleBox = transform.FindChild("BoxModule").gameObject;
 
 		currentHP = maxHP;
 
 		//Acquire objects
 		scriptModuleController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController>();
-		spriteRenderer = GetComponent<SpriteRenderer> ();
+		//spriteRenderer = moduleBox.GetComponent<SpriteRenderer> ();
 		if(tag == "Ship")
 		{
 			moduleOwner = transform.parent.parent.gameObject.GetComponent<ScriptShipController>();
@@ -98,38 +105,6 @@ public class ScriptModule : MonoBehaviour {
 					scriptModuleController.RemoveModule(this);
 				}
 			}
-
-			/*
-			if(moduleType == ModuleType.Weapon && moduleOwner.target)
-			{
-				Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
-				if(attackVector.magnitude <= weaponRange)
-				{
-					if(canShoot)
-					{
-						canShoot = false;
-					GameObject hotBullet = Instantiate (moduleOwner.basicBullet, transform.position, transform.rotation) as GameObject;
-						ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
-						scriptProjectile.projectileDamage = weaponDamage;
-						scriptProjectile.owner = moduleOwner.gameObject;
-						hotBullet.rigidbody2D.AddForce(attackVector * 100); //Magic number
-						shotTimer = 0;
-					} else {
-						shotTimer += Time.deltaTime;
-						if(shotTimer >= 1/shotsPerSecond)
-						{
-							canShoot = true;
-						}
-					}
-				} else {
-					if(!canShoot)
-					{
-						canShoot = true;
-					}
-				}
-			}
-
-			*/
 		}
 
 	}
@@ -202,21 +177,7 @@ public class ScriptModule : MonoBehaviour {
 					Debug.LogError("No possible attach sites on " + coordinates);
 				}
 			}
-
-		//	Vector2 prospectiveDirectionY = new Vector2(0F, hotVector.y);
-
-
-			//if(Random.value > 0.5F)
-			//{
-			//	hotVector.x = 0;
-			//} else {
-			//	hotVector.y = 0;
-			//}
 		}
-		
-		//Vector2 hotterVector = new Vector2(-hotVector.y, hotVector.x); //Rotate 90 degrees
-
-		//Debug.Log (coordinates + " " + hotVector);
 		return hotVector;
 	}
 
@@ -232,17 +193,4 @@ public class ScriptModule : MonoBehaviour {
 			isActivated = false;
 				}
 	}
-
-
-	//	//transform.localPosition = Vector2.zero;
-	//	shipSpaceCoordinates = Vector3.zero;
-
-	//	if(moduleType == ModuleType.Weapon)
-	//	{
-	//		canShoot = false;
-	//	}
-	
-
-
-
 }

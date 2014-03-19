@@ -29,9 +29,9 @@ public class ScriptGameController : MonoBehaviour {
 	public float ejectionAngularForceConstant = 1000F;
 
 	//Prefabs
-	public GameObject augmentModule;
-	public GameObject defenseModule;
-	public GameObject weaponModule;
+	//public GameObject augmentModule;
+	//public GameObject defenseModule;
+	public GameObject modulePrefab;
 
 	//Transforms
 	public Transform shipContainer;
@@ -72,20 +72,23 @@ public class ScriptGameController : MonoBehaviour {
 			//GameObject hotMod = Instantiate (modulePrefab) as GameObject;
 
 
-			GameObject hotMod = gameObject;
-			float hotRand = Random.value * 3;
+			GameObject hotMod = Instantiate (modulePrefab) as GameObject;
+
+			//float hotRand = Random.value * 3;
+			/*
 			if(hotRand <= 1)
 			{
-				 hotMod = Instantiate (augmentModule) as GameObject;
+				// hotMod = Instantiate (augmentModule) as GameObject;
 				//Debug.Log ("hull module");
 			} else if(hotRand <= 2){
-				 hotMod = Instantiate (weaponModule) as GameObject;
+				// hotMod = Instantiate (weaponModule) as GameObject;
 				//Debug.Log ("weapon module");
 			} else if(hotRand <= 3){
-				hotMod = Instantiate (defenseModule) as GameObject;
+				//hotMod = Instantiate (defenseModule) as GameObject;
 			} else {
 				Debug.LogError ("Bug in random number generator.");
 			}
+*/
 
 			hotMod.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
 			hotMod.transform.parent = this.gameObject.transform;
@@ -97,6 +100,14 @@ public class ScriptGameController : MonoBehaviour {
 			hotMod.rigidbody2D.AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
 			//GetNextID(hotModS.GetComponent<ScriptModule>());
 			//Debug.Log (i);
+
+			//Type
+			scriptModule.moduleType = ModuleType.Weapon;
+
+			//Subtype
+			scriptModule.moduleSubtype = GetRandomEnum<ModuleSubtype>();
+			string enumString = scriptModule.moduleSubtype.ToString();
+			scriptModule.textMesh.text = enumString[0].ToString();
 		}
 
 		SetModuleRigidbodies (moduleRigidbodyMode);
@@ -115,9 +126,6 @@ public class ScriptGameController : MonoBehaviour {
 			foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
 				pilotContiguousModules = ship.GetModulesContiguousToPilot();
 		}
-
-
-
 	}
 
 	public int GetNextID()
@@ -171,9 +179,13 @@ public class ScriptGameController : MonoBehaviour {
 		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
 		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
 		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
-
-
 	}
 
+	public static T GetRandomEnum<T>()
+	{
+		System.Array hotArray = System.Enum.GetValues(typeof(T));
+		T value = (T)hotArray.GetValue(UnityEngine.Random.Range (0, hotArray.Length));
+		return value;
+	}
 
 }

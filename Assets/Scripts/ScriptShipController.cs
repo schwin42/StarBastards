@@ -8,12 +8,22 @@ public class Activation
 	public int activationID; //ID is unique to ship, not universe
 	public ModuleType moduleType; //Gadget type
 	public List<Node> constituentNodes; //Nodes that make up this activation
+
+	//Proper stats
+	public int homingLevel = 0;
+	public int radiusLevel = 0;
+	public int powerLevel = 0;
+	public int durationLevel = 0;
+	public int numberLevel = 0;
+	public int speedLevel = 0;
+
+	//Mechanical stats
 	public int damage = 10;
 	public float shotDelay = 1; //In seconds
 	public int shotForce = 2000;
 	public int size = 0;
 	public int scatterAngle = 0;
-	public bool canShoot = true;
+	public bool canShoot = false;
 	public float shotTimer;
 
 	public Activation(int activationIDArg, ModuleType moduleTypeArg, List<Node> constituentNodesArg)
@@ -48,7 +58,8 @@ public class ScriptShipController : MonoBehaviour {
 	public ParticleSystem thrustEffect;
 	public GameObject target;
 
-//Objects
+//Acquired
+	[System.NonSerialized]
 	public Transform shipModuleContainer;
 
 //Cached from inspector
@@ -72,13 +83,13 @@ public class ScriptShipController : MonoBehaviour {
 	private AudioSource audioSource;
 	//public Rigidbody2D rigidCharacter;
 	//private GameObject newBullet = null;
-	private float teleportTimer = 0f;
+	//private float teleportTimer = 0f;
 
 //Status
 	[System.NonSerialized]
 	public bool isThrusting = false;
 	//public bool justTeleported = false;
-	public BoundaryDirection teleportDirection = BoundaryDirection.None;
+	//public BoundaryDirection teleportDirection = BoundaryDirection.None;
 	public bool shipIsActive = true;
 
 	// Use this for initialization
@@ -136,18 +147,7 @@ public class ScriptShipController : MonoBehaviour {
 			//foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
 			//{
 
-
-			currentActivations = scriptShipSheet.GetActivations();
-			foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
-						Node node = scriptShipSheet.GetNodeFromModule (module);
-						if (node.activationIndex == -1) {
-								module.SetActivation (false);
-						} else if (node.activationIndex >= 0) {
-								module.SetActivation (true);
-						} else {
-								Debug.Log ("Invalid activation id on " + node.module.name);
-						}
-				}
+		UpdateActivationStatus();
 
 		}
 
@@ -237,7 +237,7 @@ public class ScriptShipController : MonoBehaviour {
 
 
 		//UpdateActivation (activation);
-
+			/*
 		if(teleportDirection != BoundaryDirection.None)
 		{
 			if(teleportTimer >= teleportDelay)
@@ -250,6 +250,9 @@ public class ScriptShipController : MonoBehaviour {
 			teleportTimer += Time.deltaTime;
 			}
 			}
+
+*/
+
 		}
 	}
 
@@ -433,6 +436,21 @@ public class ScriptShipController : MonoBehaviour {
 			//}
 		//}
 	}
+	}
+
+	void UpdateActivationStatus()
+	{
+		currentActivations = scriptShipSheet.GetActivations();
+		foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
+			Node node = scriptShipSheet.GetNodeFromModule (module);
+			if (node.activationIndex == -1) {
+				module.SetActivation (false);
+			} else if (node.activationIndex >= 0) {
+				module.SetActivation (true);
+			} else {
+				Debug.Log ("Invalid activation id on " + node.module.name);
+			}
+		}
 	}
 
 }
