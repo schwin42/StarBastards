@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class Node
 {
 	public ScriptModule module; //Gameobject at this node in the grid, if any
-	public bool isAdded;  //True indicates this node has been checked off
+	public bool isAdded = false;  //True indicates this node has been checked off
 	public bool isEmpty; //Whether a module exists in this node
 	public int snakeIndex = -1; //Negative one for index indicates null value
 	public int activationIndex = -1; //Ditto
@@ -123,7 +123,7 @@ public class ScriptShipSheet : MonoBehaviour {
 	}
 
 	//Convert real world coordinates to absolute grid coordinates
-	public Vector2 GetGridNodeCoordinates(Vector2 nodeCoordinates)
+	public static Vector2 GetGridNodeCoordinates(Vector2 nodeCoordinates)
 	{
 		Vector2 gridNodeCoordinates = Vector2.zero;
 		gridNodeCoordinates.x = nodeCoordinates.x + maxX;
@@ -276,8 +276,7 @@ public class ScriptShipSheet : MonoBehaviour {
 		foreach(ScriptModule hotMod in GetComponent<ScriptShipController>().shipModuleContainer.GetComponentsInChildren<ScriptModule>())
 		        {
 			Node hotModNode = GetNodeFromModule(hotMod);
-			//Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
-			//Node hotModNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+		
 			hotModNode.snakeIndex = -1;
 			hotModNode.activationIndex = -1;
 			hotModNode.isAdded = false;
@@ -301,19 +300,50 @@ public class ScriptShipSheet : MonoBehaviour {
 				                    return hotActivations;
 	}
 
-	List<Activation> ArmActivations (List<Activation> hotActivations)
+	public void ArmActivations (List<Activation> hotActivations)
 	{
-
+		Debug.Log ("Arming");
 		foreach(Activation activation in hotActivations)
 		{
 			if(activation.moduleType == ModuleType.Weapon)
 			{
 				//Calculate activation stats
+				foreach(Node node in activation.constituentNodes)
+				{
+					switch(node.module.moduleSubtype)
+					{
+					case ModuleSubtype.Duration:
+						activation.durationLevel++;
+						break;
+					//case ModuleSubtype.Homing:
+					//	activation.homingLevel++;
+					//	break;
+					case ModuleSubtype.Number:
+						activation.numberLevel++;
+						break;
+					case ModuleSubtype.Power:
+						activation.powerLevel++;
+						break;
+					case ModuleSubtype.Radius:
+						activation.radiusLevel++;
+						break;
+					case ModuleSubtype.Speed:
+						activation.speedLevel++;
+						break;
+					default:
+						Debug.LogError("Invalid module subtype: " + node.module.moduleSubtype);
+						break;
+					}
+
+					activation.DeriveRealStats();
+				}
+
 			}
 		}
 
-		return hotActivations;
+		//return hotActivations;
 	}
+
 
 	public List<Activation> GetActivations()
 	{

@@ -12,8 +12,7 @@ public enum ModuleType
 
 public enum ModuleSubtype
 {
-	None,
-	Homing,
+	//Homing,
 	Radius,
 	Power,
 	Duration,
@@ -34,7 +33,7 @@ public class ScriptModule : MonoBehaviour {
 	public Vector2 moduleNodeCoordinates; //Location of owned module relative to pilot module
 	public bool isActivated = false;
 	public ModuleType moduleType = ModuleType.None;
-	public ModuleSubtype moduleSubtype = ModuleSubtype.None;
+	public ModuleSubtype moduleSubtype;
 	
 	//Configurable
 	public Color defaultColor;
@@ -162,14 +161,14 @@ public class ScriptModule : MonoBehaviour {
 			Debug.Log (coordinates + " checked for adjacent at " + Time.time);
 			Vector2 prospectiveOffsetX = new Vector2(hotVector.x, 0F);
 			Vector2 prospectiveCoordinatesX = moduleNodeCoordinates + prospectiveOffsetX;
-			Vector2 prospectiveGridCoordinatesX = scriptShipSheet.GetGridNodeCoordinates(prospectiveCoordinatesX);
+			Vector2 prospectiveGridCoordinatesX = ScriptShipSheet.GetGridNodeCoordinates(prospectiveCoordinatesX);
 			if(scriptShipSheet.schematic[(int)prospectiveGridCoordinatesX.x, (int)prospectiveGridCoordinatesX.y].isEmpty)
 			{
 				hotVector = prospectiveOffsetX;
 			} else {
 				Vector2 prospectiveOffsetY = new Vector2(0F, hotVector.y);
 				Vector2 prospectiveCoordinatesY = moduleNodeCoordinates + prospectiveOffsetY;
-				Vector2 prospectiveGridCoordinatesY = scriptShipSheet.GetGridNodeCoordinates(prospectiveCoordinatesY);
+				Vector2 prospectiveGridCoordinatesY = ScriptShipSheet.GetGridNodeCoordinates(prospectiveCoordinatesY);
 				if(scriptShipSheet.schematic[(int)prospectiveGridCoordinatesY.x, (int)prospectiveGridCoordinatesY.y].isEmpty)
 				{
 					hotVector = prospectiveOffsetY;

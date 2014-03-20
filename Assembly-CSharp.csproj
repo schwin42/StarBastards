@@ -172,6 +172,7 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
+     <Compile Include="Assets\ScriptBaseController.cs" />
      <Compile Include="Assets\Scripts\ControllerTouch.cs" />
      <Compile Include="Assets\Scripts\ScriptBoundary.cs" />
      <Compile Include="Assets\Scripts\ScriptButton.cs" />

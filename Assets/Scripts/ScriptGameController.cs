@@ -161,7 +161,7 @@ public class ScriptGameController : MonoBehaviour {
 	{
 		//Cache ejection vector
 		Vector2 pilotToEjectionVector = hotMod.gameObject.transform.position - hotMod.moduleOwner.pilotModule.transform.position;
-
+		GameObject previousOwner = hotMod.moduleOwner.gameObject;
 		hotMod.moduleOwner = null;
 		hotMod.transform.parent = spaceContainer;
 		hotMod.tag = "NeutralModule";
@@ -179,6 +179,13 @@ public class ScriptGameController : MonoBehaviour {
 		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
 		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
 		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
+
+		//Remove module from grid
+		Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
+		previousOwner.GetComponent<ScriptShipSheet>().schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = new Node();
+
+		//Remove module from activation
+		previousOwner.SendMessage("UpdateActivationStatus");
 	}
 
 	public static T GetRandomEnum<T>()

@@ -10,19 +10,25 @@ public class Activation
 	public List<Node> constituentNodes; //Nodes that make up this activation
 
 	//Proper stats
-	public int homingLevel = 0;
-	public int radiusLevel = 0;
-	public int powerLevel = 0;
 	public int durationLevel = 0;
+	public int homingLevel = 0;
 	public int numberLevel = 0;
+	public int powerLevel = 0;
+	public int radiusLevel = 0;
 	public int speedLevel = 0;
 
 	//Mechanical stats
 	public int damage = 10;
-	public float shotDelay = 1; //In seconds
+	public float bulletsPerSecond; //In seconds
 	public int shotForce = 2000;
-	public int size = 0;
+	//public int size = 0;
 	public int scatterAngle = 0;
+	public int durationInSeconds = 0;
+	public int homingConstant = 0;
+	public int bulletsPerShot = 0;
+	public int bulletScale = 0;
+
+	//State
 	public bool canShoot = false;
 	public float shotTimer;
 
@@ -32,6 +38,16 @@ public class Activation
 		moduleType = moduleTypeArg;
 		constituentNodes = constituentNodesArg;
 		}
+
+	public void DeriveRealStats()
+	{
+		durationInSeconds = durationLevel + 1;
+		homingConstant = homingLevel;
+		bulletsPerSecond = (numberLevel * 3) + 1;
+		damage = (powerLevel + 1) * 10;
+		bulletScale = (radiusLevel * 2) + 1;
+		shotForce = (speedLevel + 1) * 1000;
+	}
 
 }
 
@@ -147,7 +163,6 @@ public class ScriptShipController : MonoBehaviour {
 			//foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
 			//{
 
-		UpdateActivationStatus();
 
 		}
 
@@ -235,8 +250,14 @@ public class ScriptShipController : MonoBehaviour {
 		//transform.rotation = Quaternion.Euler(0, 
 		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
 
+		//	UpdateActivationStatus();
 
-		//UpdateActivation (activation);
+			foreach(Activation activation in currentActivations)
+			{
+		UpdateActivation (activation);
+			}
+
+
 			/*
 		if(teleportDirection != BoundaryDirection.None)
 		{
@@ -328,17 +349,14 @@ public class ScriptShipController : MonoBehaviour {
 			rigidbodyResetPending = true;
 		}
 
-		//Ready module
-		//if(scriptModule.moduleType == ModuleType.Weapon) //Ready weapon
-		//{
-		//	scriptModule.canShoot = true;
-		//}
-
 		//Add to grid
-		Vector2 gridNodeCoordinates = scriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
+		Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
 		Node hotNode = new Node(addedModule);
-	//	Debug.Log (gridNodeCoordinates);
 		scriptShipSheet.schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
+
+		//Add to activation
+		UpdateActivationStatus();
+		
 	}
 	/*
 	IEnumerator ResetShipRigidbody(Vector2 lastVelocity)
@@ -404,25 +422,35 @@ public class ScriptShipController : MonoBehaviour {
 		{
 			if(activation.moduleType == ModuleType.Weapon)
 			{
-		Vector2 attackVector = pilotModule.transform.TransformDirection (Vector2.up);
+				Vector2 attackVector = pilotModule.transform.TransformDirection (Vector2.up);
 		//	if(attackVector.magnitude <= weaponRange)
 			//{
 				if(activation.canShoot)
 				{
-					activation.canShoot = false;
-			Vector3 bulletPosition = pilotModule.transform.position;
-					GameObject hotBullet = Instantiate (basicBullet, bulletPosition, transform.rotation) as GameObject;
-				hotBullet.transform.parent = dynamicObjectsContainer;
-			//Debug.Log (transform.position);
-			ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
-					scriptProjectile.projectileDamage = activation.damage;
-					scriptProjectile.owner = gameObject;
-				hotBullet.rigidbody2D.velocity = rigidbody2D.velocity;	
-				hotBullet.rigidbody2D.AddForce(attackVector * activation.shotForce); //Magic number
+					//Change state
 					activation.shotTimer = 0;
+					activation.canShoot = false;
+					//Bullet creation
+					Vector3 bulletPosition = pilotModule.transform.position;
+					GameObject hotBullet = Instantiate (basicBullet, bulletPosition, transform.rotation) as GameObject;
+					//Bullet registration
+					hotBullet.transform.parent = dynamicObjectsContainer;
+					ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
+					scriptProjectile.owner = gameObject;
+
+					//Assign properties
+					scriptProjectile.projectileDamage = activation.damage;
+					hotBullet.transform.localScale *= activation.bulletScale;
+					scriptProjectile.bulletDuration = activation.durationInSeconds;
+
+					//Add force
+					hotBullet.rigidbody2D.velocity = rigidbody2D.velocity;	
+					hotBullet.rigidbody2D.AddForce(attackVector * activation.shotForce); //Magic number
+
 				} else {
 					activation.shotTimer += Time.deltaTime;
-					if(activation.shotTimer >= activation.shotDelay)
+					float shotDelay = 1 / activation.bulletsPerSecond;
+					if(activation.shotTimer >= shotDelay)
 					{
 						activation.canShoot = true;
 					}
@@ -441,6 +469,8 @@ public class ScriptShipController : MonoBehaviour {
 	void UpdateActivationStatus()
 	{
 		currentActivations = scriptShipSheet.GetActivations();
+		scriptShipSheet.ArmActivations(currentActivations);
+
 		foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
 			Node node = scriptShipSheet.GetNodeFromModule (module);
 			if (node.activationIndex == -1) {
