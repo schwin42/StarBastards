@@ -5,8 +5,8 @@ public enum ModuleType
 {
 	None,
 	Weapon,
-	Assist,
-	Defense,
+	Laser,
+	Armor,
 	Pilot
 }
 
@@ -42,13 +42,17 @@ public class ScriptModule : MonoBehaviour {
 	//Scriptable
 
 	//Inspector objects
-	public ScriptGameController scriptModuleController;
+
 	public GameObject moduleBox;
 	public TextMesh textMesh;
 	public SpriteRenderer spriteRenderer;
+
+	//Prefabs
+	public GameObject explosionEffect;
+
 	
 	//Acquired objects
-
+	protected ScriptGameController scriptModuleController;
 
 	
 	public int maxHP = 10;
@@ -130,6 +134,39 @@ public class ScriptModule : MonoBehaviour {
 
 				//Collect module
 				moduleOwner.AddModule(collision.gameObject.GetComponent<ScriptModule>(), gameObject, assimilationNodeCoordinates);
+
+			} else if(collision.gameObject.tag == "Ship" 
+			          //&& collision.rigidbody == null
+			          )
+			{
+
+				//Debug.Log ("Self: " + gameObject.name + " , Collided object: " + collision.gameObject.name + ", Collider: " + collision.collider.name + " @" + Time.time);
+
+
+				ScriptModule colMod = collision.collider.GetComponent<ScriptModule>();
+				//Debug.Log (colMod.name);
+				if(colMod != null)
+				{
+				if(colMod.moduleOwner == moduleOwner)
+				{
+			//		Debug.Log(moduleOwner.name + " collided with self.");
+				} else {
+					if(moduleType == ModuleType.Armor && isActivated) //If this module is activated armor
+					{
+						Debug.Log (gameObject.name + " deals damage to " + colMod.gameObject);
+						colMod.currentHP -= maxHP;
+						Instantiate(explosionEffect, colMod.transform.position, Quaternion.identity);
+					} else { //If this module  is not activated armor
+						if(colMod.moduleType == ModuleType.Armor && colMod.isActivated) //Inactive against active armor
+						{
+							//No effect
+						} else { //Inactive against inactive
+							colMod.currentHP -= maxHP;
+							Instantiate(explosionEffect, colMod.transform.position, Quaternion.identity);
+						}
+					}
+				}
+			}
 
 			}
 		} 

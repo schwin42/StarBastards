@@ -27,6 +27,12 @@ public class ScriptGameController : MonoBehaviour {
 	public float startingForceConstant = 10;
 	public float ejectionLinearForceConstant = 1000F;
 	public float ejectionAngularForceConstant = 1000F;
+	public Color inactiveGunColor;
+	public Color activeGunColor;
+	public Color inactiveArmorColor;
+	public Color activeArmorColor;
+	public Color inactiveLaserColor;
+	public Color activeLaserColor;
 
 	//Prefabs
 	//public GameObject augmentModule;
@@ -67,28 +73,15 @@ public class ScriptGameController : MonoBehaviour {
 
 
 		//Generate neutral modules
-		for(int i = 0; i<100; i++)
+		for(int i = 0; i<200; i++)
 		{
 			//GameObject hotMod = Instantiate (modulePrefab) as GameObject;
 
 
 			GameObject hotMod = Instantiate (modulePrefab) as GameObject;
 
-			//float hotRand = Random.value * 3;
-			/*
-			if(hotRand <= 1)
-			{
-				// hotMod = Instantiate (augmentModule) as GameObject;
-				//Debug.Log ("hull module");
-			} else if(hotRand <= 2){
-				// hotMod = Instantiate (weaponModule) as GameObject;
-				//Debug.Log ("weapon module");
-			} else if(hotRand <= 3){
-				//hotMod = Instantiate (defenseModule) as GameObject;
-			} else {
-				Debug.LogError ("Bug in random number generator.");
-			}
-*/
+
+
 
 			hotMod.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
 			hotMod.transform.parent = this.gameObject.transform;
@@ -102,7 +95,25 @@ public class ScriptGameController : MonoBehaviour {
 			//Debug.Log (i);
 
 			//Type
-			scriptModule.moduleType = ModuleType.Weapon;
+			float hotRand = Random.value * 3;
+			//Color defaultColor = Color.black;
+			//Color activeColor = Color.black;
+			if(hotRand <= 1)
+			{
+				scriptModule.moduleType = ModuleType.Weapon;
+				scriptModule.defaultColor = inactiveGunColor;
+				scriptModule.activatedColor = activeGunColor;
+			} else if(hotRand <= 2){
+				scriptModule.moduleType = ModuleType.Armor;
+				scriptModule.defaultColor = inactiveArmorColor;
+				scriptModule.activatedColor = activeArmorColor;
+			} else if(hotRand <= 3){
+				scriptModule.moduleType = ModuleType.Laser;
+				scriptModule.defaultColor = inactiveLaserColor;
+				scriptModule.activatedColor = activeLaserColor;
+			} else {
+				Debug.LogError ("Bug in random number generator.");
+			}
 
 			//Subtype
 			scriptModule.moduleSubtype = GetRandomEnum<ModuleSubtype>();

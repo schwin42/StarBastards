@@ -216,31 +216,31 @@ public class ScriptShipSheet : MonoBehaviour {
 				} else {
 						if(adjacentNode.module.moduleType == targetType)
 						{ //If module type matches center node
-							Debug.Log ("Root module, adjacent module: " + hotModNode.module.name + ", " + adjacentNode.module.name);
+						//	Debug.Log ("Root module, adjacent module: " + hotModNode.module.name + ", " + adjacentNode.module.name);
 
 							if(hotModNode.snakeIndex == -1){ //A0: Center node does NOT belong to snake
 								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
-									Debug.Log ("00");
+									//Debug.Log ("00");
 									//Create new snake and add both to it
 									Snake hotSnake = new Snake(hotSnakes, targetType);
 									hotSnake.AddNodeToSnake(hotModNode);
 									hotSnake.AddNodeToSnake(adjacentNode);} 
 								else if(adjacentNode.snakeIndex >= 0){//B1: Adjacent node belongs to snake
-									Debug.Log ("01");
+									//Debug.Log ("01");
 									//Add center node to adjacent node's snake
 									hotSnakes[adjacentNode.snakeIndex].AddNodeToSnake(hotModNode);} 
 								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
 							} else if(hotModNode.snakeIndex >= 0){//A1: Center node belongs to snake
 								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
-									Debug.Log ("10");
+									//Debug.Log ("10");
 									//Add adjacent node to center node's snake
 									hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(adjacentNode);}
 								else if(adjacentNode.snakeIndex == hotModNode.snakeIndex){//B1: Adjacent node belongs to same snake
-									Debug.Log ("11");
+									//Debug.Log ("11");
 									//PK Stand There!
 								}
 								else if(adjacentNode.snakeIndex >= 0){//B2: Adjacent node belongs to different snake	
-									Debug.Log ("12");
+									//Debug.Log ("12");
 									hotSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
 									//Assign node's snake id as root node snake
 									List<Node> transferList = new List<Node>(hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
@@ -287,7 +287,7 @@ public class ScriptShipSheet : MonoBehaviour {
 	{
 		List<Activation> hotActivations = new List<Activation> ();
 		foreach (Snake snake in hotSnakes) {
-			Debug.Log ("Node count >= min Nodes " + snake.constituentNodes.Count + ", " + minNodesForActivation);
+			//Debug.Log ("Node count >= min Nodes " + snake.constituentNodes.Count + ", " + minNodesForActivation);
 			if(snake.constituentNodes.Count >= minNodesForActivation)
 			{
 				hotActivations.Add (new Activation(snake.snakeID, snake.moduleType, snake.constituentNodes)); 
@@ -302,43 +302,70 @@ public class ScriptShipSheet : MonoBehaviour {
 
 	public void ArmActivations (List<Activation> hotActivations)
 	{
-		Debug.Log ("Arming");
+
+		scriptShipController.ClearOldLasers();
+		//Debug.Log ("Arming");
 		foreach(Activation activation in hotActivations)
 		{
-			if(activation.moduleType == ModuleType.Weapon)
-			{
+
 				//Calculate activation stats
 				foreach(Node node in activation.constituentNodes)
 				{
+					switch(node.module.moduleType)
+					{
+					case ModuleType.Weapon:
+
 					switch(node.module.moduleSubtype)
 					{
 					case ModuleSubtype.Duration:
-						activation.durationLevel++;
+						activation.gunDurationLevel++;
 						break;
 					//case ModuleSubtype.Homing:
 					//	activation.homingLevel++;
 					//	break;
 					case ModuleSubtype.Number:
-						activation.numberLevel++;
+						activation.gunNumberLevel++;
 						break;
 					case ModuleSubtype.Power:
-						activation.powerLevel++;
+						activation.gunPowerLevel++;
 						break;
 					case ModuleSubtype.Radius:
-						activation.radiusLevel++;
+						activation.gunRadiusLevel++;
 						break;
 					case ModuleSubtype.Speed:
-						activation.speedLevel++;
+						activation.gunSpeedLevel++;
 						break;
 					default:
 						Debug.LogError("Invalid module subtype: " + node.module.moduleSubtype);
 						break;
 					}
+						break;
+					case ModuleType.Armor:
+						activation.armorPowerLevel++;
+						break;
+					case ModuleType.Laser:
+						activation.laserRadiusLevel++;
+						break;
+					default:
+						Debug.Log ("Invalid module type: " + node.module.moduleType);
+					break;
+					}
 
-					activation.DeriveRealStats();
+					activation.DeriveRealStats(activation.moduleType);
+
+				if(activation.moduleType == ModuleType.Armor)
+				{
+					node.module.currentHP += activation.bonusHP;
+				} 
 				}
-
+			//For each activation
+			if(activation.moduleType == ModuleType.Laser)
+			{
+				scriptShipController.InitializeLaser(activation);
 			}
+			
+			
+
 		}
 
 		//return hotActivations;
