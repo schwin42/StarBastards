@@ -313,7 +313,7 @@ public class ScriptShipController : MonoBehaviour {
 	//Should be migrated to module controller
 	public void AddModule(ScriptModule addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
-		//Debug.Log (addedModule.moduleID);
+		Debug.Log (addedModule.moduleID);
 		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
 
@@ -322,6 +322,7 @@ public class ScriptShipController : MonoBehaviour {
 			//Set ship as parent
 			addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
 			//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
+		}
 
 			//Log event
 			scriptModule.ownTime = Time.frameCount;
@@ -334,11 +335,17 @@ public class ScriptShipController : MonoBehaviour {
 			scriptModule.currentHP = scriptModule.maxHP; //Set starting HP
 
 			//Verify module
-			VerifyCoordinates (addedModule);
-
+			Debug.Log ("Before call");
+			if(!CoordinatesAreValid (addedModule))
+			{
+				//Eject module
+				scriptModuleController.RemoveModule(addedModule);
+				Debug.Log ("Coordinates are invalid.");
+			} else {
 			//Play sound effect
+				Debug.Log ("Coordinates are valid");
 			audioSource.Play();
-		} 
+		
 
 
 		//Mode handler
@@ -388,7 +395,7 @@ public class ScriptShipController : MonoBehaviour {
 
 		//Add to activation
 		UpdateActivationStatus();
-		
+		}
 	}
 	/*
 	IEnumerator ResetShipRigidbody(Vector2 lastVelocity)
@@ -422,7 +429,7 @@ public class ScriptShipController : MonoBehaviour {
 		return localPosition / ratioOfNodeToSpace;
 	}
 
-	void VerifyCoordinates(ScriptModule hotMod)
+	bool CoordinatesAreValid(ScriptModule hotMod)
 	{
 		//Throw error iff hotMod's coordinates match another child object of this ship's  module container
 		ScriptModule[] iterationScripts = shipModuleContainer.GetComponentsInChildren<ScriptModule> ();
@@ -430,11 +437,10 @@ public class ScriptShipController : MonoBehaviour {
 			if(hotMod.moduleNodeCoordinates == otherMod.moduleNodeCoordinates && hotMod != otherMod)
 			{
 				Debug.LogError(hotMod.moduleID + "'s coordinates conflict with " + otherMod.moduleID + "'s.");
+				return false;
 			}
-		//	Vector3 vector3Position = module.transform.localPosition;
-		//	Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
-		//	AddModule(module, hotCoordinates);
 		}
+		return true;
 	}
 
 	void UpdateVelocity(float thrustInput, float turnInput, Rigidbody2D hotRigid, Vector2 hotForward)
