@@ -23,6 +23,7 @@ public class ScriptGameController : MonoBehaviour {
 	public ControlType controlType;
 
 	//Configurable
+	public int startingModules = 200;
 	public bool moduleRigidbodyMode = true;
 	public float startingForceConstant = 10;
 	public float ejectionLinearForceConstant = 1000F;
@@ -57,7 +58,6 @@ public class ScriptGameController : MonoBehaviour {
 	void Start () {
 
 		scriptInterfaceController = GameObject.Find ("RootInterface").GetComponent<ScriptInterfaceController>();
-		//Debug.Log (scriptInterfaceController);
 		scriptInterfaceController.SetInterface(controlType);
 
 		//Get objects
@@ -73,53 +73,8 @@ public class ScriptGameController : MonoBehaviour {
 
 
 		//Generate neutral modules
-		for(int i = 0; i<200; i++)
-		{
-			//GameObject hotMod = Instantiate (modulePrefab) as GameObject;
-
-
-			GameObject hotMod = Instantiate (modulePrefab) as GameObject;
-
-
-
-
-			hotMod.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
-			hotMod.transform.parent = this.gameObject.transform;
-			ScriptModule scriptModule = hotMod.GetComponent<ScriptModule>();
-			scriptModule.moduleID = GetNextID();
-			hotMod.name = "Module" + scriptModule.moduleID;
-
-			Vector2 normalizedRandomForce = new Vector2(Random.value * 2 - 1, Random.value * 2 - 1); 
-			hotMod.rigidbody2D.AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
-			//GetNextID(hotModS.GetComponent<ScriptModule>());
-			//Debug.Log (i);
-
-			//Type
-			float hotRand = Random.value * 3;
-			//Color defaultColor = Color.black;
-			//Color activeColor = Color.black;
-			if(hotRand <= 1)
-			{
-				scriptModule.moduleType = ModuleType.Weapon;
-				scriptModule.defaultColor = inactiveGunColor;
-				scriptModule.activatedColor = activeGunColor;
-			} else if(hotRand <= 2){
-				scriptModule.moduleType = ModuleType.Armor;
-				scriptModule.defaultColor = inactiveArmorColor;
-				scriptModule.activatedColor = activeArmorColor;
-			} else if(hotRand <= 3){
-				scriptModule.moduleType = ModuleType.Laser;
-				scriptModule.defaultColor = inactiveLaserColor;
-				scriptModule.activatedColor = activeLaserColor;
-			} else {
-				Debug.LogError ("Bug in random number generator.");
-			}
-
-			//Subtype
-			scriptModule.moduleSubtype = GetRandomEnum<ModuleSubtype>();
-			string enumString = scriptModule.moduleSubtype.ToString();
-			scriptModule.textMesh.text = enumString[0].ToString();
-		}
+		SpawnModules(startingModules);
+	
 
 		SetModuleRigidbodies (moduleRigidbodyMode);
 	}
@@ -137,6 +92,7 @@ public class ScriptGameController : MonoBehaviour {
 			foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
 				pilotContiguousModules = ship.GetModulesContiguousToPilot();
 		}
+
 	}
 
 	public int GetNextID()
@@ -168,14 +124,14 @@ public class ScriptGameController : MonoBehaviour {
 
 	}
 
-	public void RemoveModule(ScriptModule hotMod)
+	public void BreakModule(ScriptModule hotMod)
 	{
 		//Cache ejection vector
 		Vector2 pilotToEjectionVector = hotMod.gameObject.transform.position - hotMod.moduleOwner.pilotModule.transform.position;
 		GameObject previousOwner = hotMod.moduleOwner.gameObject;
 		hotMod.moduleOwner = null;
 		hotMod.transform.parent = spaceContainer;
-		hotMod.tag = "NeutralModule";
+		hotMod.tag = "Debris";
 		//if(hotMod.moduleType == ModuleType.Weapon)
 		//{
 		//	hotMod.canShoot = false;
@@ -204,6 +160,52 @@ public class ScriptGameController : MonoBehaviour {
 		System.Array hotArray = System.Enum.GetValues(typeof(T));
 		T value = (T)hotArray.GetValue(UnityEngine.Random.Range (0, hotArray.Length));
 		return value;
+	}
+
+	void SpawnModules(int amount)
+	{
+		for(int i = 0; i<amount; i++)
+		{
+			
+			GameObject hotMod = Instantiate (modulePrefab) as GameObject;
+			
+			hotMod.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
+			hotMod.transform.parent = this.gameObject.transform;
+			ScriptModule scriptModule = hotMod.GetComponent<ScriptModule>();
+			scriptModule.moduleID = GetNextID();
+			hotMod.name = "Module" + scriptModule.moduleID;
+			
+			Vector2 normalizedRandomForce = new Vector2(Random.value * 2 - 1, Random.value * 2 - 1); 
+			hotMod.rigidbody2D.AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
+			//GetNextID(hotModS.GetComponent<ScriptModule>());
+			//Debug.Log (i);
+			
+			//Type
+			float hotRand = Random.value * 3;
+			//Color defaultColor = Color.black;
+			//Color activeColor = Color.black;
+			if(hotRand <= 1)
+			{
+				scriptModule.moduleType = ModuleType.Weapon;
+				scriptModule.defaultColor = inactiveGunColor;
+				scriptModule.activatedColor = activeGunColor;
+			} else if(hotRand <= 2){
+				scriptModule.moduleType = ModuleType.Armor;
+				scriptModule.defaultColor = inactiveArmorColor;
+				scriptModule.activatedColor = activeArmorColor;
+			} else if(hotRand <= 3){
+				scriptModule.moduleType = ModuleType.Laser;
+				scriptModule.defaultColor = inactiveLaserColor;
+				scriptModule.activatedColor = activeLaserColor;
+			} else {
+				Debug.LogError ("Bug in random number generator.");
+			}
+			
+			//Subtype
+			scriptModule.moduleSubtype = GetRandomEnum<ModuleSubtype>();
+			string enumString = scriptModule.moduleSubtype.ToString();
+			scriptModule.textMesh.text = enumString[0].ToString();
+		}
 	}
 
 }

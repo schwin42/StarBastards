@@ -190,6 +190,12 @@ public class ScriptShipController : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
 	{
+		ScriptModule[] iterationModules = shipModuleContainer.GetComponentsInChildren<ScriptModule>();
+		foreach(ScriptModule module in iterationModules)
+		{
+			Node node = scriptShipSheet.GetNodeFromModule(module);
+			module.transform.FindChild("LabelModule").GetComponent<TextMesh>().text = node.snakeIndex.ToString();
+		}
 		//if(Input.GetKeyDown("3")) 
 	//	{
 			//foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
@@ -282,7 +288,7 @@ public class ScriptShipController : MonoBehaviour {
 		//transform.rotation = Quaternion.Euler(0, 
 		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
 
-		//	UpdateActivationStatus();
+			UpdateActivationStatus();
 
 			foreach(Activation activation in currentActivations)
 			{
@@ -313,7 +319,7 @@ public class ScriptShipController : MonoBehaviour {
 	//Should be migrated to module controller
 	public void AddModule(ScriptModule addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
-		Debug.Log (addedModule.moduleID);
+		//Debug.Log (addedModule.moduleID);
 		//Temporary variables
 		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
 
@@ -335,15 +341,15 @@ public class ScriptShipController : MonoBehaviour {
 			scriptModule.currentHP = scriptModule.maxHP; //Set starting HP
 
 			//Verify module
-			Debug.Log ("Before call");
+			//Debug.Log ("Before call");
 			if(!CoordinatesAreValid (addedModule))
 			{
 				//Eject module
-				scriptModuleController.RemoveModule(addedModule);
-				Debug.Log ("Coordinates are invalid.");
+				scriptModuleController.BreakModule(addedModule);
+				//Debug.Log ("Coordinates are invalid.");
 			} else {
 			//Play sound effect
-				Debug.Log ("Coordinates are valid");
+				//Debug.Log ("Coordinates are valid");
 			audioSource.Play();
 		
 
@@ -390,11 +396,14 @@ public class ScriptShipController : MonoBehaviour {
 
 		//Add to grid
 		Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
-		Node hotNode = new Node(addedModule);
-		scriptShipSheet.schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
+			//int[] schematicCoordinates = new int[]{(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y};
+			//(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
+		
+			scriptShipSheet.AddModuleToGrid(addedModule, gridNodeCoordinates);
+				
 
 		//Add to activation
-		UpdateActivationStatus();
+		//UpdateActivationStatus();
 		}
 	}
 	/*
@@ -465,6 +474,7 @@ public class ScriptShipController : MonoBehaviour {
 			//{
 				if(activation.canShoot)
 				{
+					Debug.Log ("Can shoot");
 					//Change state
 					activation.shotTimer = 0;
 					activation.canShoot = false;
@@ -486,7 +496,9 @@ public class ScriptShipController : MonoBehaviour {
 					hotBullet.rigidbody2D.AddForce(attackVector * activation.shotForce); //Magic number
 
 				} else {
+
 					activation.shotTimer += Time.deltaTime;
+					Debug.Log (activation.shotTimer + " @"+Time.time);
 					float shotDelay = 1 / activation.bulletsPerSecond;
 					if(activation.shotTimer >= shotDelay)
 					{

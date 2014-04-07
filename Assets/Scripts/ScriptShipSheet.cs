@@ -46,11 +46,9 @@ public class Snake
 
 	public void AddNodeToSnake(Node hotNode)
 	{
-
 		constituentNodes.Add (hotNode);
 		hotNode.snakeIndex = snakeID;
 		//Debug.Log (hotNode.module.name + " added to " + snakeID);
-	
 	}
 
 }
@@ -67,7 +65,8 @@ public class ScriptShipSheet : MonoBehaviour {
 	static private int maxY = 50; //Max positive and negative y-value
 	private int minNodesForActivation = 3; //Number of contiguous modules required to form activation
 
-	public List<Snake> lastSnakes; //List of last known snakes
+	//public List<Snake> lastSnakes; //List of last known snakes
+	public List<Snake> currentSnakes; 
 
 	//Grid as 2D array
 	public Node[,] schematic = new Node[maxX*2,maxY*2];
@@ -117,7 +116,6 @@ public class ScriptShipSheet : MonoBehaviour {
 				{
 					moduleString = hotNode.module.gameObject.name;
 				}
-				//Debug.Log ("Node(" + i + ", " + j + "): Empty? " + hotNode.isEmpty + ", Module: " + moduleString);
 			}
 		}
 	}
@@ -184,104 +182,104 @@ public class ScriptShipSheet : MonoBehaviour {
 	}
 
 
-	List<Snake> GetModuleSnakes()
-	{
-		ScriptModule[] childModules = GetComponent<ScriptShipController>().shipModuleContainer.
-			GetComponentsInChildren<ScriptModule>();
-		List<Snake> hotSnakes = new List<Snake>();
-		//int nextSnakeID = 0;
-
+//	List<Snake> GetModuleSnakes()
+//	{
+//		ScriptModule[] childModules = GetComponent<ScriptShipController>().shipModuleContainer.
+//			GetComponentsInChildren<ScriptModule>();
+//		List<Snake> hotSnakes = new List<Snake>();
+//		//int nextSnakeID = 0;
+//
+//		
+//		//After loop ends, clear temporary variables
+//		ClearOldNodeValues();
+//
+//		foreach(ScriptModule hotMod in childModules)
+//		{
+//			ModuleType targetType = hotMod.moduleType;
+//			if(!(targetType == ModuleType.Pilot || targetType == ModuleType.None))
+//			{
+//				Node hotModNode = GetNodeFromModule(hotMod);
+//			Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
+//			//Debug.Log ("Root module: " + hotModNode.module.name);
+//
+//			//Check adjacent modules for like modules
+//				Vector2[] adjacentDirections = GetAdjacentPoints(nodeGridCoordinates);
+//		
+//			foreach (Vector2 adjacentCoordinates in adjacentDirections) 
+//			{
+//				Node adjacentNode = schematic[(int)adjacentCoordinates.x, (int)adjacentCoordinates.y];
+//				if(adjacentNode.isEmpty)
+//				{
+//					//PK Stand There!
+//				} else {
+//						if(adjacentNode.module.moduleType == targetType)
+//						{ //If module type matches center node
+//						//	Debug.Log ("Root module, adjacent module: " + hotModNode.module.name + ", " + adjacentNode.module.name);
+//
+//							if(hotModNode.snakeIndex == -1){ //A0: Center node does NOT belong to snake
+//								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
+//									//Debug.Log ("00");
+//									//Create new snake and add both to it
+//									Snake hotSnake = new Snake(hotSnakes, targetType);
+//									hotSnake.AddNodeToSnake(hotModNode);
+//									hotSnake.AddNodeToSnake(adjacentNode);} 
+//								else if(adjacentNode.snakeIndex >= 0){//B1: Adjacent node belongs to snake
+//									//Debug.Log ("01");
+//									//Add center node to adjacent node's snake
+//									hotSnakes[adjacentNode.snakeIndex].AddNodeToSnake(hotModNode);} 
+//								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
+//							} else if(hotModNode.snakeIndex >= 0){//A1: Center node belongs to snake
+//								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
+//									//Debug.Log ("10");
+//									//Add adjacent node to center node's snake
+//									hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(adjacentNode);}
+//								else if(adjacentNode.snakeIndex == hotModNode.snakeIndex){//B1: Adjacent node belongs to same snake
+//									//Debug.Log ("11");
+//									//PK Stand There!
+//								}
+//								else if(adjacentNode.snakeIndex >= 0){//B2: Adjacent node belongs to different snake	
+//									//Debug.Log ("12");
+//									hotSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
+//									//Assign node's snake id as root node snake
+//									List<Node> transferList = new List<Node>(hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
+//									hotSnakes[adjacentNode.snakeIndex].constituentNodes = new List<Node>(); //Clear adjacent snake's nodes
+//
+//									foreach(Node transferNode in transferList)
+//									{
+//										Debug.Log("12 - root snake, adjacent snake, module:" + hotModNode.snakeIndex + ", " + adjacentNode.snakeIndex + ", " + transferNode.module.name);
+//										hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(transferNode);
+//										//node.snakeIndex = hotModNode.snakeIndex;
+//									}
+//									//Debug.Break ();
+//									//hotSnakes[hotModNode.snakeIndex].constituentNodes.AddRange(
+//									//	hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Add adjacent snake's modules to center snake
+//								}
+//								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
+//							}
+//							else
+//							{Debug.LogError ("Invalid root node index: " + hotModNode.snakeIndex);}
+//
+//				}
+//				}
+//			}
+//		}
+//		}
+//
+//		currentSnakes = hotSnakes;
+//		return hotSnakes;
+//	}
 		
-		//After loop ends, clear temporary variables
-		ClearOldNodeValues();
-
-		foreach(ScriptModule hotMod in childModules)
-		{
-			ModuleType targetType = hotMod.moduleType;
-			if(!(targetType == ModuleType.Pilot || targetType == ModuleType.None))
-			{
-				Node hotModNode = GetNodeFromModule(hotMod);
-			Vector2 nodeGridCoordinates = GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
-			//Debug.Log ("Root module: " + hotModNode.module.name);
-
-			//Check adjacent modules for like modules
-				Vector2[] adjacentDirections = GetAdjacentPoints(nodeGridCoordinates);
-		
-			foreach (Vector2 adjacentCoordinates in adjacentDirections) 
-			{
-				Node adjacentNode = schematic[(int)adjacentCoordinates.x, (int)adjacentCoordinates.y];
-				if(adjacentNode.isEmpty)
-				{
-					//PK Stand There!
-				} else {
-						if(adjacentNode.module.moduleType == targetType)
-						{ //If module type matches center node
-						//	Debug.Log ("Root module, adjacent module: " + hotModNode.module.name + ", " + adjacentNode.module.name);
-
-							if(hotModNode.snakeIndex == -1){ //A0: Center node does NOT belong to snake
-								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
-									//Debug.Log ("00");
-									//Create new snake and add both to it
-									Snake hotSnake = new Snake(hotSnakes, targetType);
-									hotSnake.AddNodeToSnake(hotModNode);
-									hotSnake.AddNodeToSnake(adjacentNode);} 
-								else if(adjacentNode.snakeIndex >= 0){//B1: Adjacent node belongs to snake
-									//Debug.Log ("01");
-									//Add center node to adjacent node's snake
-									hotSnakes[adjacentNode.snakeIndex].AddNodeToSnake(hotModNode);} 
-								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
-							} else if(hotModNode.snakeIndex >= 0){//A1: Center node belongs to snake
-								if(adjacentNode.snakeIndex == -1){//B0: Adjacent node does NOT belong to snake
-									//Debug.Log ("10");
-									//Add adjacent node to center node's snake
-									hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(adjacentNode);}
-								else if(adjacentNode.snakeIndex == hotModNode.snakeIndex){//B1: Adjacent node belongs to same snake
-									//Debug.Log ("11");
-									//PK Stand There!
-								}
-								else if(adjacentNode.snakeIndex >= 0){//B2: Adjacent node belongs to different snake	
-									//Debug.Log ("12");
-									hotSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
-									//Assign node's snake id as root node snake
-									List<Node> transferList = new List<Node>(hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
-									hotSnakes[adjacentNode.snakeIndex].constituentNodes = new List<Node>(); //Clear adjacent snake's nodes
-
-									foreach(Node transferNode in transferList)
-									{
-										Debug.Log("12 - root snake, adjacent snake, module:" + hotModNode.snakeIndex + ", " + adjacentNode.snakeIndex + ", " + transferNode.module.name);
-										hotSnakes[hotModNode.snakeIndex].AddNodeToSnake(transferNode);
-										//node.snakeIndex = hotModNode.snakeIndex;
-									}
-									//Debug.Break ();
-									//hotSnakes[hotModNode.snakeIndex].constituentNodes.AddRange(
-									//	hotSnakes[adjacentNode.snakeIndex].constituentNodes); //Add adjacent snake's modules to center snake
-								}
-								else {Debug.LogError ("Invalid adjacent node index: " + adjacentNode.snakeIndex);}
-							}
-							else
-							{Debug.LogError ("Invalid root node index: " + hotModNode.snakeIndex);}
-
-				}
-				}
-			}
-		}
-		}
-
-		lastSnakes = hotSnakes;
-		return hotSnakes;
-	}
-		
-	void ClearOldNodeValues()
-	{
-		foreach(ScriptModule hotMod in GetComponent<ScriptShipController>().shipModuleContainer.GetComponentsInChildren<ScriptModule>())
-		        {
-			Node hotModNode = GetNodeFromModule(hotMod);
-		
-			hotModNode.snakeIndex = -1;
-			hotModNode.activationIndex = -1;
-			hotModNode.isAdded = false;
-		}
-	}
+//	void ClearOldNodeValues()
+//	{
+//		foreach(ScriptModule hotMod in GetComponent<ScriptShipController>().shipModuleContainer.GetComponentsInChildren<ScriptModule>())
+//		        {
+//			Node hotModNode = GetNodeFromModule(hotMod);
+//		
+//			hotModNode.snakeIndex = -1;
+//			hotModNode.activationIndex = -1;
+//			hotModNode.isAdded = false;
+//		}
+//	}
 
 	List<Activation> ConvertSnakesToActivations(List<Snake> hotSnakes)
 	{
@@ -374,7 +372,7 @@ public class ScriptShipSheet : MonoBehaviour {
 
 	public List<Activation> GetActivations()
 	{
-		return ConvertSnakesToActivations(GetModuleSnakes ());
+		return ConvertSnakesToActivations(currentSnakes);
 	}
 
 	public Node GetNodeFromModule(ScriptModule module)
@@ -393,6 +391,67 @@ public class ScriptShipSheet : MonoBehaviour {
 			new Vector2(startingPoint.x - 1, startingPoint.y) //Left
 		};
 		return adjacentPoints;
+	}
+
+	public void AddModuleToGrid(ScriptModule module, Vector2 schematicCoordinates)
+	{
+		Node centerNode = new Node(module);
+		schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
+
+		Vector2[] adjacentPoints = GetAdjacentPoints(schematicCoordinates);
+		//I. Check adjacent nodes for like module types
+		//Debug.Log ("Adjacent points: "+adjacentPoints);
+		foreach(Vector2 adjacentNodeCoordinates in adjacentPoints)
+		{
+			Node adjacentNode = schematic[(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
+			if(!adjacentNode.isEmpty)
+			{
+				if(adjacentNode.module.moduleType == centerNode.module.moduleType)
+				{
+					if(adjacentNode.snakeIndex == -1) //A. Adjacent unowned
+					{
+						if(centerNode.snakeIndex == -1) //1. Center unowned- Add center and adjacent to new snake
+						{
+							Snake hotSnake = new Snake(currentSnakes, centerNode.module.moduleType);
+							hotSnake.AddNodeToSnake(centerNode);
+							hotSnake.AddNodeToSnake(adjacentNode);
+						} else if(centerNode.snakeIndex >= 0) //2. Center owned- Add adjacent to center's snake
+						{
+							currentSnakes[centerNode.snakeIndex].AddNodeToSnake(adjacentNode);
+						} else {
+							Debug.LogError("Invalid snake index on center: "+centerNode.module.moduleID);
+						}
+					} else if(adjacentNode.snakeIndex >= 0) //B. Adjacent owned
+					{
+						if(centerNode.snakeIndex == -1) //1. Center unowned- Add center to adjacent's snake 
+						{
+							currentSnakes[adjacentNode.snakeIndex].AddNodeToSnake(centerNode);
+						} else if (centerNode.snakeIndex == adjacentNode.snakeIndex) //2. Center owned by same- Do nothing
+						{
+							//Do nothing
+						} else if (centerNode.snakeIndex >= 0) //3. Center owned by different- Subsume adjacent snake into current snake
+						{
+							currentSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
+							//Assign node's snake id as root node snake
+							List<Node> transferList = new List<Node>(currentSnakes[adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
+							currentSnakes[adjacentNode.snakeIndex].constituentNodes = new List<Node>(); //Clear adjacent snake's nodes
+							foreach(Node transferNode in transferList)
+							{
+								//Debug.Log("12 - root snake, adjacent snake, module:" + hotModNode.snakeIndex + ", " + adjacentNode.snakeIndex + ", " + transferNode.module.name);
+								currentSnakes[centerNode.snakeIndex].AddNodeToSnake(transferNode);
+								//node.snakeIndex = hotModNode.snakeIndex;
+							}
+						} else {
+							Debug.LogError("Invalid snake index on center: "+centerNode.module.moduleID);
+						}
+					} else {
+						Debug.LogError ("Invalid snake index on adjacent: "+adjacentNode.module.moduleID);
+					}
+					//Debug.Log ("Center, adjacent: {" + centerNode.module.moduleID+", "+ adjacentNode.module.moduleID+"}");
+				}
+		}
+		}
+
 	}
 
 }

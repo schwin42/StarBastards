@@ -23,20 +23,21 @@ public enum ModuleSubtype
 
 
 public class ScriptModule : MonoBehaviour {
+	
 
-	//public string moduleName;
-	public int moduleID;
-	//[System.NonSerialized]
-
-	//State
+	//Properties
 	public ScriptShipController moduleOwner = null; //Null indicates module is neutral
 	public Vector2 moduleNodeCoordinates; //Location of owned module relative to pilot module
-	public bool isActivated = false;
 	public ModuleType moduleType = ModuleType.None;
 	public ModuleSubtype moduleSubtype;
-	
-	//Configurable
+
+	//State
+	public int moduleID;
+	public bool isActivated = false;
+
+	//[System.NonSerialized] 
 	public Color defaultColor;
+	//[System.NonSerialized] 
 	public Color activatedColor;
 
 	//Scriptable
@@ -100,12 +101,12 @@ public class ScriptModule : MonoBehaviour {
 
 					ScriptModule[] iterationScripts = moduleOwner.shipModuleContainer.GetComponentsInChildren<ScriptModule>();
 					foreach(ScriptModule hotMod in iterationScripts){
-						scriptModuleController.RemoveModule(hotMod);
+						scriptModuleController.BreakModule(hotMod);
 					}
 					tag = "Debris";
 				//	Destroy(hotShip);
 				} else {
-					scriptModuleController.RemoveModule(this);
+					scriptModuleController.BreakModule(this);
 				}
 			}
 		}

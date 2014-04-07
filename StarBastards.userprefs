@@ -1,8 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptShipController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScriptShipSheet.cs">
     <Files>
-      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="392" Column="13" />
+      <File FileName="Assets/Scripts/ScriptShipController.cs" Line="48" Column="24" />
+      <File FileName="Assets/Scripts/ScriptGameController.cs" Line="95" Column="3" />
+      <File FileName="Assets/Scripts/ScriptModule.cs" Line="214" Column="1" />
+      <File FileName="Assets/Scripts/ScriptShipSheet.cs" Line="284" Column="31" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
