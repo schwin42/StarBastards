@@ -623,6 +623,11 @@ public class ScriptShipSheet : MonoBehaviour {
 				{
 					if(adjacentNode.module.moduleType == centerNode.module.moduleType)
 					{
+						//If exactly one adjacent node belongs to same snake, remove center node from snake
+							//If current snake now has one module, remove snake
+						//If more than one adjacent node belongs to the same snake
+							//Depth-first search to see which adjacent nodes (if any) are connected
+						//If node is unconnected, split into new snake
 
 					}
 				}
