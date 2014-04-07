@@ -152,7 +152,7 @@ public class ScriptGameController : MonoBehaviour {
 		previousOwner.GetComponent<ScriptShipSheet>().schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = new Node();
 
 		//Remove module from activation
-		previousOwner.SendMessage("UpdateActivationStatus");
+		//previousOwner.SendMessage("UpdateActivationStatus");
 	}
 
 	public static T GetRandomEnum<T>()
