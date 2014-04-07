@@ -35,6 +35,76 @@ public class Snake
 	public ModuleType moduleType;
 	public bool isPruned = false; //Whether this snake has been subsumed by another
 
+	//State
+	public bool isArmed = false;
+	public float shotTimer;
+	
+		//Proper stats
+			//Gun
+		public int gunDurationLevel = 0;
+		public int gunHomingLevel = 0;
+		public int gunNumberLevel = 0;
+		public int gunPowerLevel = 0;
+		public int gunRadiusLevel = 0;
+		public int gunSpeedLevel = 0;
+	
+			//Armor
+		public int armorPowerLevel = 0;
+		public int armorRadiusLevel = 0;
+	
+			//Laser
+		public int laserRadiusLevel = 0;
+		public int laserPowerLevel = 0;
+		public int laserNumberLevel = 0;
+	
+		//Mechanical stats
+			//Gun
+		public int damage = 10;
+		public float bulletsPerSecond; //In seconds
+		public int shotForce = 2000;
+		//public int size = 0;
+		public int scatterAngle = 0;
+		public int durationInSeconds = 0;
+		public int homingConstant = 0;
+		public int bulletsPerShot = 0;
+		public int bulletScale = 0;
+			//Armor
+		public int bonusHP;
+			//Laser
+		public float laserTriggerScale;
+
+
+		//Gun state
+	public bool canShoot = false;
+	//Laser state
+	public bool laserTriggerEnabled = false;
+
+
+
+		public void DeriveRealStats(ModuleType moduleType)
+		{
+			switch(moduleType)
+			{
+			case ModuleType.Weapon:
+			durationInSeconds = gunDurationLevel + 1; //Magic numbers, please change
+			homingConstant = gunHomingLevel;
+			bulletsPerSecond = (gunNumberLevel * 2) + 1;
+			damage = (gunPowerLevel + 1) * 10;
+			bulletScale = (gunRadiusLevel * 2) + 1;
+			shotForce = (gunSpeedLevel + 1) * 1000;
+				break;
+			case ModuleType.Armor:
+				bonusHP = armorPowerLevel * 10;
+				break;
+			case ModuleType.Laser:
+				laserTriggerScale = laserRadiusLevel * 10;
+				break;
+			default:
+				Debug.LogError("Invalid module type: " + moduleType);
+				break;
+			}
+		}
+
 	public Snake(List<Snake> hotSnakes, ModuleType moduleTypeArg)
 	{
 		moduleType = moduleTypeArg;
@@ -44,18 +114,88 @@ public class Snake
 
 	}
 
-	public void AddNodeToSnake(Node hotNode)
+	public void AddNodeToSnake(Node node)
 	{
-		constituentNodes.Add (hotNode);
-		hotNode.snakeIndex = snakeID;
-		//Debug.Log (hotNode.module.name + " added to " + snakeID);
+		constituentNodes.Add (node);
+		node.snakeIndex = snakeID;
+
+		//Increment snake levels
+		switch(node.module.moduleType)
+								{
+								case ModuleType.Weapon:
+									
+									switch(node.module.moduleSubtype)
+									{
+									case ModuleSubtype.Duration:
+										gunDurationLevel++;
+										break;
+										//case ModuleSubtype.Homing:
+										//	activation.homingLevel++;
+										//	break;
+									case ModuleSubtype.Number:
+										gunNumberLevel++;
+										break;
+									case ModuleSubtype.Power:
+										gunPowerLevel++;
+										break;
+									case ModuleSubtype.Radius:
+										gunRadiusLevel++;
+										break;
+									case ModuleSubtype.Speed:
+										gunSpeedLevel++;
+										break;
+									default:
+										Debug.LogError("Invalid module subtype: " + node.module.moduleSubtype);
+										break;
+									}
+									break;
+								case ModuleType.Armor:
+									armorPowerLevel++;
+									break;
+								case ModuleType.Laser:
+									laserRadiusLevel++;
+									break;
+								default:
+									Debug.Log ("Invalid module type: " + node.module.moduleType);
+									break;
+								}
+		DeriveRealStats(moduleType);
+
+	}
+
+	public void SetArmed(bool willBeArmed)
+	{
+		if(willBeArmed)
+		{
+		
+		foreach(Node node in constituentNodes)
+		{
+				node.module.SetActivation (true);
+				//node.module.isActivated = true;
+	
+					if(moduleType == ModuleType.Armor)
+					{
+						node.module.currentHP += bonusHP;
+					} 
+	
+		}
+			isArmed = true;
+
+		}else { 
+			foreach(Node node in constituentNodes)
+			{
+				node.module.SetActivation(false);
+			}
+			isArmed = false;
+
+	}
 	}
 
 }
 
 public class ScriptShipSheet : MonoBehaviour {
 
-	public ScriptShipController scriptShipController;
+	protected ScriptShipController scriptShipController;
 
 	public List<ScriptModule> pilotContiguousModules; //Modules connected to first module
 
@@ -281,99 +421,100 @@ public class ScriptShipSheet : MonoBehaviour {
 //		}
 //	}
 
-	List<Activation> ConvertSnakesToActivations(List<Snake> hotSnakes)
-	{
-		List<Activation> hotActivations = new List<Activation> ();
-		foreach (Snake snake in hotSnakes) {
-			//Debug.Log ("Node count >= min Nodes " + snake.constituentNodes.Count + ", " + minNodesForActivation);
-			if(snake.constituentNodes.Count >= minNodesForActivation)
-			{
-				hotActivations.Add (new Activation(snake.snakeID, snake.moduleType, snake.constituentNodes)); 
-				foreach(Node node in snake.constituentNodes)
-				{
-					node.activationIndex = hotActivations.Count - 1;
-				}
-			}
-				}
-				                    return hotActivations;
-	}
-
-	public void ArmActivations (List<Activation> hotActivations)
-	{
-
-		scriptShipController.ClearOldLasers();
-		//Debug.Log ("Arming");
-		foreach(Activation activation in hotActivations)
-		{
-
-				//Calculate activation stats
-				foreach(Node node in activation.constituentNodes)
-				{
-					switch(node.module.moduleType)
-					{
-					case ModuleType.Weapon:
-
-					switch(node.module.moduleSubtype)
-					{
-					case ModuleSubtype.Duration:
-						activation.gunDurationLevel++;
-						break;
-					//case ModuleSubtype.Homing:
-					//	activation.homingLevel++;
-					//	break;
-					case ModuleSubtype.Number:
-						activation.gunNumberLevel++;
-						break;
-					case ModuleSubtype.Power:
-						activation.gunPowerLevel++;
-						break;
-					case ModuleSubtype.Radius:
-						activation.gunRadiusLevel++;
-						break;
-					case ModuleSubtype.Speed:
-						activation.gunSpeedLevel++;
-						break;
-					default:
-						Debug.LogError("Invalid module subtype: " + node.module.moduleSubtype);
-						break;
-					}
-						break;
-					case ModuleType.Armor:
-						activation.armorPowerLevel++;
-						break;
-					case ModuleType.Laser:
-						activation.laserRadiusLevel++;
-						break;
-					default:
-						Debug.Log ("Invalid module type: " + node.module.moduleType);
-					break;
-					}
-
-					activation.DeriveRealStats(activation.moduleType);
-
-				if(activation.moduleType == ModuleType.Armor)
-				{
-					node.module.currentHP += activation.bonusHP;
-				} 
-				}
-			//For each activation
-			if(activation.moduleType == ModuleType.Laser)
-			{
-				scriptShipController.InitializeLaser(activation);
-			}
-			
-			
-
-		}
-
-		//return hotActivations;
-	}
+//	List<Activation> ConvertSnakesToActivations(List<Snake> hotSnakes)
+//	{
+//		List<Activation> hotActivations = new List<Activation> ();
+//		foreach (Snake snake in hotSnakes) {
+//			//Debug.Log ("Node count >= min Nodes " + snake.constituentNodes.Count + ", " + minNodesForActivation);
+//			if(snake.constituentNodes.Count >= minNodesForActivation)
+//			{
+//				hotActivations.Add (new Activation(snake.snakeID, snake.moduleType, snake.constituentNodes)); 
+//				foreach(Node node in snake.constituentNodes)
+//				{
+//					node.activationIndex = hotActivations.Count - 1;
+//				}
+//			}
+//				}
+//				                    return hotActivations;
+//	}
 
 
-	public List<Activation> GetActivations()
-	{
-		return ConvertSnakesToActivations(currentSnakes);
-	}
+//	public void ArmActivations (List<Activation> hotActivations)
+//	{
+//
+//		scriptShipController.ClearOldLasers();
+//		//Debug.Log ("Arming");
+//		foreach(Activation activation in hotActivations)
+//		{
+//
+//				//Calculate activation stats
+//				foreach(Node node in activation.constituentNodes)
+//				{
+//					switch(node.module.moduleType)
+//					{
+//					case ModuleType.Weapon:
+//
+//					switch(node.module.moduleSubtype)
+//					{
+//					case ModuleSubtype.Duration:
+//						activation.gunDurationLevel++;
+//						break;
+//					//case ModuleSubtype.Homing:
+//					//	activation.homingLevel++;
+//					//	break;
+//					case ModuleSubtype.Number:
+//						activation.gunNumberLevel++;
+//						break;
+//					case ModuleSubtype.Power:
+//						activation.gunPowerLevel++;
+//						break;
+//					case ModuleSubtype.Radius:
+//						activation.gunRadiusLevel++;
+//						break;
+//					case ModuleSubtype.Speed:
+//						activation.gunSpeedLevel++;
+//						break;
+//					default:
+//						Debug.LogError("Invalid module subtype: " + node.module.moduleSubtype);
+//						break;
+//					}
+//						break;
+//					case ModuleType.Armor:
+//						activation.armorPowerLevel++;
+//						break;
+//					case ModuleType.Laser:
+//						activation.laserRadiusLevel++;
+//						break;
+//					default:
+//						Debug.Log ("Invalid module type: " + node.module.moduleType);
+//					break;
+//					}
+//
+//					activation.DeriveRealStats(activation.moduleType);
+//
+//				if(activation.moduleType == ModuleType.Armor)
+//				{
+//					node.module.currentHP += activation.bonusHP;
+//				} 
+//				}
+//			//For each activation
+//			if(activation.moduleType == ModuleType.Laser)
+//			{
+//				scriptShipController.InitializeLaser(activation);
+//			}
+//			
+//			
+//
+//		}
+//
+//		//return hotActivations;
+//	}
+
+
+//	public List<Activation> GetActivations()
+//	{
+//		return ConvertSnakesToActivations(currentSnakes);
+//	}
 
 	public Node GetNodeFromModule(ScriptModule module)
 	{
@@ -452,6 +593,42 @@ public class ScriptShipSheet : MonoBehaviour {
 		}
 		}
 
+		if(centerNode.snakeIndex != -1)
+		{
+			if(currentSnakes[centerNode.snakeIndex].constituentNodes.Count >= minNodesForActivation)
+			{
+				currentSnakes[centerNode.snakeIndex].SetArmed(true);
+			}
+		}
+
+	}
+
+	public void RemoveModuleFromGrid(ScriptModule module)
+	{
+		//Node centerNode = new Node(module);
+		//schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
+		Node centerNode = GetNodeFromModule(module);
+		Vector2 schematicCoordinates = GetGridNodeCoordinates(centerNode.module.moduleNodeCoordinates);
+		schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = new Node();
+
+		if(centerNode.snakeIndex >= 0)
+		{
+
+		Vector2[] adjacentPoints = GetAdjacentPoints(schematicCoordinates);
+
+		foreach(Vector2 adjacentNodeCoordinates in adjacentPoints)
+		{
+				Node adjacentNode = schematic[(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
+				if(!adjacentNode.isEmpty)
+				{
+					if(adjacentNode.module.moduleType == centerNode.module.moduleType)
+					{
+
+					}
+				}
+		}
+
+		}
 	}
 
 }

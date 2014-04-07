@@ -34,6 +34,7 @@ public class ScriptModule : MonoBehaviour {
 	//State
 	public int moduleID;
 	public bool isActivated = false;
+	//public bool isArmed = false;
 
 	//[System.NonSerialized] 
 	public Color defaultColor;

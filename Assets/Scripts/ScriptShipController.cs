@@ -2,83 +2,83 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class Activation
-{
-	public int activationID; //ID is unique to ship, not universe
-	public ModuleType moduleType; //Gadget type
-	public List<Node> constituentNodes; //Nodes that make up this activation
-
-	//Proper stats
-		//Gun
-	public int gunDurationLevel = 0;
-	public int gunHomingLevel = 0;
-	public int gunNumberLevel = 0;
-	public int gunPowerLevel = 0;
-	public int gunRadiusLevel = 0;
-	public int gunSpeedLevel = 0;
-
-		//Armor
-	public int armorPowerLevel = 0;
-	public int armorRadiusLevel = 0;
-
-		//Laser
-	public int laserRadiusLevel = 0;
-	public int laserPowerLevel = 0;
-	public int laserNumberLevel = 0;
-
-	//Mechanical stats
-		//Gun
-	public int damage = 10;
-	public float bulletsPerSecond; //In seconds
-	public int shotForce = 2000;
-	//public int size = 0;
-	public int scatterAngle = 0;
-	public int durationInSeconds = 0;
-	public int homingConstant = 0;
-	public int bulletsPerShot = 0;
-	public int bulletScale = 0;
-		//Armor
-	public int bonusHP;
-		//Laser
-	public float laserTriggerScale;
-
-	//State
-	public bool canShoot = false;
-	public float shotTimer;
-
-	public Activation(int activationIDArg, ModuleType moduleTypeArg, List<Node> constituentNodesArg)
-	{
-		activationID = activationIDArg;
-		moduleType = moduleTypeArg;
-		constituentNodes = constituentNodesArg;
-		}
-
-	public void DeriveRealStats(ModuleType moduleType)
-	{
-		switch(moduleType)
-		{
-		case ModuleType.Weapon:
-		durationInSeconds = gunDurationLevel + 1; //Magic numbers, please change
-		homingConstant = gunHomingLevel;
-		bulletsPerSecond = (gunNumberLevel * 2) + 1;
-		damage = (gunPowerLevel + 1) * 10;
-		bulletScale = (gunRadiusLevel * 2) + 1;
-		shotForce = (gunSpeedLevel + 1) * 1000;
-			break;
-		case ModuleType.Armor:
-			bonusHP = armorPowerLevel * 10;
-			break;
-		case ModuleType.Laser:
-			laserTriggerScale = laserRadiusLevel * 10;
-			break;
-		default:
-			Debug.LogError("Invalid module type: " + moduleType);
-			break;
-		}
-	}
-
-}
+//[System.Serializable]
+//public class Activation
+//{
+//	public int activationID; //ID is unique to ship, not universe
+//	public ModuleType moduleType; //Gadget type
+//	public List<Node> constituentNodes; //Nodes that make up this activation
+//
+//	//Proper stats
+//		//Gun
+//	public int gunDurationLevel = 0;
+//	public int gunHomingLevel = 0;
+//	public int gunNumberLevel = 0;
+//	public int gunPowerLevel = 0;
+//	public int gunRadiusLevel = 0;
+//	public int gunSpeedLevel = 0;
+//
+//		//Armor
+//	public int armorPowerLevel = 0;
+//	public int armorRadiusLevel = 0;
+//
+//		//Laser
+//	public int laserRadiusLevel = 0;
+//	public int laserPowerLevel = 0;
+//	public int laserNumberLevel = 0;
+//
+//	//Mechanical stats
+//		//Gun
+//	public int damage = 10;
+//	public float bulletsPerSecond; //In seconds
+//	public int shotForce = 2000;
+//	//public int size = 0;
+//	public int scatterAngle = 0;
+//	public int durationInSeconds = 0;
+//	public int homingConstant = 0;
+//	public int bulletsPerShot = 0;
+//	public int bulletScale = 0;
+//		//Armor
+//	public int bonusHP;
+//		//Laser
+//	public float laserTriggerScale;
+//
+//	//State
+//	public bool canShoot = false;
+//	public float shotTimer;
+//
+//	public Activation(int activationIDArg, ModuleType moduleTypeArg, List<Node> constituentNodesArg)
+//	{
+//		activationID = activationIDArg;
+//		moduleType = moduleTypeArg;
+//		constituentNodes = constituentNodesArg;
+//		}
+//
+//	public void DeriveRealStats(ModuleType moduleType)
+//	{
+//		switch(moduleType)
+//		{
+//		case ModuleType.Weapon:
+//		durationInSeconds = gunDurationLevel + 1; //Magic numbers, please change
+//		homingConstant = gunHomingLevel;
+//		bulletsPerSecond = (gunNumberLevel * 2) + 1;
+//		damage = (gunPowerLevel + 1) * 10;
+//		bulletScale = (gunRadiusLevel * 2) + 1;
+//		shotForce = (gunSpeedLevel + 1) * 1000;
+//			break;
+//		case ModuleType.Armor:
+//			bonusHP = armorPowerLevel * 10;
+//			break;
+//		case ModuleType.Laser:
+//			laserTriggerScale = laserRadiusLevel * 10;
+//			break;
+//		default:
+//			Debug.LogError("Invalid module type: " + moduleType);
+//			break;
+//		}
+//	}
+//
+//}
 
 public class ScriptShipController : MonoBehaviour {
 
@@ -88,7 +88,7 @@ public class ScriptShipController : MonoBehaviour {
 	//public Activation activation = new Activation();
 
 //State
-	public List<Activation> currentActivations = new List<Activation> ();
+	//public List<Activation> currentActivations = new List<Activation> ();
 
 	//Motion
 	public float thrustForceConstant = 10.0F;
@@ -288,11 +288,11 @@ public class ScriptShipController : MonoBehaviour {
 		//transform.rotation = Quaternion.Euler(0, 
 		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
 
-			UpdateActivationStatus();
+			//UpdateActivationStatus();
 
-			foreach(Activation activation in currentActivations)
+			foreach(Snake snake in scriptShipSheet.currentSnakes)
 			{
-		UpdateActivation (activation);
+		UpdateActivationAbility (snake);
 			}
 
 
@@ -460,24 +460,25 @@ public class ScriptShipController : MonoBehaviour {
 		//Debug.Log (hotForce + " " + hotRigid.velocity);
 	}
 
-	void UpdateActivation(Activation activation)
+	void UpdateActivationAbility(Snake snake)
 	{
 	//	if(moduleType == ModuleType.Weapon && moduleOwner.target)
 	//	{
 		//	Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
 		if(pilotModule)
 		{
-			if(activation.moduleType == ModuleType.Weapon)
+			if(snake.isArmed){
+			if(snake.moduleType == ModuleType.Weapon)
 			{
 				Vector2 attackVector = pilotModule.transform.TransformDirection (Vector2.up);
 		//	if(attackVector.magnitude <= weaponRange)
 			//{
-				if(activation.canShoot)
+				if(snake.canShoot)
 				{
 					Debug.Log ("Can shoot");
 					//Change state
-					activation.shotTimer = 0;
-					activation.canShoot = false;
+					snake.shotTimer = 0;
+					snake.canShoot = false;
 					//Bullet creation
 					Vector3 bulletPosition = pilotModule.transform.position;
 					GameObject hotBullet = Instantiate (basicBullet, bulletPosition, transform.rotation) as GameObject;
@@ -487,86 +488,71 @@ public class ScriptShipController : MonoBehaviour {
 					scriptProjectile.owner = gameObject;
 
 					//Assign properties
-					scriptProjectile.projectileDamage = activation.damage;
-					hotBullet.transform.localScale *= activation.bulletScale;
-					scriptProjectile.bulletDuration = activation.durationInSeconds;
+					scriptProjectile.projectileDamage = snake.damage;
+					hotBullet.transform.localScale *= snake.bulletScale;
+					scriptProjectile.bulletDuration = snake.durationInSeconds;
 
 					//Add force
 					hotBullet.rigidbody2D.velocity = rigidbody2D.velocity;	
-					hotBullet.rigidbody2D.AddForce(attackVector * activation.shotForce); //Magic number
+					hotBullet.rigidbody2D.AddForce(attackVector * snake.shotForce); //Magic number
 
 				} else {
 
-					activation.shotTimer += Time.deltaTime;
-					Debug.Log (activation.shotTimer + " @"+Time.time);
-					float shotDelay = 1 / activation.bulletsPerSecond;
-					if(activation.shotTimer >= shotDelay)
+					snake.shotTimer += Time.deltaTime;
+					//Debug.Log (snake.shotTimer + " @"+Time.time);
+					float shotDelay = 1 / snake.bulletsPerSecond;
+					if(snake.shotTimer >= shotDelay)
 					{
-						activation.canShoot = true;
+						snake.canShoot = true;
 					}
 				}
-		//} else if (activation.moduleType == ModuleType.Laser)
-		//	{
+		} else if (snake.moduleType == ModuleType.Laser)
+			{
+				if(!snake.laserTriggerEnabled)
+				{
+					snake.laserTriggerEnabled = true;
 
-		//		if(laserTrigger.activeSelf)
-		//		{
-
-			//	} else {
-			//		laserTrigger.SetActive(
-			//	}
-				//laserTrigger.SetActive(true);
+						GameObject hotTrigger = Instantiate(laserTrigger) as GameObject;
+						Vector3 triggerScale = new Vector3(snake.laserTriggerScale, snake.laserTriggerScale, 1);
+						hotTrigger.transform.localScale = triggerScale;
+						hotTrigger.transform.position = transform.position;
+						//hotTrigger.transform.localScale.y = activation.laserTriggerScale;
+						hotTrigger.transform.parent = triggerContainer.transform;
+					//} else 
+				//	{
+				//		Debug.LogError("Invalid activation type for laser: " + snake.moduleType);
+					}
+				}
+				}
 			}
 			}
 
-		//	} else {
-		//		if(!canShoot)
-		//		{
-		//			canShoot = true;
-		//		}
-			//}
-		//}
-	}
 
-	void UpdateActivationStatus()
-	{
-		currentActivations = scriptShipSheet.GetActivations();
-		scriptShipSheet.ArmActivations(currentActivations);
-
-		foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
-			Node node = scriptShipSheet.GetNodeFromModule (module);
-			if (node.activationIndex == -1) {
-				module.SetActivation (false);
-			} else if (node.activationIndex >= 0) {
-				module.SetActivation (true);
-			} else {
-				Debug.Log ("Invalid activation id on " + node.module.name);
-			}
-		}
-	}
+//	void UpdateActivationStatus()
+//	{
+//		currentActivations = scriptShipSheet.GetActivations();
+//		scriptShipSheet.ArmActivations(currentActivations);
+//
+//		foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
+//			Node node = scriptShipSheet.GetNodeFromModule (module);
+//			if (node.activationIndex == -1) {
+//				module.SetActivation (false);
+//			} else if (node.activationIndex >= 0) {
+//				module.SetActivation (true);
+//			} else {
+//				Debug.Log ("Invalid activation id on " + node.module.name);
+//			}
+//		}
+//	}
 	
-	public void InitializeLaser(Activation activation)
-		{
-		if(activation.moduleType == ModuleType.Laser)
-		{
-			GameObject hotTrigger = Instantiate(laserTrigger) as GameObject;
-			Vector3 triggerScale = new Vector3(activation.laserTriggerScale, activation.laserTriggerScale, 1);
-			hotTrigger.transform.localScale = triggerScale;
-			hotTrigger.transform.position = transform.position;
-				
-			//hotTrigger.transform.localScale.y = activation.laserTriggerScale;
-			hotTrigger.transform.parent = triggerContainer.transform;
-		} else 
-		{
-			Debug.LogError("Invalid activation type for laser: " + activation.moduleType);
-		}
-		}
 
-	public void ClearOldLasers()
-	{
-		foreach(Transform child in triggerContainer.transform)
-		{
-			Destroy(child.gameObject);
-		}
-	}
+
+//	public void ClearOldLasers()
+//	{
+//		foreach(Transform child in triggerContainer.transform)
+//		{
+//			Destroy(child.gameObject);
+//		}
+//	}
 
 }
