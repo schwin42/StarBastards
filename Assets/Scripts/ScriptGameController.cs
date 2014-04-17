@@ -148,9 +148,9 @@ public class ScriptGameController : MonoBehaviour {
 		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
 
 		//Remove module from grid
-		Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
-		previousOwner.GetComponent<ScriptShipSheet>().schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = new Node();
-
+		//Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
+		//previousOwner.GetComponent<ScriptShipSheet>().schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = new Node();
+		previousOwner.GetComponent<ScriptShipSheet>().RemoveModuleFromGrid(hotMod);
 		//Remove module from activation
 		//previousOwner.SendMessage("UpdateActivationStatus");
 	}

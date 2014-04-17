@@ -6,41 +6,41 @@ using System.Collections.Generic;
 //Node within x-y grid
 public class Node
 {
-	public ScriptModule module; //Gameobject at this node in the grid, if any
-	public bool isAdded = false;  //True indicates this node has been checked off
-	public bool isEmpty; //Whether a module exists in this node
-	public int snakeIndex = -1; //Negative one for index indicates null value
-	public int activationIndex = -1; //Ditto
+		public ScriptModule module; //Gameobject at this node in the grid, if any
+		public bool isAdded = false;  //True indicates this node has been checked off
+		public bool isEmpty; //Whether a module exists in this node
+		public int snakeIndex = -1; //Negative one for index indicates null value
+		public int activationIndex = -1; //Ditto
 
-	//Empty node constructor
-	public Node()
-	{
-		module = null;
-		isEmpty = true;
-	}
+		//Empty node constructor
+		public Node ()
+		{
+				module = null;
+				isEmpty = true;
+		}
 
-	//Occupied node constructor
-	public Node(ScriptModule scriptModuleArg)
-	{
-		module = scriptModuleArg;
-		isEmpty = false;
-	}
+		//Occupied node constructor
+		public Node (ScriptModule scriptModuleArg)
+		{
+				module = scriptModuleArg;
+				isEmpty = false;
+		}
 }
 
 [System.Serializable]
 public class Snake
 {
-	public int snakeID; //id and index
-	public List<Node> constituentNodes;
-	public ModuleType moduleType;
-	public bool isPruned = false; //Whether this snake has been subsumed by another
+		public int snakeID = -1; //id and index, -1 is null
+		public List<Node> constituentNodes = new List<Node>();
+		public ModuleType moduleType = ModuleType.None;
+		public bool isPruned = false; //Whether this snake has been subsumed by another
 
-	//State
-	public bool isArmed = false;
-	public float shotTimer;
+		//State
+		public bool isArmed = false;
+		public float shotTimer;
 	
 		//Proper stats
-			//Gun
+		//Gun
 		public int gunDurationLevel = 0;
 		public int gunHomingLevel = 0;
 		public int gunNumberLevel = 0;
@@ -48,17 +48,17 @@ public class Snake
 		public int gunRadiusLevel = 0;
 		public int gunSpeedLevel = 0;
 	
-			//Armor
+		//Armor
 		public int armorPowerLevel = 0;
 		public int armorRadiusLevel = 0;
 	
-			//Laser
+		//Laser
 		public int laserRadiusLevel = 0;
 		public int laserPowerLevel = 0;
 		public int laserNumberLevel = 0;
 	
 		//Mechanical stats
-			//Gun
+		//Gun
 		public int damage = 10;
 		public float bulletsPerSecond; //In seconds
 		public int shotForce = 2000;
@@ -68,258 +68,293 @@ public class Snake
 		public int homingConstant = 0;
 		public int bulletsPerShot = 0;
 		public int bulletScale = 0;
-			//Armor
+		//Armor
 		public int bonusHP;
-			//Laser
+		//Laser
 		public float laserTriggerScale;
 
 
 		//Gun state
-	public bool canShoot = false;
-	//Laser state
-	public bool laserTriggerEnabled = false;
+		public bool canShoot = false;
+		//Laser state
+		public bool laserTriggerEnabled = false;
 
-
-
-		public void DeriveRealStats(ModuleType moduleType)
+		public void DeriveRealStats (ModuleType moduleType)
 		{
-			switch(moduleType)
-			{
-			case ModuleType.Weapon:
-			durationInSeconds = gunDurationLevel + 1; //Magic numbers, please change
-			homingConstant = gunHomingLevel;
-			bulletsPerSecond = (gunNumberLevel * 2) + 1;
-			damage = (gunPowerLevel + 1) * 10;
-			bulletScale = (gunRadiusLevel * 2) + 1;
-			shotForce = (gunSpeedLevel + 1) * 1000;
+				switch (moduleType) {
+				case ModuleType.Weapon:
+						durationInSeconds = gunDurationLevel + 1; //Magic numbers, please change
+						homingConstant = gunHomingLevel;
+						bulletsPerSecond = (gunNumberLevel * 2) + 1;
+						damage = (gunPowerLevel + 1) * 10;
+						bulletScale = (gunRadiusLevel * 2) + 1;
+						shotForce = (gunSpeedLevel + 1) * 1000;
+						break;
+				case ModuleType.Armor:
+						bonusHP = armorPowerLevel * 10;
+						break;
+				case ModuleType.Laser:
+						laserTriggerScale = laserRadiusLevel * 10;
+						break;
+				default:
+						Debug.LogError ("Invalid module type: " + moduleType);
+						break;
+				}
+		}
+
+	public Snake () {}
+		public Snake (List<Snake> hotSnakes, ModuleType moduleTypeArg)
+		{
+				moduleType = moduleTypeArg;
+				snakeID = hotSnakes.Count;
+				hotSnakes.Add (this);
+				constituentNodes = new List<Node> ();
+
+		}
+
+		public void AddNodeToSnake (Node node)
+		{
+				constituentNodes.Add (node);
+				node.snakeIndex = snakeID;
+
+				//Increment snake levels
+				switch (node.module.moduleType) {
+				case ModuleType.Weapon:
+									
+						switch (node.module.moduleSubtype) {
+						case ModuleSubtype.Duration:
+								gunDurationLevel++;
+								break;
+						//case ModuleSubtype.Homing:
+						//	activation.homingLevel++;
+						//	break;
+						case ModuleSubtype.Number:
+								gunNumberLevel++;
+								break;
+						case ModuleSubtype.Power:
+								gunPowerLevel++;
+								break;
+						case ModuleSubtype.Radius:
+								gunRadiusLevel++;
+								break;
+						case ModuleSubtype.Speed:
+								gunSpeedLevel++;
+								break;
+						default:
+								Debug.LogError ("Invalid module subtype: " + node.module.moduleSubtype);
+								break;
+						}
+						break;
+				case ModuleType.Armor:
+						armorPowerLevel++;
+						break;
+				case ModuleType.Laser:
+						laserRadiusLevel++;
+						break;
+				default:
+						Debug.Log ("Invalid module type: " + node.module.moduleType);
+						break;
+				}
+				DeriveRealStats (moduleType);
+
+		}
+
+	public void RemoveNodeFromSnake(Node node)
+	{
+		constituentNodes.Remove(node);
+		node.snakeIndex = -1;
+
+		//Decrement snake levels
+		switch (node.module.moduleType) {
+		case ModuleType.Weapon:
+			
+			switch (node.module.moduleSubtype) {
+			case ModuleSubtype.Duration:
+				gunDurationLevel--;
 				break;
-			case ModuleType.Armor:
-				bonusHP = armorPowerLevel * 10;
+				//case ModuleSubtype.Homing:
+				//	activation.homingLevel++;
+				//	break;
+			case ModuleSubtype.Number:
+				gunNumberLevel--;
 				break;
-			case ModuleType.Laser:
-				laserTriggerScale = laserRadiusLevel * 10;
+			case ModuleSubtype.Power:
+				gunPowerLevel--;
+				break;
+			case ModuleSubtype.Radius:
+				gunRadiusLevel--;
+				break;
+			case ModuleSubtype.Speed:
+				gunSpeedLevel--;
 				break;
 			default:
-				Debug.LogError("Invalid module type: " + moduleType);
+				Debug.LogError ("Invalid module subtype: " + node.module.moduleSubtype);
 				break;
 			}
+			break;
+		case ModuleType.Armor:
+			armorPowerLevel--;
+			break;
+		case ModuleType.Laser:
+			laserRadiusLevel--;
+			break;
+		default:
+			Debug.Log ("Invalid module type: " + node.module.moduleType);
+			break;
 		}
-
-	public Snake(List<Snake> hotSnakes, ModuleType moduleTypeArg)
-	{
-		moduleType = moduleTypeArg;
-		snakeID = hotSnakes.Count;
-		hotSnakes.Add (this);
-		constituentNodes = new List<Node>();
+		DeriveRealStats (moduleType);
 
 	}
 
-	public void AddNodeToSnake(Node node)
-	{
-		constituentNodes.Add (node);
-		node.snakeIndex = snakeID;
-
-		//Increment snake levels
-		switch(node.module.moduleType)
-								{
-								case ModuleType.Weapon:
-									
-									switch(node.module.moduleSubtype)
-									{
-									case ModuleSubtype.Duration:
-										gunDurationLevel++;
-										break;
-										//case ModuleSubtype.Homing:
-										//	activation.homingLevel++;
-										//	break;
-									case ModuleSubtype.Number:
-										gunNumberLevel++;
-										break;
-									case ModuleSubtype.Power:
-										gunPowerLevel++;
-										break;
-									case ModuleSubtype.Radius:
-										gunRadiusLevel++;
-										break;
-									case ModuleSubtype.Speed:
-										gunSpeedLevel++;
-										break;
-									default:
-										Debug.LogError("Invalid module subtype: " + node.module.moduleSubtype);
-										break;
-									}
-									break;
-								case ModuleType.Armor:
-									armorPowerLevel++;
-									break;
-								case ModuleType.Laser:
-									laserRadiusLevel++;
-									break;
-								default:
-									Debug.Log ("Invalid module type: " + node.module.moduleType);
-									break;
-								}
-		DeriveRealStats(moduleType);
-
-	}
-
-	public void SetArmed(bool willBeArmed)
-	{
-		if(willBeArmed)
+		public void SetArmed (bool willBeArmed)
 		{
+				if (willBeArmed) {
 		
-		foreach(Node node in constituentNodes)
-		{
-				node.module.SetActivation (true);
-				//node.module.isActivated = true;
+						foreach (Node node in constituentNodes) {
+								node.module.SetActivation (true);
+								//node.module.isActivated = true;
 	
-					if(moduleType == ModuleType.Armor)
-					{
-						node.module.currentHP += bonusHP;
-					} 
+								if (moduleType == ModuleType.Armor) {
+										node.module.currentHP += bonusHP;
+								} 
 	
+						}
+						isArmed = true;
+
+				} else { 
+						foreach (Node node in constituentNodes) {
+								node.module.SetActivation (false);
+						}
+						isArmed = false;
+
+				}
 		}
-			isArmed = true;
-
-		}else { 
-			foreach(Node node in constituentNodes)
-			{
-				node.module.SetActivation(false);
-			}
-			isArmed = false;
-
-	}
-	}
 
 }
 
-public class ScriptShipSheet : MonoBehaviour {
+public class ScriptShipSheet : MonoBehaviour
+{
 
-	protected ScriptShipController scriptShipController;
+		protected ScriptShipController scriptShipController;
+		public List<ScriptModule> pilotContiguousModules; //Modules connected to first module
 
-	public List<ScriptModule> pilotContiguousModules; //Modules connected to first module
 
+		//Scriptable
+		static private int maxX = 50; //Max positive and negative x-value
+		static private int maxY = 50; //Max positive and negative y-value
+		private int minNodesForActivation = 3; //Number of contiguous modules required to form activation
 
-	//Scriptable
-	static private int maxX = 50; //Max positive and negative x-value
-	static private int maxY = 50; //Max positive and negative y-value
-	private int minNodesForActivation = 3; //Number of contiguous modules required to form activation
+		//public List<Snake> lastSnakes; //List of last known snakes
+		public List<Snake> currentSnakes; 
 
-	//public List<Snake> lastSnakes; //List of last known snakes
-	public List<Snake> currentSnakes; 
-
-	//Grid as 2D array
-	public Node[,] schematic = new Node[maxX*2,maxY*2];
+		//Grid as 2D array
+		public Node[,] schematic = new Node[maxX * 2, maxY * 2];
 	
-	// Use this for initialization
-	void Start () {
+		// Use this for initialization
+		void Start ()
+		{
 
-		//Acquire scripts
-		scriptShipController = gameObject.GetComponent<ScriptShipController>();
+				//Acquire scripts
+				scriptShipController = gameObject.GetComponent<ScriptShipController> ();
 		
-		InitializeGrid ();
-	}
+				InitializeGrid ();
+		}
 	
-	// Update is called once per frame
-	void Update () {
+		// Update is called once per frame
+		void Update ()
+		{
 	
 
 
-	}
-
-	void InitializeGrid()
-	{
-	//Temporary variables
-		int bound0 = schematic.GetUpperBound(0);
-		int bound1 = schematic.GetUpperBound(1);
-
-		//Create a node for each pair of coordinates
-		for (int i = 0; i < bound0; i++) {
-			for(int j = 0; j < bound1; j++)
-			{
-				schematic[i, j] = new Node();
-			}
-				}
-	}
-
-	public void GridStatus()
-	{
-		int bound0 = schematic.GetUpperBound(0);
-		int bound1 = schematic.GetUpperBound(1);
-
-		for (int i = 0; i < bound0; i++) {
-			for(int j = 0; j < bound1; j++)
-			{
-				Node hotNode = schematic[i, j];
-				string moduleString;
-				if(hotNode.module)
-				{
-					moduleString = hotNode.module.gameObject.name;
-				}
-			}
 		}
-	}
 
-	//Convert real world coordinates to absolute grid coordinates
-	public static Vector2 GetGridNodeCoordinates(Vector2 nodeCoordinates)
-	{
-		Vector2 gridNodeCoordinates = Vector2.zero;
-		gridNodeCoordinates.x = nodeCoordinates.x + maxX;
-		gridNodeCoordinates.y = nodeCoordinates.y + maxY;
-		//Debug.Log (gridNodeCoordinates);
-		return gridNodeCoordinates;
-	}
-
-	//Return list of modules that are connected to first module
-	public List<ScriptModule> GetModulesContiguousToPilot()
-	{
-		//Temporary variables
-		pilotContiguousModules = new List<ScriptModule> ();
-		ScriptModule pilotModule = scriptShipController.pilotModule.GetComponent<ScriptModule> ();
-
-		//Breadth-first search
-		pilotContiguousModules.Add (pilotModule);
-		Vector2 pilotGridCoordinates = GetGridNodeCoordinates (pilotModule.moduleNodeCoordinates);
-		schematic[(int)pilotGridCoordinates.x, (int)pilotGridCoordinates.y].isAdded = true;
-
-		//Main iteration
-		for(int i = 0; i < pilotContiguousModules.Count; i++)
+		void InitializeGrid ()
 		{
-			//Add adjacent modules to list and set as added
-			AddContiguousModules(pilotContiguousModules[i].moduleNodeCoordinates);
+				//Temporary variables
+				int bound0 = schematic.GetUpperBound (0);
+				int bound1 = schematic.GetUpperBound (1);
+
+				//Create a node for each pair of coordinates
+				for (int i = 0; i < bound0; i++) {
+						for (int j = 0; j < bound1; j++) {
+								schematic [i, j] = new Node ();
+						}
+				}
 		}
 
-		//Clear temp variables
-		foreach(ScriptModule module in pilotContiguousModules)
+		public void GridStatus ()
 		{
-			Vector2 nodeGridCoordinates = GetGridNodeCoordinates (module.moduleNodeCoordinates);
-			Node hotNode = schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+				int bound0 = schematic.GetUpperBound (0);
+				int bound1 = schematic.GetUpperBound (1);
 
-			//hotNode.isChecked = false;
-			hotNode.isAdded = false;
+				for (int i = 0; i < bound0; i++) {
+						for (int j = 0; j < bound1; j++) {
+								Node hotNode = schematic [i, j];
+								string moduleString;
+								if (hotNode.module) {
+										moduleString = hotNode.module.gameObject.name;
+								}
+						}
+				}
 		}
-		Debug.Log (pilotContiguousModules.Count);
-		return pilotContiguousModules;
-	}
 
-	 void AddContiguousModules(Vector2 nodeWorldCoordinates)
-	{
-		Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
-
-		Vector2[] adjacentCoordinates = GetAdjacentPoints (nodeGridCoordinates);
-
-		foreach (Vector2 adjacentVector2 in adjacentCoordinates) {
-			//Debug.Log ((int)adjacentVector2.x + " " + (int)adjacentVector2.y);
-			Node adjacentNode = schematic[(int)adjacentVector2.x, (int)adjacentVector2.y];
-			if(adjacentNode.isEmpty || adjacentNode.isAdded)
-			{
-				//Do nothing
-			} else {
-			pilotContiguousModules.Add (adjacentNode.module);
-				adjacentNode.isAdded = true;
-			}
+		//Convert real world coordinates to absolute grid coordinates
+		public static Vector2 GetGridNodeCoordinates (Vector2 nodeCoordinates)
+		{
+				Vector2 gridNodeCoordinates = Vector2.zero;
+				gridNodeCoordinates.x = nodeCoordinates.x + maxX;
+				gridNodeCoordinates.y = nodeCoordinates.y + maxY;
+				//Debug.Log (gridNodeCoordinates);
+				return gridNodeCoordinates;
 		}
-	}
+
+		//Return list of modules that are connected to first module
+		public List<ScriptModule> GetModulesContiguousToPilot ()
+		{
+				//Temporary variables
+				pilotContiguousModules = new List<ScriptModule> ();
+				ScriptModule pilotModule = scriptShipController.pilotModule.GetComponent<ScriptModule> ();
+
+				//Breadth-first search
+				pilotContiguousModules.Add (pilotModule);
+				Vector2 pilotGridCoordinates = GetGridNodeCoordinates (pilotModule.moduleNodeCoordinates);
+				schematic [(int)pilotGridCoordinates.x, (int)pilotGridCoordinates.y].isAdded = true;
+
+				//Main iteration
+				for (int i = 0; i < pilotContiguousModules.Count; i++) {
+						//Add adjacent modules to list and set as added
+						AddContiguousModules (pilotContiguousModules [i].moduleNodeCoordinates);
+				}
+
+				//Clear temp variables
+				foreach (ScriptModule module in pilotContiguousModules) {
+						Vector2 nodeGridCoordinates = GetGridNodeCoordinates (module.moduleNodeCoordinates);
+						Node hotNode = schematic [(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+
+						//hotNode.isChecked = false;
+						hotNode.isAdded = false;
+				}
+				Debug.Log (pilotContiguousModules.Count);
+				return pilotContiguousModules;
+		}
+
+		void AddContiguousModules (Vector2 nodeWorldCoordinates)
+		{
+				Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
+
+				Vector2[] adjacentCoordinates = GetAdjacentPoints (nodeGridCoordinates);
+
+				foreach (Vector2 adjacentVector2 in adjacentCoordinates) {
+						//Debug.Log ((int)adjacentVector2.x + " " + (int)adjacentVector2.y);
+						Node adjacentNode = schematic [(int)adjacentVector2.x, (int)adjacentVector2.y];
+						if (adjacentNode.isEmpty || adjacentNode.isAdded) {
+								//Do nothing
+						} else {
+								pilotContiguousModules.Add (adjacentNode.module);
+								adjacentNode.isAdded = true;
+						}
+				}
+		}
 
 
 //	List<Snake> GetModuleSnakes()
@@ -516,126 +551,154 @@ public class ScriptShipSheet : MonoBehaviour {
 //		return ConvertSnakesToActivations(currentSnakes);
 //	}
 
-	public Node GetNodeFromModule(ScriptModule module)
-	{
-		Vector2 nodeGridCoordinates = GetGridNodeCoordinates(module.moduleNodeCoordinates);
-		return schematic[(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
-	}
-
-	Vector2[] GetAdjacentPoints(Vector2 startingPoint)
-	{
-		Vector2[] adjacentPoints = 
+		public Node GetNodeFromModule (ScriptModule module)
 		{
-			new Vector2(startingPoint.x, startingPoint.y + 1), //Up
-			new Vector2(startingPoint.x, startingPoint.y - 1), //Down
-			new Vector2(startingPoint.x + 1, startingPoint.y), //Right
-			new Vector2(startingPoint.x - 1, startingPoint.y) //Left
+				Vector2 nodeGridCoordinates = GetGridNodeCoordinates (module.moduleNodeCoordinates);
+				return schematic [(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
+		}
+
+		Vector2[] GetAdjacentPoints (Vector2 startingPoint)
+		{
+				Vector2[] adjacentPoints = 
+		{
+			new Vector2 (startingPoint.x, startingPoint.y + 1), //Up
+			new Vector2 (startingPoint.x, startingPoint.y - 1), //Down
+			new Vector2 (startingPoint.x + 1, startingPoint.y), //Right
+			new Vector2 (startingPoint.x - 1, startingPoint.y) //Left
 		};
-		return adjacentPoints;
-	}
+				return adjacentPoints;
+		}
 
-	public void AddModuleToGrid(ScriptModule module, Vector2 schematicCoordinates)
-	{
-		Node centerNode = new Node(module);
-		schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
-
-		Vector2[] adjacentPoints = GetAdjacentPoints(schematicCoordinates);
-		//I. Check adjacent nodes for like module types
-		//Debug.Log ("Adjacent points: "+adjacentPoints);
-		foreach(Vector2 adjacentNodeCoordinates in adjacentPoints)
+		public void AddModuleToGrid (ScriptModule module, Vector2 schematicCoordinates)
 		{
-			Node adjacentNode = schematic[(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
-			if(!adjacentNode.isEmpty)
-			{
-				if(adjacentNode.module.moduleType == centerNode.module.moduleType)
-				{
-					if(adjacentNode.snakeIndex == -1) //A. Adjacent unowned
-					{
-						if(centerNode.snakeIndex == -1) //1. Center unowned- Add center and adjacent to new snake
-						{
-							Snake hotSnake = new Snake(currentSnakes, centerNode.module.moduleType);
-							hotSnake.AddNodeToSnake(centerNode);
-							hotSnake.AddNodeToSnake(adjacentNode);
-						} else if(centerNode.snakeIndex >= 0) //2. Center owned- Add adjacent to center's snake
-						{
-							currentSnakes[centerNode.snakeIndex].AddNodeToSnake(adjacentNode);
-						} else {
-							Debug.LogError("Invalid snake index on center: "+centerNode.module.moduleID);
+				Node centerNode = new Node (module);
+				schematic [(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
+
+				Vector2[] adjacentPoints = GetAdjacentPoints (schematicCoordinates);
+				//I. Check adjacent nodes for like module types
+				//Debug.Log ("Adjacent points: "+adjacentPoints);
+				foreach (Vector2 adjacentNodeCoordinates in adjacentPoints) {
+						Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
+						if (!adjacentNode.isEmpty) {
+								if (adjacentNode.module.moduleType == centerNode.module.moduleType) {
+										if (adjacentNode.snakeIndex == -1) { //A. Adjacent unowned
+												if (centerNode.snakeIndex == -1) { //1. Center unowned- Add center and adjacent to new snake
+														Snake hotSnake = new Snake (currentSnakes, centerNode.module.moduleType);
+														hotSnake.AddNodeToSnake (centerNode);
+														hotSnake.AddNodeToSnake (adjacentNode);
+												} else if (centerNode.snakeIndex >= 0) { //2. Center owned- Add adjacent to center's snake
+														currentSnakes [centerNode.snakeIndex].AddNodeToSnake (adjacentNode);
+												} else {
+														Debug.LogError ("Invalid snake index on center: " + centerNode.module.moduleID);
+												}
+										} else if (adjacentNode.snakeIndex >= 0) { //B. Adjacent owned
+												if (centerNode.snakeIndex == -1) { //1. Center unowned- Add center to adjacent's snake
+														currentSnakes [adjacentNode.snakeIndex].AddNodeToSnake (centerNode);
+												} else if (centerNode.snakeIndex == adjacentNode.snakeIndex) { //2. Center owned by same- Do nothing
+														//Do nothing
+												} else if (centerNode.snakeIndex >= 0) { //3. Center owned by different- Subsume adjacent snake into current snake
+														currentSnakes [adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
+														//Assign node's snake id as root node snake
+														List<Node> transferList = new List<Node> (currentSnakes [adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
+														currentSnakes [adjacentNode.snakeIndex].constituentNodes = new List<Node> (); //Clear adjacent snake's nodes
+														foreach (Node transferNode in transferList) {
+																//Debug.Log("12 - root snake, adjacent snake, module:" + hotModNode.snakeIndex + ", " + adjacentNode.snakeIndex + ", " + transferNode.module.name);
+																currentSnakes [centerNode.snakeIndex].AddNodeToSnake (transferNode);
+																//node.snakeIndex = hotModNode.snakeIndex;
+														}
+												} else {
+														Debug.LogError ("Invalid snake index on center: " + centerNode.module.moduleID);
+												}
+										} else {
+												Debug.LogError ("Invalid snake index on adjacent: " + adjacentNode.module.moduleID);
+										}
+										//Debug.Log ("Center, adjacent: {" + centerNode.module.moduleID+", "+ adjacentNode.module.moduleID+"}");
+								}
 						}
-					} else if(adjacentNode.snakeIndex >= 0) //B. Adjacent owned
-					{
-						if(centerNode.snakeIndex == -1) //1. Center unowned- Add center to adjacent's snake 
-						{
-							currentSnakes[adjacentNode.snakeIndex].AddNodeToSnake(centerNode);
-						} else if (centerNode.snakeIndex == adjacentNode.snakeIndex) //2. Center owned by same- Do nothing
-						{
-							//Do nothing
-						} else if (centerNode.snakeIndex >= 0) //3. Center owned by different- Subsume adjacent snake into current snake
-						{
-							currentSnakes[adjacentNode.snakeIndex].isPruned = true; //Mark adjacent snake as dead
-							//Assign node's snake id as root node snake
-							List<Node> transferList = new List<Node>(currentSnakes[adjacentNode.snakeIndex].constituentNodes); //Cache adjacent snake's nodes
-							currentSnakes[adjacentNode.snakeIndex].constituentNodes = new List<Node>(); //Clear adjacent snake's nodes
-							foreach(Node transferNode in transferList)
-							{
-								//Debug.Log("12 - root snake, adjacent snake, module:" + hotModNode.snakeIndex + ", " + adjacentNode.snakeIndex + ", " + transferNode.module.name);
-								currentSnakes[centerNode.snakeIndex].AddNodeToSnake(transferNode);
-								//node.snakeIndex = hotModNode.snakeIndex;
-							}
-						} else {
-							Debug.LogError("Invalid snake index on center: "+centerNode.module.moduleID);
-						}
-					} else {
-						Debug.LogError ("Invalid snake index on adjacent: "+adjacentNode.module.moduleID);
-					}
-					//Debug.Log ("Center, adjacent: {" + centerNode.module.moduleID+", "+ adjacentNode.module.moduleID+"}");
 				}
-		}
+
+				if (centerNode.snakeIndex != -1) {
+						if (currentSnakes [centerNode.snakeIndex].constituentNodes.Count >= minNodesForActivation) {
+								currentSnakes [centerNode.snakeIndex].SetArmed (true);
+						}
+				}
+
 		}
 
-		if(centerNode.snakeIndex != -1)
+		public void RemoveModuleFromGrid (ScriptModule module)
 		{
-			if(currentSnakes[centerNode.snakeIndex].constituentNodes.Count >= minNodesForActivation)
+		Debug.Log ("Remove "+module);
+				//Node centerNode = new Node(module);
+				//schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
+				Node centerNode = GetNodeFromModule (module);
+				Vector2 schematicCoordinates = GetGridNodeCoordinates (centerNode.module.moduleNodeCoordinates);
+				schematic [(int)schematicCoordinates.x, (int)schematicCoordinates.y] = new Node ();
+
+				if (centerNode.snakeIndex >= 0) {
+
+						Vector2[] adjacentPoints = GetAdjacentPoints (schematicCoordinates);
+			List<Node> matchingNodes = new List<Node>();
+						foreach (Vector2 adjacentNodeCoordinates in adjacentPoints) {
+								Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
+								if (!adjacentNode.isEmpty) {
+										if (adjacentNode.module.moduleType == centerNode.module.moduleType) {
+						matchingNodes.Add (adjacentNode);
+										}
+								}
+						}
+			Debug.Log ("Matching nodes == "+matchingNodes.Count);
+			Snake damagedSnake = new Snake();
+			foreach(Node matchingNode in matchingNodes)
 			{
-				currentSnakes[centerNode.snakeIndex].SetArmed(true);
+				switch(matchingNodes.Count)
+				{
+				case 0:
+					//Do nothing
+					break;
+				case 1:
+					Debug.Log ("1 matching node.");
+					currentSnakes[matchingNode.snakeIndex].RemoveNodeFromSnake(centerNode);
+					damagedSnake = currentSnakes[matchingNode.snakeIndex];
+					break;
+				case 2:
+					//If more than one adjacent node belongs to the same snake
+					//Depth-first search to see which adjacent nodes (if any) are connected
+					//If node is unconnected, split into new snake
+					Debug.Log ("No handling for two matching nodes.");
+					break;
+				case 3:
+					Debug.Log ("No handling for three matching nodes.");
+					break;
+				case 4:
+					Debug.Log ("No handling for four matching nodes.");
+					break;
+
+				}
+
+				if(damagedSnake != null)
+				{
+					Debug.Log ("Damaged snake: "+damagedSnake);
+					if(damagedSnake.constituentNodes.Count < minNodesForActivation)
+					{
+						Debug.Log ("Snake disarmed: "+damagedSnake.snakeID + " on "+gameObject.name);
+						damagedSnake.SetArmed(false);
+						centerNode.module.SetActivation(false);
+					}
+
+					if(damagedSnake.constituentNodes.Count < 2)
+					{
+						damagedSnake.isPruned = true; //Mark adjacent snake as dead
+						foreach(Node snakeNode in damagedSnake.constituentNodes)
+						{
+							snakeNode.snakeIndex = -1;
+						}
+					}
+
+				}
+
 			}
-		}
 
-	}
-
-	public void RemoveModuleFromGrid(ScriptModule module)
-	{
-		//Node centerNode = new Node(module);
-		//schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
-		Node centerNode = GetNodeFromModule(module);
-		Vector2 schematicCoordinates = GetGridNodeCoordinates(centerNode.module.moduleNodeCoordinates);
-		schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = new Node();
-
-		if(centerNode.snakeIndex >= 0)
-		{
-
-		Vector2[] adjacentPoints = GetAdjacentPoints(schematicCoordinates);
-
-		foreach(Vector2 adjacentNodeCoordinates in adjacentPoints)
-		{
-				Node adjacentNode = schematic[(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
-				if(!adjacentNode.isEmpty)
-				{
-					if(adjacentNode.module.moduleType == centerNode.module.moduleType)
-					{
-
-
-						//If exactly one adjacent node belongs to same snake, remove center node from snake
-							//If current snake now has one module, remove snake
-						//If more than one adjacent node belongs to the same snake
-							//Depth-first search to see which adjacent nodes (if any) are connected
-						//If node is unconnected, split into new snake
-
-					}
 				}
 		}
-
-		}
-	}
 
 }

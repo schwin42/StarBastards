@@ -475,7 +475,7 @@ public class ScriptShipController : MonoBehaviour {
 			//{
 				if(snake.canShoot)
 				{
-					Debug.Log ("Can shoot");
+					//Debug.Log ("Can shoot");
 					//Change state
 					snake.shotTimer = 0;
 					snake.canShoot = false;
