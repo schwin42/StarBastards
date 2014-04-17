@@ -10,7 +10,7 @@ public class Node
 		public bool isAdded = false;  //True indicates this node has been checked off
 		public bool isEmpty; //Whether a module exists in this node
 		public int snakeIndex = -1; //Negative one for index indicates null value
-		public int activationIndex = -1; //Ditto
+		//public int activationIndex = -1; //Ditto
 
 		//Empty node constructor
 		public Node ()
@@ -258,6 +258,8 @@ public class ScriptShipSheet : MonoBehaviour
 				scriptShipController = gameObject.GetComponent<ScriptShipController> ();
 		
 				InitializeGrid ();
+
+				
 		}
 	
 		// Update is called once per frame
@@ -323,7 +325,7 @@ public class ScriptShipSheet : MonoBehaviour
 				//Main iteration
 				for (int i = 0; i < pilotContiguousModules.Count; i++) {
 						//Add adjacent modules to list and set as added
-						AddContiguousModules (pilotContiguousModules [i].moduleNodeCoordinates);
+						AddContiguousModules (GetNodeFromModule(pilotContiguousModules[i]));
 				}
 
 				//Clear temp variables
@@ -338,15 +340,15 @@ public class ScriptShipSheet : MonoBehaviour
 				return pilotContiguousModules;
 		}
 
-		void AddContiguousModules (Vector2 nodeWorldCoordinates)
+		void AddContiguousModules (Node centerNode)
 		{
-				Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
-
-				Vector2[] adjacentCoordinates = GetAdjacentPoints (nodeGridCoordinates);
-
-				foreach (Vector2 adjacentVector2 in adjacentCoordinates) {
+				//Vector2 nodeGridCoordinates = GetGridNodeCoordinates (nodeWorldCoordinates);
+				
+			//	Vector2[] adjacentCoordinates = GetAdjacentPoints (nodeGridCoordinates);
+		Node[] adjacentNodes = GetAdjacentNodes(centerNode);
+				foreach (Node adjacentNode in adjacentNodes) {
 						//Debug.Log ((int)adjacentVector2.x + " " + (int)adjacentVector2.y);
-						Node adjacentNode = schematic [(int)adjacentVector2.x, (int)adjacentVector2.y];
+						//Node adjacentNode = schematic [(int)adjacentVector2.x, (int)adjacentVector2.y];
 						if (adjacentNode.isEmpty || adjacentNode.isAdded) {
 								//Do nothing
 						} else {
@@ -557,16 +559,26 @@ public class ScriptShipSheet : MonoBehaviour
 				return schematic [(int)nodeGridCoordinates.x, (int)nodeGridCoordinates.y];
 		}
 
-		Vector2[] GetAdjacentPoints (Vector2 startingPoint)
+	Node[] GetAdjacentNodes (Node centerNode) //Vector2 startingPoint
 		{
-				Vector2[] adjacentPoints = 
+		Debug.Log ("Center node: "+centerNode.module.moduleID);
+		Vector2 startingPoint = GetGridNodeCoordinates(centerNode.module.moduleNodeCoordinates);
+
+				Node[] adjacentNodes = 
 		{
-			new Vector2 (startingPoint.x, startingPoint.y + 1), //Up
-			new Vector2 (startingPoint.x, startingPoint.y - 1), //Down
-			new Vector2 (startingPoint.x + 1, startingPoint.y), //Right
-			new Vector2 (startingPoint.x - 1, startingPoint.y) //Left
+			schematic[(int)startingPoint.x, (int)startingPoint.y + 1], //Up
+			schematic[(int)startingPoint.x, (int)startingPoint.y - 1], //Down
+			schematic[(int)startingPoint.x + 1, (int)startingPoint.y], //Right
+			schematic[(int)startingPoint.x - 1, (int)startingPoint.y], //Left
+
+
+//			new Vector2 (startingPoint.x, startingPoint.y + 1), //Up
+//			new Vector2 (startingPoint.x, startingPoint.y - 1), //Down
+//			new Vector2 (startingPoint.x + 1, startingPoint.y), //Right
+//			new Vector2 (startingPoint.x - 1, startingPoint.y) //Left
+//			Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
 		};
-				return adjacentPoints;
+				return adjacentNodes;
 		}
 
 		public void AddModuleToGrid (ScriptModule module, Vector2 schematicCoordinates)
@@ -574,11 +586,12 @@ public class ScriptShipSheet : MonoBehaviour
 				Node centerNode = new Node (module);
 				schematic [(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
 
-				Vector2[] adjacentPoints = GetAdjacentPoints (schematicCoordinates);
+			//	Vector2[] adjacentPoints = GetAdjacentPoints (schematicCoordinates);
+		Node[] adjacentNodes = GetAdjacentNodes(centerNode);
 				//I. Check adjacent nodes for like module types
 				//Debug.Log ("Adjacent points: "+adjacentPoints);
-				foreach (Vector2 adjacentNodeCoordinates in adjacentPoints) {
-						Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
+				foreach (Node adjacentNode in adjacentNodes) {
+						//Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
 						if (!adjacentNode.isEmpty) {
 								if (adjacentNode.module.moduleType == centerNode.module.moduleType) {
 										if (adjacentNode.snakeIndex == -1) { //A. Adjacent unowned
@@ -625,21 +638,57 @@ public class ScriptShipSheet : MonoBehaviour
 
 		}
 
-		public void RemoveModuleFromGrid (ScriptModule module)
+	public void RemoveModuleFromGrid (ScriptModule module)
+	{
+		//Remove from grid
+		Node centerNode = GetNodeFromModule (module);
+		Vector2 schematicCoordinates = GetGridNodeCoordinates (centerNode.module.moduleNodeCoordinates);
+		schematic [(int)schematicCoordinates.x, (int)schematicCoordinates.y] = new Node ();
+	}
+
+	public void RemoveModuleFromSnake(ScriptModule module)
+	{
+
+		Node node = GetNodeFromModule(module);
+		Debug.Log (module.moduleID +" removed from snake: "+ node.snakeIndex);
+		if(node.snakeIndex >= 0)
+		{
+			Snake damagedSnake = currentSnakes[node.snakeIndex];
+			damagedSnake.RemoveNodeFromSnake(node);
+			if(damagedSnake.constituentNodes.Count < minNodesForActivation)
+			{
+				Debug.Log ("Snake disarmed: "+damagedSnake.snakeID + " on "+gameObject.name);
+				damagedSnake.SetArmed(false);
+				module.SetActivation(false);
+			}
+			
+			if(damagedSnake.constituentNodes.Count < 2)
+			{
+				damagedSnake.isPruned = true; //Mark adjacent snake as dead
+				foreach(Node snakeNode in damagedSnake.constituentNodes)
+				{
+					snakeNode.snakeIndex = -1;
+				}
+			}
+		}
+
+
+
+	}
+
+	public void DamageSnakeAtModule (ScriptModule module)
 		{
 		Debug.Log ("Remove "+module);
 				//Node centerNode = new Node(module);
 				//schematic[(int)schematicCoordinates.x, (int)schematicCoordinates.y] = centerNode;
-				Node centerNode = GetNodeFromModule (module);
-				Vector2 schematicCoordinates = GetGridNodeCoordinates (centerNode.module.moduleNodeCoordinates);
-				schematic [(int)schematicCoordinates.x, (int)schematicCoordinates.y] = new Node ();
-
+		Node centerNode = GetNodeFromModule(module);
+		//Remove node from snake and split/ remove snake
 				if (centerNode.snakeIndex >= 0) {
-
-						Vector2[] adjacentPoints = GetAdjacentPoints (schematicCoordinates);
+					Node[] adjacentNodes = GetAdjacentNodes(centerNode);
+						//Vector2[] adjacentPoints = GetAdjacentPoints (schematicCoordinates);
 			List<Node> matchingNodes = new List<Node>();
-						foreach (Vector2 adjacentNodeCoordinates in adjacentPoints) {
-								Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
+						foreach (Node adjacentNode in adjacentNodes) {
+								//Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
 								if (!adjacentNode.isEmpty) {
 										if (adjacentNode.module.moduleType == centerNode.module.moduleType) {
 						matchingNodes.Add (adjacentNode);
@@ -657,13 +706,15 @@ public class ScriptShipSheet : MonoBehaviour
 					break;
 				case 1:
 					Debug.Log ("1 matching node.");
-					currentSnakes[matchingNode.snakeIndex].RemoveNodeFromSnake(centerNode);
+					//currentSnakes[matchingNode.snakeIndex].RemoveNodeFromSnake(centerNode);
 					damagedSnake = currentSnakes[matchingNode.snakeIndex];
 					break;
 				case 2:
 					//If more than one adjacent node belongs to the same snake
+
 					//Depth-first search to see which adjacent nodes (if any) are connected
-					//If node is unconnected, split into new snake
+					//If node is connected, remove node from the only snake
+					//If node is unconnected, remove node from snake, then split into two
 					Debug.Log ("No handling for two matching nodes.");
 					break;
 				case 3:
@@ -678,21 +729,7 @@ public class ScriptShipSheet : MonoBehaviour
 				if(damagedSnake != null)
 				{
 					Debug.Log ("Damaged snake: "+damagedSnake);
-					if(damagedSnake.constituentNodes.Count < minNodesForActivation)
-					{
-						Debug.Log ("Snake disarmed: "+damagedSnake.snakeID + " on "+gameObject.name);
-						damagedSnake.SetArmed(false);
-						centerNode.module.SetActivation(false);
-					}
 
-					if(damagedSnake.constituentNodes.Count < 2)
-					{
-						damagedSnake.isPruned = true; //Mark adjacent snake as dead
-						foreach(Node snakeNode in damagedSnake.constituentNodes)
-						{
-							snakeNode.snakeIndex = -1;
-						}
-					}
 
 				}
 
@@ -700,5 +737,6 @@ public class ScriptShipSheet : MonoBehaviour
 
 				}
 		}
+
 
 }

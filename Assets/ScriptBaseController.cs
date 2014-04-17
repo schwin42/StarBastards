@@ -14,10 +14,10 @@ public class ScriptBaseController : MonoBehaviour {
 	float bulletTimer = 0;
 	bool canShoot = false;
 
-	//Properties
-	float bulletRate = .2F;
-	float bulletDuration = 3f;
-	float bulletForce = 2000;	 
+	//Configurable
+	public float bulletRate = .2F;
+	public float bulletDuration = 3f;
+	public float bulletForce = 2000;	 
 	public int currentHP;
 	
 	// Use this for initialization

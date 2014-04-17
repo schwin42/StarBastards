@@ -399,6 +399,7 @@ public class ScriptShipController : MonoBehaviour {
 			//int[] schematicCoordinates = new int[]{(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y};
 			//(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
 		
+			Debug.Log (addedModule + " added to grid at "+gridNodeCoordinates);
 			scriptShipSheet.AddModuleToGrid(addedModule, gridNodeCoordinates);
 				
 

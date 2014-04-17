@@ -19,6 +19,8 @@ public enum ControlType
 
 public class ScriptGameController : MonoBehaviour {
 
+	public static ScriptGameController Instance;
+
 	//Configurable static Mode
 	public ControlType controlType;
 
@@ -54,6 +56,11 @@ public class ScriptGameController : MonoBehaviour {
 
 	//Debug
 	public List<ScriptModule> pilotContiguousModules = new List<ScriptModule>();
+
+	void Awake()
+	{
+		Instance = this;
+	}
 
 	void Start () {
 
@@ -126,31 +133,69 @@ public class ScriptGameController : MonoBehaviour {
 
 	public void BreakModule(ScriptModule hotMod)
 	{
-		//Cache ejection vector
-		Vector2 pilotToEjectionVector = hotMod.gameObject.transform.position - hotMod.moduleOwner.pilotModule.transform.position;
-		GameObject previousOwner = hotMod.moduleOwner.gameObject;
-		hotMod.moduleOwner = null;
-		hotMod.transform.parent = spaceContainer;
+		//Cache ship values
+		Vector2 pilotToEjectionVector = Vector2.zero;
+		Debug.Log (hotMod.moduleID +"'s type is " +hotMod.moduleType);
+		//if(hotMod.moduleType != ModuleType.Pilot)
+		//{
+		pilotToEjectionVector = hotMod.gameObject.transform.position - hotMod.moduleOwner.pilotModule.transform.position;
+		//}
+		ScriptShipController previousOwner = hotMod.moduleOwner;
+
+		hotMod.SetAsUnowned();
+		//ScriptShipController previousOwner = hotMod.moduleOwner;
+		//hotMod.moduleOwner = null;
+		//hotMod.transform.parent = spaceContainer;
 		hotMod.tag = "Debris";
 		//if(hotMod.moduleType == ModuleType.Weapon)
 		//{
 		//	hotMod.canShoot = false;
 		//}
+
+		//Jettison module
+		JettisonModule(hotMod, pilotToEjectionVector);
+
+		ScriptShipSheet previousShipSheet = previousOwner.GetComponent<ScriptShipSheet>();
+
+
+		previousShipSheet.RemoveModuleFromSnake(hotMod);
+		previousShipSheet.RemoveModuleFromGrid(hotMod);
+
+		//Jettison unconnected modules
+		ScriptModule[] iterationScripts = previousOwner.shipModuleContainer.GetComponentsInChildren<ScriptModule>();
+		if(hotMod.moduleType != ModuleType.Pilot)
+		   {
+		Debug.Log ("Before removing disconnected.");
+		List<ScriptModule> connectedModules = previousShipSheet.GetModulesContiguousToPilot();
+		Debug.Log ("Connected modules: " + connectedModules.Count);
 		
-		hotMod.gameObject.AddComponent<Rigidbody2D>();
-		//Set rigidbody properties...
-
-		//Add rigidbody velocity
-		//Vector2 ejectionLinearForce = new Vector2((Random.value -0.5F) * ejectionLinearForceConstant, (Random.value -0.5F) * ejectionLinearForceConstant);
-		Vector2 ejectionLinearForce = pilotToEjectionVector * ejectionLinearForceConstant;
-		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
-		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
-		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
-
-		//Remove module from grid
-		//Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(hotMod.moduleNodeCoordinates);
-		//previousOwner.GetComponent<ScriptShipSheet>().schematic[(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = new Node();
-		previousOwner.GetComponent<ScriptShipSheet>().RemoveModuleFromGrid(hotMod);
+		Debug.Log ("ship modules: "+ iterationScripts.Length);
+		foreach(ScriptModule shipModule in iterationScripts)
+		{
+			if(!connectedModules.Contains(shipModule))
+			{
+				Debug.Log ("shipModule is disconnected: "+shipModule.moduleID);
+				Vector2 pilotToDisconnectedVector = shipModule.gameObject.transform.position - previousOwner.pilotModule.transform.position;
+				shipModule.SetAsUnowned();
+				shipModule.tag = "NeutralModule";
+				JettisonModule(shipModule, pilotToDisconnectedVector);
+				previousShipSheet.RemoveModuleFromSnake(shipModule);
+				previousShipSheet.RemoveModuleFromGrid(shipModule);
+			}
+		}
+		} else {
+			foreach(ScriptModule shipModule in iterationScripts)
+			{
+				Debug.Log ("shipModule is disconnected: "+shipModule.moduleID);
+				Vector2 pilotToDisconnectedVector = shipModule.gameObject.transform.position - previousOwner.pilotModule.transform.position;
+				shipModule.SetAsUnowned();
+				shipModule.tag = "NeutralModule";
+				JettisonModule(shipModule, pilotToDisconnectedVector);
+				previousShipSheet.RemoveModuleFromSnake(shipModule);
+				previousShipSheet.RemoveModuleFromGrid(shipModule);
+			}
+		}
+		previousShipSheet.DamageSnakeAtModule(hotMod);
 		//Remove module from activation
 		//previousOwner.SendMessage("UpdateActivationStatus");
 	}
@@ -208,4 +253,16 @@ public class ScriptGameController : MonoBehaviour {
 		}
 	}
 
+	void JettisonModule(ScriptModule hotMod, Vector2 ejectionVector)
+	{
+		hotMod.gameObject.AddComponent<Rigidbody2D>();
+		//Set rigidbody properties...
+		
+		//Add rigidbody velocity
+		//Vector2 ejectionLinearForce = new Vector2((Random.value -0.5F) * ejectionLinearForceConstant, (Random.value -0.5F) * ejectionLinearForceConstant);
+		Vector2 ejectionLinearForce = ejectionVector * ejectionLinearForceConstant;
+		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
+		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
+		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
+	}
 }

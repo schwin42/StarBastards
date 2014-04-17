@@ -93,22 +93,9 @@ public class ScriptModule : MonoBehaviour {
 
 			if(currentHP <= 0)
 			{
-				if(moduleType == ModuleType.Pilot)
-				{
-					//Debug.Log (gameObject.name + "Destroyed.");
-					//Cache owner
-					//GameObject hotShip = moduleOwner.gameObject;
-					moduleOwner.shipIsActive = false;
 
-					ScriptModule[] iterationScripts = moduleOwner.shipModuleContainer.GetComponentsInChildren<ScriptModule>();
-					foreach(ScriptModule hotMod in iterationScripts){
-						scriptModuleController.BreakModule(hotMod);
-					}
-					tag = "Debris";
-				//	Destroy(hotShip);
-				} else {
 					scriptModuleController.BreakModule(this);
-				}
+
 			}
 		}
 
@@ -230,5 +217,11 @@ public class ScriptModule : MonoBehaviour {
 			spriteRenderer.color = defaultColor;
 			isActivated = false;
 				}
+	}
+
+	public void SetAsUnowned()
+	{
+		moduleOwner = null;
+		transform.parent = ScriptGameController.Instance.spaceContainer;
 	}
 }
