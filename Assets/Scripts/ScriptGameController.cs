@@ -102,10 +102,10 @@ public class ScriptGameController : MonoBehaviour {
 
 	}
 
-	public int GetNextID()
+	public static int GetNextID()
 	{
-		int returnID = nextModuleID;
-		nextModuleID++;
+		int returnID = Instance.nextModuleID;
+		Instance.nextModuleID++;
 		return returnID;
 	}
 

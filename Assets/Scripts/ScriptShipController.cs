@@ -140,9 +140,8 @@ public class ScriptShipController : MonoBehaviour {
 	//public BoundaryDirection teleportDirection = BoundaryDirection.None;
 	public bool shipIsActive = true;
 
-	// Use this for initialization
-	void Start () {
-	
+	void Awake()
+	{
 		//Get other objects
 		scriptHumanInput = GetComponent<ScriptHumanInput>();
 		scriptShipIntelligence = GetComponent<ScriptShipIntelligence>();
@@ -151,6 +150,12 @@ public class ScriptShipController : MonoBehaviour {
 		scriptModuleController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController> ();
 		audioSource = GetComponent<AudioSource>();
 		dynamicObjectsContainer = GameObject.Find ("ContainerDynamicObjects").transform;
+	}
+
+	// Use this for initialization
+	void Start () {
+	
+
 
 
 		//Set controlling rigidbody
@@ -165,14 +170,7 @@ public class ScriptShipController : MonoBehaviour {
 		rigidbodyLinearDrag = rigidbody2D.drag;
 		rigidbodyAngularDrag = rigidbody2D.angularDrag;
 
-		//Register starting modules, update to add joints if applicable
-		ScriptModule[] iterationScripts = shipModuleContainer.GetComponentsInChildren<ScriptModule> ();
-		foreach (ScriptModule module in iterationScripts) {
-			module.moduleID = scriptModuleController.GetNextID();
-			Vector3 vector3Position = module.transform.localPosition;
-			Vector2 hotCoordinates = LocalPositionToNodeCoordinates(new Vector2(vector3Position.x, vector3Position.y));
-			AddModule(module, gameObject, hotCoordinates);
-			}
+
 		//for (int i = 0; i < shipModuleContainer.childCount; i++) {
 		//	GameObject hotMod = shipModuleContainer.GetChild(i).gameObject;
 		//	Vector3 vector3Position = hotMod.transform.localPosition;
@@ -429,12 +427,12 @@ public class ScriptShipController : MonoBehaviour {
 			//	}
 	}
 */
-	Vector2 NodeCoordinatesToLocalPosition(Vector2 nodeCoordinates)
+	 Vector2 NodeCoordinatesToLocalPosition(Vector2 nodeCoordinates)
 	{
 		return nodeCoordinates * ratioOfNodeToSpace;
 	}
 
-	Vector2 LocalPositionToNodeCoordinates(Vector2 localPosition)
+	public Vector2 LocalPositionToNodeCoordinates(Vector2 localPosition)
 	{
 		return localPosition / ratioOfNodeToSpace;
 	}
