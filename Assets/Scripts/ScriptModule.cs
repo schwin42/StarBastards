@@ -106,11 +106,13 @@ public class ScriptModule : MonoBehaviour {
 		//Debug.Log(gameObject.name);
 		//Debug.Log (collision.gameObject.name);
 		//Debug.Log ("Collided");
-		if(moduleOwner != null)
+		if(moduleOwner != null) //If A. unowned
 		{
 
-			if(collision.gameObject.tag == "NeutralModule")
+			if(collision.gameObject.tag == "NeutralModule") //And B. other is unowned
 			{
+				//Stick together
+
 
 				//Calculate module location
 				ContactPoint2D contact = collision.contacts[0];

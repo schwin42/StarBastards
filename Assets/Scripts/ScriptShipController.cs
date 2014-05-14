@@ -188,6 +188,7 @@ public class ScriptShipController : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
 	{
+		//Debug
 		ScriptModule[] iterationModules = shipModuleContainer.GetComponentsInChildren<ScriptModule>();
 		foreach(ScriptModule module in iterationModules)
 		{
@@ -198,6 +199,8 @@ public class ScriptShipController : MonoBehaviour {
 	//	{
 			//foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
 			//{
+
+
 
 
 		}
@@ -225,6 +228,8 @@ public class ScriptShipController : MonoBehaviour {
 		}
 
 			//Update position
+
+
 
 		if(scriptModuleController.moduleRigidbodyMode)
 		{
@@ -314,7 +319,7 @@ public class ScriptShipController : MonoBehaviour {
 	}
 
 
-	//Should be migrated to module controller
+	//TODO Migrate to module controller
 	public void AddModule(ScriptModule addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
 		//Debug.Log (addedModule.moduleID);
@@ -400,6 +405,9 @@ public class ScriptShipController : MonoBehaviour {
 			Debug.Log (addedModule + " added to grid at "+gridNodeCoordinates);
 			scriptShipSheet.AddModuleToGrid(addedModule, gridNodeCoordinates);
 				
+			//Reset pilot transform to prevent misalignment on collision
+			pilotModule.transform.localPosition = Vector3.zero;
+			pilotModule.transform.localRotation = Quaternion.identity;
 
 		//Add to activation
 		//UpdateActivationStatus();

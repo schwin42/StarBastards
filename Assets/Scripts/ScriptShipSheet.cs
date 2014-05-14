@@ -604,7 +604,7 @@ public class ScriptShipSheet : MonoBehaviour
 				//I. Check adjacent nodes for like module types
 				//Debug.Log ("Adjacent points: "+adjacentPoints);
 				foreach (Node adjacentNode in adjacentNodes) {
-						Debug.Log (adjacentNode);
+						//Debug.Log (adjacentNode);
 						//Node adjacentNode = schematic [(int)adjacentNodeCoordinates.x, (int)adjacentNodeCoordinates.y];
 						if (!adjacentNode.isEmpty) {
 								if (adjacentNode.module.moduleType == centerNode.module.moduleType) {

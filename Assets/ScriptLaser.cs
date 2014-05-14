@@ -79,7 +79,7 @@ public class ScriptLaser : MonoBehaviour {
 
 	void OnTriggerExit2D(Collider2D collider)
 	{
-		Debug.Log (collider.gameObject.name + " @ " + Time.time);
+		//Debug.Log (collider.gameObject.name + " @ " + Time.time);
 		if(trackedTargets.Contains(collider.gameObject))
 		   {
 			int targetIndex = trackedTargets.IndexOf(collider.gameObject);
