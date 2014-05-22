@@ -707,35 +707,36 @@ public class ScriptShipSheet : MonoBehaviour
 						}
 						Debug.Log ("Matching nodes == " + matchingNodes.Count);
 						Snake damagedSnake = new Snake ();
-						foreach (Node matchingNode in matchingNodes) {
+						//foreach (Node matchingNode in matchingNodes) {
 								switch (matchingNodes.Count) {
 								case 0:
 					//Do nothing
 										break;
 								case 1:
 										Debug.Log ("1 matching node.");
-					//currentSnakes[matchingNode.snakeIndex].RemoveNodeFromSnake(centerNode);
-										damagedSnake = currentSnakes [matchingNode.snakeIndex];
+					currentSnakes[matchingNodes[0].snakeIndex].RemoveNodeFromSnake(centerNode);
+										damagedSnake = currentSnakes [matchingNodes[0].snakeIndex];
 										break;
 								case 2:
+								case 3:
+								case 4:
 					//If more than one adjacent node belongs to the same snake
-
+				//Center node, matching nodes -> List of connected node arrays
+				List<List<Node>> independentNodeConnections = GetIndependentlyConnectedNodes(centerNode, matchingNodes);
+				//0 count- No nodes are independently connected and all must be split into new snakes
 					//Depth-first search to see which adjacent nodes (if any) are connected
 					//If node is connected, remove node from the only snake
 					//If node is unconnected, remove node from snake, then split into two
-										Debug.Log ("No handling for two matching nodes.");
 										break;
-								case 3:
-										Debug.Log ("No handling for three matching nodes.");
-										break;
-								case 4:
-										Debug.Log ("No handling for four matching nodes.");
-										break;
+			default:
+				Debug.LogError ("Invalid number of matching nodes: "+matchingNodes.Count);
+				break;
 
 								}
 
 								if (damagedSnake != null) {
 										Debug.Log ("Damaged snake: " + damagedSnake);
+										
 
 
 								}
@@ -743,7 +744,38 @@ public class ScriptShipSheet : MonoBehaviour
 						}
 
 				}
-		}
+
+	List<List<Node>> GetIndependentlyConnectedNodes(Node centerNode, List<Node> matchingNodes)
+	{
+		Debug.Log ("Independence check - center node: "+centerNode.module.moduleID+", matching nodes: "+matchingNodes.ToString());
+		//Function will take from two to four matching nodes and return each set of nodes that is connected without using the center node
+	
+		List<List<Node>> upperList = new List<List<Node>>();
+
+	for(int i = 0; i < matchingNodes.Count; i++)
+	{
+		//Start with arbitrary matching node
+		Node startNode = matchingNodes[i];
+		//Initialize bool to track whether the connection list has been added for this matching node
+		bool isConnectedToEnd = false;
+	}
+
+	//Check for adjacent matching nodes
+	//Add matching nodes to nodesToCheck list if checkedNodes does not contain node
+	//If matchingNodes contains this end node, if connection is false, create a new list and set the connection bool to true
+	//...and add start node and end node to it
+	//If connection is true, just add end node to the connection list
+	//Add node to checked list, remove from nodesToCheck list
+	//Repeat until nodesToCheck is empty
+
+	//Compare count of upperList[0] to matchingNodes
+	//If upper - matching is
+	//-Inf to -2: Run the search again on the next node
+	//-1 to 0: Return upperList
+	//1 to infinity: More connected nodes than matching nodes, throw error
+
+		return upperList;
+}
 
 
 }
