@@ -80,24 +80,25 @@ using System.Collections.Generic;
 //
 //}
 
-public class ScriptShipController : MonoBehaviour {
+public class ScriptShipController : MonoBehaviour
+{
 
-//Configurable
+	//Configurable
 	public PlayerControl playerControl = PlayerControl.None;
 	public Color playerColor;
 	//public Activation activation = new Activation();
 
-//State
+	//State
 	//public List<Activation> currentActivations = new List<Activation> ();
 
 	//Motion
 	public float thrustForceConstant = 10.0F;
 	public float turnSpeedConstant = 1.0F;
-//	public float bulletForceConstant = 10.0F;
-	//public float topSpeed = 10.0F; 
+	//	public float bulletForceConstant = 10.0F;
+	//public float topSpeed = 10.0F;
 	public float teleportDelay = 1.0F;
 	
-//Inspector Assigned
+	//Inspector Assigned
 	public GameObject pilotModule;
 	public GameObject basicBullet;
 	public ParticleSystem thrustEffect;
@@ -106,11 +107,11 @@ public class ScriptShipController : MonoBehaviour {
 	//public GameObject target;
 
 
-//Acquired
+	//Acquired
 	[System.NonSerialized]
 	public Transform shipModuleContainer;
 
-//Cached from inspector
+	//Cached from inspector
 	[System.NonSerialized]
 	public float rigidbodyMass;
 	[System.NonSerialized]
@@ -118,7 +119,7 @@ public class ScriptShipController : MonoBehaviour {
 	[System.NonSerialized]
 	public float rigidbodyAngularDrag;
 
-//Private variables
+	//Private variables
 	private float ratioOfNodeToSpace = 2F;
 	private ScriptHumanInput scriptHumanInput;
 	private ScriptShipIntelligence scriptShipIntelligence;
@@ -133,7 +134,7 @@ public class ScriptShipController : MonoBehaviour {
 	//private GameObject newBullet = null;
 	//private float teleportTimer = 0f;
 
-//Status
+	//Status
 	[System.NonSerialized]
 	public bool isThrusting = false;
 	//public bool justTeleported = false;
@@ -146,14 +147,15 @@ public class ScriptShipController : MonoBehaviour {
 		scriptHumanInput = GetComponent<ScriptHumanInput>();
 		scriptShipIntelligence = GetComponent<ScriptShipIntelligence>();
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
-		shipModuleContainer = transform.FindChild ("ContainerModule");
-		scriptModuleController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController> ();
+		shipModuleContainer = transform.FindChild("ContainerModule");
+		scriptModuleController = GameObject.Find("ControllerGame").GetComponent<ScriptGameController>();
 		audioSource = GetComponent<AudioSource>();
-		dynamicObjectsContainer = GameObject.Find ("ContainerDynamicObjects").transform;
+		dynamicObjectsContainer = GameObject.Find("ContainerDynamicObjects").transform;
 	}
 
 	// Use this for initialization
-	void Start () {
+	void Start()
+	{
 	
 
 
@@ -162,13 +164,13 @@ public class ScriptShipController : MonoBehaviour {
 		//if (scriptModuleController.moduleRigidbodyMode) {
 		//				rigidCharacter = pilotModule.rigidbody2D;
 		//		} else {
-			//rigidCharacter = this.rigidbody2D;
+		//rigidCharacter = this.rigidbody2D;
 		//		}
 
 		//Cache starting rigidbody values from inspector
-		rigidbodyMass = rigidbody2D.mass;
-		rigidbodyLinearDrag = rigidbody2D.drag;
-		rigidbodyAngularDrag = rigidbody2D.angularDrag;
+		rigidbodyMass = GetComponent<Rigidbody2D>().mass;
+		rigidbodyLinearDrag = GetComponent<Rigidbody2D>().drag;
+		rigidbodyAngularDrag = GetComponent<Rigidbody2D>().angularDrag;
 
 
 		//for (int i = 0; i < shipModuleContainer.childCount; i++) {
@@ -190,113 +192,107 @@ public class ScriptShipController : MonoBehaviour {
 	{
 		//Debug
 		ScriptModule[] iterationModules = shipModuleContainer.GetComponentsInChildren<ScriptModule>();
-		foreach(ScriptModule module in iterationModules)
-		{
+		foreach (ScriptModule module in iterationModules) {
 			Node node = scriptShipSheet.GetNodeFromModule(module);
 			module.transform.FindChild("LabelModule").GetComponent<TextMesh>().text = node.snakeIndex.ToString();
 		}
 		//if(Input.GetKeyDown("3")) 
-	//	{
-			//foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
-			//{
+		//	{
+		//foreach(ScriptShipSheet ship in shipContainer.GetComponentsInChildren<ScriptShipSheet>())
+		//{
 
 
 
 
-		}
+	}
 
-	void FixedUpdate () 
+	void FixedUpdate()
 	{		
 
-		if(shipIsActive)
-		{
-		//Temporary variables
-		float thrustInput = 0;
-		float turnInput = 0;
+		if (shipIsActive) {
+			//Temporary variables
+			float thrustInput = 0;
+			float turnInput = 0;
 
-		//Assign input
-		if (playerControl == PlayerControl.Human) {
-
-			thrustInput = scriptHumanInput.thrustInput;
-			turnInput = scriptHumanInput.turnInput;
-			//Debug.Log ("Human");
-		} else if (playerControl == PlayerControl.Computer) {
-			thrustInput = scriptShipIntelligence.thrustInput;
-			turnInput = scriptShipIntelligence.turnInput;
-		} else {
-			Debug.Log ("No control selected for " + this);
-		}
+			//Assign input
+			if (playerControl == PlayerControl.Human) {
+				thrustInput = scriptHumanInput.thrustInput;
+				turnInput = scriptHumanInput.turnInput;
+				//Debug.Log ("Human");
+			} else if (playerControl == PlayerControl.Computer) {
+				thrustInput = scriptShipIntelligence.thrustInput;
+				turnInput = scriptShipIntelligence.turnInput;
+			} else {
+				Debug.Log("No control selected for " + this);
+			}
 
 			//Update position
 
 
 
-		if(scriptModuleController.moduleRigidbodyMode)
-		{
+			if (scriptModuleController.moduleRigidbodyMode) {
 				//rigidCharacter = pilotModule.rigidbody2D;
-			Vector2 pilotModuleForward = pilotModule.transform.TransformDirection(Vector2.up);
-			//Debug.Log ("Pilot forward: " + pilotModuleForward);
-			UpdateVelocity(thrustInput, turnInput, pilotModule.rigidbody2D, pilotModuleForward);
+				Vector2 pilotModuleForward = pilotModule.transform.TransformDirection(Vector2.up);
+				//Debug.Log ("Pilot forward: " + pilotModuleForward);
+				UpdateVelocity(thrustInput, turnInput, pilotModule.GetComponent<Rigidbody2D>(), pilotModuleForward);
 				//Debug.Log ("pilot rigidbody mode");
-		} else {
-			Vector2 upVector = Vector2.up;
-			Vector2 shipForward = transform.TransformDirection (upVector);
-			//Debug.Log ("Ship forward: " + shipForward + "Up: " + upVector + Time.frameCount);
-			if(rigidbody2D)
-			{
-				//Debug.Log (thrustInput + turnInput + rigidbody2D.gameObject.name + forwardDirection + Time.frameCount);
-				UpdateVelocity(thrustInput, turnInput, rigidbody2D, shipForward);
-			//	Debug.Log ("Velocity Updated: " + thrustInput + ", " + turnInput);
-			} else if(rigidbodyResetPending){
-			//	Debug.Log ("Reset");
-				gameObject.AddComponent<Rigidbody2D> ();
-				rigidbodyResetPending = false;
-				//Cache rigidbody
-				Vector2 newVelocity = lastVelocity;
-				rigidbody2D.mass = rigidbodyMass;
-				rigidbody2D.drag = rigidbodyLinearDrag;
-				rigidbody2D.angularDrag = rigidbodyAngularDrag;
-				rigidbody2D.velocity = newVelocity;
-			}
+			} else {
+				Vector2 upVector = Vector2.up;
+				Vector2 shipForward = transform.TransformDirection(upVector);
+				//Debug.Log ("Ship forward: " + shipForward + "Up: " + upVector + Time.frameCount);
+				if (GetComponent<Rigidbody2D>()) {
+					//Debug.Log (thrustInput + turnInput + rigidbody2D.gameObject.name + forwardDirection + Time.frameCount);
+					UpdateVelocity(thrustInput, turnInput, GetComponent<Rigidbody2D>(), shipForward);
+					//	Debug.Log ("Velocity Updated: " + thrustInput + ", " + turnInput);
+				} else if (rigidbodyResetPending) {
+					//	Debug.Log ("Reset");
+					gameObject.AddComponent<Rigidbody2D>();
+					rigidbodyResetPending = false;
+					//Cache rigidbody
+					Vector2 newVelocity = lastVelocity;
+					GetComponent<Rigidbody2D>().mass = rigidbodyMass;
+					GetComponent<Rigidbody2D>().drag = rigidbodyLinearDrag;
+					GetComponent<Rigidbody2D>().angularDrag = rigidbodyAngularDrag;
+					GetComponent<Rigidbody2D>().velocity = newVelocity;
+				}
 
-		}
+			}
 			
 			//Debug.Log (rigidCharacter.gameObject.name + hotForce);
 			//Debug.Log ("Turn input: " + turnInput);
-		//	hotRigid.angularVelocity = 90;
-		//if(canThrust)
-						if (!isThrusting && thrustInput == 1) {
-								isThrusting = true;
-								thrustEffect.enableEmission = true;
-						} 
-						if (isThrusting && thrustInput == 0) {
-								isThrusting = false;
-								thrustEffect.enableEmission = false;
-						}
-				//} else if(rigidbodyResetPending){
+			//	hotRigid.angularVelocity = 90;
+			//if(canThrust)
+			if (!isThrusting && thrustInput == 1) {
+				isThrusting = true;
+				thrustEffect.enableEmission = true;
+			} 
+			if (isThrusting && thrustInput == 0) {
+				isThrusting = false;
+				thrustEffect.enableEmission = false;
+			}
+			//} else if(rigidbodyResetPending){
 		
 
 
 				
-		//Update parent object position
-		//transform.position = pilotModule.transform.position;
-		//transform.rotation = pilotModule.transform.rotation;
+			//Update parent object position
+			//transform.position = pilotModule.transform.position;
+			//transform.rotation = pilotModule.transform.rotation;
 
-		//if(scriptMainInput.queueFire){
-		//	scriptMainInput.queueFire = false;
-		//	GameObject newBullet = Instantiate(basicBullet, transform.position, transform.rotation) as GameObject;
-		//	newBullet.GetComponent<Rigidbody>().AddForce(forwardDirection * bulletForceConstant);
-		//}
-		//inputTest = scriptMainInput.turnInput;
-		//transform.rotation = Quaternion.Euler(0, 
-		//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
+			//if(scriptMainInput.queueFire){
+			//	scriptMainInput.queueFire = false;
+			//	GameObject newBullet = Instantiate(basicBullet, transform.position, transform.rotation) as GameObject;
+			//	newBullet.GetComponent<Rigidbody>().AddForce(forwardDirection * bulletForceConstant);
+			//}
+			//inputTest = scriptMainInput.turnInput;
+			//transform.rotation = Quaternion.Euler(0, 
+			//transform.Rotate(0, scriptMainInput.turnInput * turnSpeedConstant * Time.fixedDeltaTime, 0);
 
 			//UpdateActivationStatus();
 
-			foreach(Snake snake in scriptShipSheet.currentSnakes)
-			{
-		UpdateActivationAbility (snake);
-			}
+//			foreach (Snake snake in scriptShipSheet.currentSnakes) {
+//				UpdateActivationAbility(snake);
+//			}
 
 
 			/*
@@ -324,7 +320,7 @@ public class ScriptShipController : MonoBehaviour {
 	{
 		//Debug.Log (addedModule.moduleID);
 		//Temporary variables
-		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule> ();
+		ScriptModule scriptModule = addedModule.GetComponent<ScriptModule>();
 
 		//Register non-starting modules
 		if (addedModule.moduleType != ModuleType.Pilot) {
@@ -333,84 +329,80 @@ public class ScriptShipController : MonoBehaviour {
 			//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
 		}
 
-			//Log event
-			scriptModule.ownTime = Time.frameCount;
-			scriptModule.captureModule = assimilatingObject;
+		//Log event
+		scriptModule.ownTime = Time.frameCount;
+		scriptModule.captureModule = assimilatingObject;
 
-			//Update module
-			scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
-			addedModule.tag = "Ship"; //Tag as part of ship
-			scriptModule.moduleOwner = this; //Mark this ship as new owner
-			scriptModule.currentHP = scriptModule.maxHP; //Set starting HP
+		//Update module
+		scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
+		addedModule.tag = "Ship"; //Tag as part of ship
+		scriptModule.moduleOwner = this; //Mark this ship as new owner
+		scriptModule.currentHP = scriptModule.maxHP; //Set starting HP
 
-			//Verify module
-			//Debug.Log ("Before call");
-			if(!CoordinatesAreValid (addedModule))
-			{
-				//Eject module
-				scriptModuleController.BreakModule(addedModule);
-				//Debug.Log ("Coordinates are invalid.");
-			} else {
+		//Verify module
+		//Debug.Log ("Before call");
+		if (!CoordinatesAreValid(addedModule)) {
+			//Eject module
+			scriptModuleController.BreakModule(addedModule);
+			//Debug.Log ("Coordinates are invalid.");
+		} else {
 			//Play sound effect
-				//Debug.Log ("Coordinates are valid");
+			//Debug.Log ("Coordinates are valid");
 			audioSource.Play();
 		
 
 
-		//Mode handler
-		if (scriptModuleController.moduleRigidbodyMode) 
-		{
-			if(addedModule.moduleType != ModuleType.Pilot)
-			{
+			//Mode handler
+			if (scriptModuleController.moduleRigidbodyMode) {
+				if (addedModule.moduleType != ModuleType.Pilot) {
+
+					//Positioning
+					Vector2 localCoordinates = NodeCoordinatesToLocalPosition(nodeCoordinates);
+					Vector2 worldCoordinates = pilotModule.transform.TransformDirection(localCoordinates); //Set position
+					Debug.Log("Local coordinates" + localCoordinates + "; World position: " + worldCoordinates);
+					addedModule.transform.position = worldCoordinates + new Vector2(pilotModule.transform.position.x, pilotModule.transform.position.y);
+					addedModule.transform.localRotation = Quaternion.identity; //Set rotation
+
+					//Rigidbody
+					DistanceJoint2D hotJoint = addedModule.gameObject.AddComponent<DistanceJoint2D>();
+					hotJoint.connectedBody = assimilatingObject.GetComponent<Rigidbody2D>();
+					hotJoint.enableCollision = true;
+					hotJoint.distance = 2;
+					//	hotJoint.anchor;
+					//	hotJoint.connectedAnchor;
+				}
+			} else {
 
 				//Positioning
-				Vector2 localCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
-				Vector2 worldCoordinates = pilotModule.transform.TransformDirection(localCoordinates); //Set position
-				Debug.Log ("Local coordinates" + localCoordinates + "; World position: " + worldCoordinates);
-				addedModule.transform.position = worldCoordinates + new Vector2(pilotModule.transform.position.x, pilotModule.transform.position.y);
+				Vector2 localCoordinates = NodeCoordinatesToLocalPosition(nodeCoordinates);
+				addedModule.transform.localPosition = localCoordinates; //Set position
 				addedModule.transform.localRotation = Quaternion.identity; //Set rotation
 
 				//Rigidbody
-				DistanceJoint2D hotJoint = addedModule.gameObject.AddComponent<DistanceJoint2D>();
-				hotJoint.connectedBody = assimilatingObject.rigidbody2D;
-				hotJoint.collideConnected = true;
-				hotJoint.distance = 2;
-			//	hotJoint.anchor;
-			//	hotJoint.connectedAnchor;
+				if (addedModule.GetComponent<Rigidbody2D>()) {
+					Destroy(addedModule.gameObject.GetComponent<Rigidbody2D>()); 
+				}
+				//Ship rigidbody
+				lastVelocity = GetComponent<Rigidbody2D>().velocity; //Cache rigidbody velocity
+				Destroy(GetComponent<Rigidbody2D>()); //Destroy rigidbody for replacement
+				//Debug.Log ("Destroyed ship rigidbody");
+				rigidbodyResetPending = true;
 			}
-		} else {
 
-			//Positioning
-			Vector2 localCoordinates = NodeCoordinatesToLocalPosition (nodeCoordinates);
-			addedModule.transform.localPosition = localCoordinates; //Set position
-			addedModule.transform.localRotation = Quaternion.identity; //Set rotation
-
-			//Rigidbody
-			if (addedModule.rigidbody2D) 
-			{
-				Destroy (addedModule.gameObject.rigidbody2D); 
-			}
-			//Ship rigidbody
-			lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
-			Destroy(rigidbody2D); //Destroy rigidbody for replacement
-			//Debug.Log ("Destroyed ship rigidbody");
-			rigidbodyResetPending = true;
-		}
-
-		//Add to grid
-		Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
+			//Add to grid
+			Vector2 gridNodeCoordinates = ScriptShipSheet.GetGridNodeCoordinates(nodeCoordinates);
 			//int[] schematicCoordinates = new int[]{(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y};
 			//(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
 		
-			Debug.Log (addedModule + " added to grid at "+gridNodeCoordinates);
+			Debug.Log(addedModule + " added to grid at " + gridNodeCoordinates);
 			scriptShipSheet.AddModuleToGrid(addedModule, gridNodeCoordinates);
 				
 			//Reset pilot transform to prevent misalignment on collision
 			pilotModule.transform.localPosition = Vector3.zero;
 			pilotModule.transform.localRotation = Quaternion.identity;
 
-		//Add to activation
-		//UpdateActivationStatus();
+			//Add to activation
+			//UpdateActivationStatus();
 		}
 	}
 	/*
@@ -435,7 +427,7 @@ public class ScriptShipController : MonoBehaviour {
 			//	}
 	}
 */
-	 Vector2 NodeCoordinatesToLocalPosition(Vector2 nodeCoordinates)
+	Vector2 NodeCoordinatesToLocalPosition(Vector2 nodeCoordinates)
 	{
 		return nodeCoordinates * ratioOfNodeToSpace;
 	}
@@ -448,10 +440,9 @@ public class ScriptShipController : MonoBehaviour {
 	bool CoordinatesAreValid(ScriptModule hotMod)
 	{
 		//Throw error iff hotMod's coordinates match another child object of this ship's  module container
-		ScriptModule[] iterationScripts = shipModuleContainer.GetComponentsInChildren<ScriptModule> ();
+		ScriptModule[] iterationScripts = shipModuleContainer.GetComponentsInChildren<ScriptModule>();
 		foreach (ScriptModule otherMod in iterationScripts) {
-			if(hotMod.moduleNodeCoordinates == otherMod.moduleNodeCoordinates && hotMod != otherMod)
-			{
+			if (hotMod.moduleNodeCoordinates == otherMod.moduleNodeCoordinates && hotMod != otherMod) {
 				Debug.LogError(hotMod.moduleID + "'s coordinates conflict with " + otherMod.moduleID + "'s.");
 				return false;
 			}
@@ -467,99 +458,85 @@ public class ScriptShipController : MonoBehaviour {
 		//Debug.Log (hotForce + " " + hotRigid.velocity);
 	}
 
-	void UpdateActivationAbility(Snake snake)
-	{
-	//	if(moduleType == ModuleType.Weapon && moduleOwner.target)
-	//	{
-		//	Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
-		if(pilotModule)
-		{
-			if(snake.isArmed){
-			if(snake.moduleType == ModuleType.Weapon)
-			{
-				Vector2 attackVector = pilotModule.transform.TransformDirection (Vector2.up);
-		//	if(attackVector.magnitude <= weaponRange)
-			//{
-				if(snake.canShoot)
-				{
-					//Debug.Log ("Can shoot");
-					//Change state
-					snake.shotTimer = 0;
-					snake.canShoot = false;
-					//Bullet creation
-					Vector3 bulletPosition = pilotModule.transform.position;
-					GameObject hotBullet = Instantiate (basicBullet, bulletPosition, transform.rotation) as GameObject;
-					//Bullet registration
-					hotBullet.transform.parent = dynamicObjectsContainer;
-					ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
-					scriptProjectile.owner = gameObject;
-
-					//Assign properties
-					scriptProjectile.projectileDamage = snake.damage;
-					hotBullet.transform.localScale *= snake.bulletScale;
-					scriptProjectile.bulletDuration = snake.durationInSeconds;
-
-					//Add force
-					hotBullet.rigidbody2D.velocity = rigidbody2D.velocity;	
-					hotBullet.rigidbody2D.AddForce(attackVector * snake.shotForce); //Magic number
-
-				} else {
-
-					snake.shotTimer += Time.deltaTime;
-					//Debug.Log (snake.shotTimer + " @"+Time.time);
-					float shotDelay = 1 / snake.bulletsPerSecond;
-					if(snake.shotTimer >= shotDelay)
-					{
-						snake.canShoot = true;
-					}
-				}
-		} else if (snake.moduleType == ModuleType.Laser)
-			{
-				if(!snake.laserTriggerEnabled)
-				{
-					snake.laserTriggerEnabled = true;
-
-						GameObject hotTrigger = Instantiate(laserTrigger) as GameObject;
-						Vector3 triggerScale = new Vector3(snake.laserTriggerScale, snake.laserTriggerScale, 1);
-						hotTrigger.transform.localScale = triggerScale;
-						hotTrigger.transform.position = transform.position;
-						//hotTrigger.transform.localScale.y = activation.laserTriggerScale;
-						hotTrigger.transform.parent = triggerContainer.transform;
-					//} else 
-				//	{
-				//		Debug.LogError("Invalid activation type for laser: " + snake.moduleType);
-					}
-				}
-				}
-			}
-			}
-
-
-//	void UpdateActivationStatus()
+//	void UpdateActivationAbility(Snake snake)
 //	{
-//		currentActivations = scriptShipSheet.GetActivations();
-//		scriptShipSheet.ArmActivations(currentActivations);
+//		//	if(moduleType == ModuleType.Weapon && moduleOwner.target)
+//		//	{
+//		//	Vector2 attackVector = moduleOwner.target.transform.position - transform.position;
+//		if (pilotModule) {
+//			if (snake.isArmed) {
+//				if (snake.moduleType == ModuleType.Weapon) {
+//					Vector2 attackVector = pilotModule.transform.TransformDirection(Vector2.up);
+//					//	if(attackVector.magnitude <= weaponRange)
+//					//{
+//					if (snake.canShoot) {
+//						//Debug.Log ("Can shoot");
+//						//Change state
+//						snake.shotTimer = 0;
+//						snake.canShoot = false;
+//						//Bullet creation
+//						Vector3 bulletPosition = pilotModule.transform.position;
+//						GameObject hotBullet = Instantiate(basicBullet, bulletPosition, transform.rotation) as GameObject;
+//						//Bullet registration
+//						hotBullet.transform.parent = dynamicObjectsContainer;
+//						ScriptProjectile scriptProjectile = hotBullet.GetComponent<ScriptProjectile>();
+//						scriptProjectile.owner = gameObject;
 //
-//		foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
-//			Node node = scriptShipSheet.GetNodeFromModule (module);
-//			if (node.activationIndex == -1) {
-//				module.SetActivation (false);
-//			} else if (node.activationIndex >= 0) {
-//				module.SetActivation (true);
-//			} else {
-//				Debug.Log ("Invalid activation id on " + node.module.name);
+//						//Assign properties
+//						scriptProjectile.projectileDamage = snake.damage;
+//						hotBullet.transform.localScale *= snake.bulletScale;
+//						scriptProjectile.bulletDuration = snake.durationInSeconds;
+//
+//						//Add force
+//						hotBullet.GetComponent<Rigidbody2D>().velocity = GetComponent<Rigidbody2D>().velocity;	
+//						hotBullet.GetComponent<Rigidbody2D>().AddForce(attackVector * snake.shotForce); //Magic number
+//
+//					} else {
+//
+//						snake.shotTimer += Time.deltaTime;
+//						//Debug.Log (snake.shotTimer + " @"+Time.time);
+//						float shotDelay = 1 / snake.bulletsPerSecond;
+//						if (snake.shotTimer >= shotDelay) {
+//							snake.canShoot = true;
+//						}
+//					}
+//				} else if (snake.moduleType == ModuleType.Laser) {
+//					if (!snake.laserTriggerEnabled) {
+//						snake.laserTriggerEnabled = true;
+//
+//						GameObject hotTrigger = Instantiate(laserTrigger) as GameObject;
+//						Vector3 triggerScale = new Vector3(snake.laserTriggerScale, snake.laserTriggerScale, 1);
+//						hotTrigger.transform.localScale = triggerScale;
+//						hotTrigger.transform.position = transform.position;
+//						//hotTrigger.transform.localScale.y = activation.laserTriggerScale;
+//						hotTrigger.transform.parent = triggerContainer.transform;
+//						//} else 
+//						//	{
+//						//		Debug.LogError("Invalid activation type for laser: " + snake.moduleType);
+//					}
+//				}
 //			}
 //		}
 //	}
+
+
+	//	void UpdateActivationStatus()
+	//	{
+	//		currentActivations = scriptShipSheet.GetActivations();
+	//		scriptShipSheet.ArmActivations(currentActivations);
+	//
+	//		foreach (ScriptModule module in shipModuleContainer.GetComponentsInChildren<ScriptModule>()) {
+	//			Node node = scriptShipSheet.GetNodeFromModule (module);
+	//			if (node.activationIndex == -1) {
+	//				module.SetActivation (false);
+	//			} else if (node.activationIndex >= 0) {
+	//				module.SetActivation (true);
+	//			} else {
+	//				Debug.Log ("Invalid activation id on " + node.module.name);
+	//			}
+	//		}
+	//	}
 	
 
-
-//	public void ClearOldLasers()
-//	{
-//		foreach(Transform child in triggerContainer.transform)
-//		{
-//			Destroy(child.gameObject);
-//		}
-//	}
 
 }

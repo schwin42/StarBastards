@@ -25,7 +25,11 @@ public class ScriptGameController : MonoBehaviour {
 	public ControlType controlType;
 
 	//Configurable
-	public int startingModules = 200;
+	public int startingModules;
+	public int moduleSpawnSpacing;
+	public Vector2 moduleSpawnOffset;
+
+
 	public bool moduleRigidbodyMode = true;
 	public float startingForceConstant = 10;
 	public float ejectionLinearForceConstant = 1000F;
@@ -43,7 +47,7 @@ public class ScriptGameController : MonoBehaviour {
 	public GameObject modulePrefab;
 
 	//Transforms
-	public Transform shipContainer;
+	private Transform shipContainer;
 	public Transform spaceContainer;
 
 	//Objects
@@ -64,11 +68,11 @@ public class ScriptGameController : MonoBehaviour {
 
 	void Start () {
 
-		scriptInterfaceController = GameObject.Find ("RootInterface").GetComponent<ScriptInterfaceController>();
-		scriptInterfaceController.SetInterface(controlType);
+//		scriptInterfaceController = GameObject.Find ("RootInterface").GetComponent<ScriptInterfaceController>();
+//		scriptInterfaceController.SetInterface(controlType);
 
-		//Get objects
-		//shipContainer = GameObject.Find ("ContainerShip").transform;
+		//Acquire gameObjects from scene
+		shipContainer = GameObject.Find ("ShipContainer").transform;
 
 		//Set ships
 		foreach(Transform child in shipContainer)
@@ -115,15 +119,15 @@ public class ScriptGameController : MonoBehaviour {
 		foreach (GameObject ship in ships) {
 			if(value)
 			{
-			if(ship.rigidbody2D){
+			if(ship.GetComponent<Rigidbody2D>()){
 				Debug.Log ("Destroyed" + ship.name + "'s rigidbody2D");
-				Destroy(ship.rigidbody2D);
+				Destroy(ship.GetComponent<Rigidbody2D>());
 				}
 			} else {
 				ScriptShipController scriptShipController = ship.GetComponent<ScriptShipController>();
 				GameObject targetModule = scriptShipController.pilotModule;
 
-				Destroy(targetModule.rigidbody2D);
+				Destroy(targetModule.GetComponent<Rigidbody2D>());
 			}
 				}
 		//Change code to not remove module rigidbodies on collect 
@@ -209,19 +213,23 @@ public class ScriptGameController : MonoBehaviour {
 
 	void SpawnModules(int amount)
 	{
-		for(int i = 0; i<amount; i++)
+		for(int i = 0; i < amount; i++)
 		{
 			
-			GameObject hotMod = Instantiate (modulePrefab) as GameObject;
-			
-			hotMod.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
-			hotMod.transform.parent = this.gameObject.transform;
-			ScriptModule scriptModule = hotMod.GetComponent<ScriptModule>();
+			GameObject module = Instantiate (modulePrefab) as GameObject;
+
+			float xPosition = moduleSpawnOffset.x + (i % Mathf.Sqrt(i)) * moduleSpawnSpacing;
+			float yPosition = moduleSpawnOffset.y + Mathf.Floor (i / Mathf.Sqrt(i)) * moduleSpawnSpacing;
+			print("X, y," + xPosition + ", " + yPosition);
+			module.transform.position = new Vector2(xPosition, yPosition);
+//			module.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
+			module.transform.parent = this.gameObject.transform;
+			ScriptModule scriptModule = module.GetComponent<ScriptModule>();
 			scriptModule.moduleID = GetNextID();
-			hotMod.name = "Module" + scriptModule.moduleID;
+			module.name = "Module" + scriptModule.moduleID;
 			
 			Vector2 normalizedRandomForce = new Vector2(Random.value * 2 - 1, Random.value * 2 - 1); 
-			hotMod.rigidbody2D.AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
+//			hotMod.GetComponent<Rigidbody2D>().AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
 			//GetNextID(hotModS.GetComponent<ScriptModule>());
 			//Debug.Log (i);
 			
@@ -262,7 +270,7 @@ public class ScriptGameController : MonoBehaviour {
 		//Vector2 ejectionLinearForce = new Vector2((Random.value -0.5F) * ejectionLinearForceConstant, (Random.value -0.5F) * ejectionLinearForceConstant);
 		Vector2 ejectionLinearForce = ejectionVector * ejectionLinearForceConstant;
 		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
-		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
-		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
+		hotMod.GetComponent<Rigidbody2D>().AddForce(ejectionLinearForce);
+		hotMod.GetComponent<Rigidbody2D>().AddTorque(ejectionAngularForce);
 	}
 }

@@ -44,7 +44,7 @@ public class ScriptBaseController : MonoBehaviour {
 	if(canShoot)
 		{
 			GameObject hotBullet = Instantiate(bulletPrefab, transform.position, transform.rotation) as GameObject;
-			hotBullet.rigidbody2D.AddForce(Vector2.right * bulletForce);
+			hotBullet.GetComponent<Rigidbody2D>().AddForce(Vector2.right * bulletForce);
 			ScriptProjectile hotScript = hotBullet.GetComponent<ScriptProjectile>();
 				hotScript.owner = gameObject;
 			hotScript.bulletDuration = bulletDuration;
