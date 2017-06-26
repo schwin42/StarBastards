@@ -29,7 +29,7 @@ GameObject:
   - component: {fileID: 2300000}
   - component: {fileID: 10200000}
   m_Layer: 0
-  m_Name: LabelModule
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 400004}
   - component: {fileID: 21200000}
   m_Layer: 0
-  m_Name: BoxModule
+  m_Name: SpriteRenderer
   m_TagString: NeutralModule
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -259,11 +259,6 @@ MonoBehaviour:
   isActivated: 0
   defaultColor: {r: 0, g: 0, b: 0, a: 0}
   activatedColor: {r: 0, g: 0, b: 0, a: 0}
-  moduleBox: {fileID: 0}
-  textMesh: {fileID: 0}
-  spriteRenderer: {fileID: 0}
   explosionEffect: {fileID: 0}
   maxHP: 10
   currentHP: 0
-  ownTime: -9999
-  captureModule: {fileID: 0}

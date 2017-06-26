@@ -7,7 +7,7 @@ using System.Collections;
 //	Touch
 //}
 
-public class HumanPilotInput : IPilotInput
+public class HumanPilotInput : PilotInput
 {
 
 	//Configurable
@@ -15,15 +15,21 @@ public class HumanPilotInput : IPilotInput
 	
 	//Internal
 	private float _thrustInput;
-	public float ThrustInput { get { return _thrustInput; } }
+	public override float ThrustInput { get { return _thrustInput; } }
 
 	private float _turnInput;
-	public float TurnInput { get { return _turnInput; } } 
+	public override float TurnInput { get { return _turnInput; } } 
 
 	public bool queueFire = false;
 	[System.NonSerialized]
 	public bool[] mainInput = new bool[]{ false, false };
 	public string playerInput;
+
+	public override void Initialize (ShipController shipController) {
+		base.Initialize(shipController);
+		playerInput = "P" + shipController.ShipId.ToString("00");
+		Debug.Log("Player input: " + playerInput);
+	}
 
 	public void SetThrustInput(float value) {
 		_thrustInput = value;

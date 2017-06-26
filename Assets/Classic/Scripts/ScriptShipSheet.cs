@@ -268,9 +268,9 @@ public class ScriptShipSheet : MonoBehaviour
 
 		//Add empty nodes to grid
 		InitializeGrid();
-		Debug.Log(scriptShipController.shipModuleContainer.ToString());
+//		Debug.Log(scriptShipController.ModuleContainer.ToString());
 		//Register starting modules, update to add joints if applicable
-		Module[] iterationScripts = scriptShipController.shipModuleContainer.GetComponentsInChildren<Module>();
+		Module[] iterationScripts = scriptShipController.ModuleContainer.GetComponentsInChildren<Module>();
 		foreach (Module module in iterationScripts) {
 			module.moduleID = GameController.GetNextID();
 			Vector3 vector3Position = module.transform.localPosition;

@@ -33,6 +33,8 @@ public class GameController : MonoBehaviour
 	public int startingModules;
 	public int moduleSpawnSpacing;
 	public Vector2 moduleSpawnOffset;
+	public Vector2 shipSpawnMinimum = new Vector2(-40, -30);
+	public Vector2 shipSpawnMaximum = new Vector2(40, 30);
 
 	//Gameplay constants
 	public float startingForceConstant = 10;
@@ -57,11 +59,11 @@ public class GameController : MonoBehaviour
 	//TODO Modules?
 
 	//Bookkeeping
-	private int nextModuleID = 0;
+	private int nextModuleId = 0;
+	private int nextShipId = 0;
 	private Transform shipContainer;
 
 	private Transform _moduleContainer;
-
 	public Transform ModuleContainer { get { return _moduleContainer; } }
 
 	//Debug
@@ -75,27 +77,15 @@ public class GameController : MonoBehaviour
 
 		//Acquire gameObjects from scene
 		shipContainer = GameObject.Find("Ships").transform;
-		_moduleContainer = GameObject.Find("Modules").transform;
+		_moduleContainer = new GameObject("Modules").transform;
 
-		//Set ships
-		for (int i = 0; i < players.Count; i++) {
-			//Instantiate prefab
-			GameObject shipGo = Instantiate(shipPrefab);
-
-			//Register ship
-			ShipController shipController = shipGo.GetComponent<ShipController>();
-			activeShips.Add(shipController);
-
-			//Set pilot type
-			shipController.SetPilotType(players[i]);
-
-			//Position ships
+		//Clear ship container
+		for (int i = 0; i < shipContainer.childCount; i++) {
+			GameObject.Destroy(shipContainer.GetChild(i).gameObject);
 		}
 
-//		foreach(Transform child in shipContainer)
-//		{
-//			activeShips.Add (child.gameObject);
-//		}
+		//Set ships
+		SpawnShips();
 
 		//Generate neutral modules
 		SpawnModules(startingModules);
@@ -119,8 +109,8 @@ public class GameController : MonoBehaviour
 	}
 
 	public static int GetNextID() {
-		int returnID = Instance.nextModuleID;
-		Instance.nextModuleID++;
+		int returnID = Instance.nextModuleId;
+		Instance.nextModuleId++;
 		return returnID;
 	}
 
@@ -165,7 +155,7 @@ public class GameController : MonoBehaviour
 		previousShipSheet.RemoveModuleFromGrid(module);
 
 		//Jettison unconnected modules
-		Module[] iterationScripts = previousOwner.shipModuleContainer.GetComponentsInChildren<Module>();
+		Module[] iterationScripts = previousOwner.ModuleContainer.GetComponentsInChildren<Module>();
 		if (module.moduleType != ModuleType.Pilot) {
 			Debug.Log("Before removing disconnected.");
 			List<Module> connectedModules = previousShipSheet.GetModulesContiguousToPilot();
@@ -203,6 +193,30 @@ public class GameController : MonoBehaviour
 		return value;
 	}
 
+	void SpawnShips() {
+		for (int i = 0; i < players.Count; i++) {
+			//Instantiate prefab
+			GameObject shipGo = Instantiate(shipPrefab);
+
+			//Register ship
+			ShipController shipController = shipGo.GetComponent<ShipController>();
+			activeShips.Add(shipController);
+
+			//Set pilot type
+			shipController.Initialize(players[i], nextShipId);
+			nextShipId++;
+
+			//Parent to ship container
+			shipController.transform.SetParent(shipContainer);
+
+			//Position ships
+			float shipXPos = i % 2 == 0 ? shipSpawnMinimum.x : shipSpawnMaximum.x;
+			float shipYPos = i + 1 % 2 == 0 ? shipSpawnMinimum.y : shipSpawnMaximum.y;
+//			print("ship pos: " + shipXPos.ToString() + ", " + shipYPos.ToString());
+			shipController.transform.localPosition = new Vector2(shipXPos, shipYPos);
+		}
+	}
+
 	void SpawnModules(int amount) {
 		for (int i = 1; i <= amount; i++) {
 			
@@ -212,8 +226,7 @@ public class GameController : MonoBehaviour
 			float yPosition = moduleSpawnOffset.y + Mathf.Floor(i / Mathf.Sqrt(i)) * moduleSpawnSpacing;
 			print("X, y," + xPosition + ", " + yPosition);
 			module.transform.position = new Vector2(xPosition, yPosition);
-//			module.transform.position = new Vector2(Random.value * 200 - 100, Random.value * 200 - 100);
-			module.transform.parent = this.gameObject.transform;
+			module.transform.parent = _moduleContainer;
 			Module scriptModule = module.GetComponent<Module>();
 			scriptModule.moduleID = GetNextID();
 			module.name = "Module" + scriptModule.moduleID;
@@ -221,8 +234,7 @@ public class GameController : MonoBehaviour
 			Vector2 normalizedRandomForce = new Vector2(Random.value * 2 - 1, Random.value * 2 - 1); 
 //			hotMod.GetComponent<Rigidbody2D>().AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
 			//GetNextID(hotModS.GetComponent<ScriptModule>());
-			//Debug.Log (i);
-			
+
 			//Type
 			float hotRand = Random.value * 3;
 			//Color defaultColor = Color.black;
@@ -246,7 +258,7 @@ public class GameController : MonoBehaviour
 			//Subtype
 			scriptModule.moduleSubtype = GetRandomEnum<ModuleSubtype>();
 			string enumString = scriptModule.moduleSubtype.ToString();
-			scriptModule.textMesh.text = enumString[0].ToString();
+			scriptModule.Label.text = enumString[0].ToString();
 		}
 	}
 

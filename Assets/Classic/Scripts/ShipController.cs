@@ -84,9 +84,13 @@ public class ShipController : MonoBehaviour
 {
 
 	//Configurable
-	public AgentType playerControl = AgentType.None;
 	public Color playerColor;
 	//public Activation activation = new Activation();
+
+	//Initialization config
+	public AgentType playerControl = AgentType.None;
+	private int _shipId = -1;
+	public int ShipId { get { return _shipId; } }
 
 	//State
 	//public List<Activation> currentActivations = new List<Activation> ();
@@ -95,7 +99,7 @@ public class ShipController : MonoBehaviour
 	public float thrustForceConstant = 10.0F;
 	public float turnSpeedConstant = 1.0F;
 	public float teleportDelay = 1.0F;
-	
+
 	//Hierarchy references
 	private Module _pilotModule;
 	public Module PilotModule { get { return _pilotModule; } }
@@ -103,14 +107,17 @@ public class ShipController : MonoBehaviour
 	private Rigidbody2D _pilotRigidbody;
 	public Rigidbody2D PilotRigidbody { get { return _pilotRigidbody; } }  
 
+	//Prefabs
 	public GameObject basicBullet;
-	public ParticleSystem thrustEffect;
-	public GameObject laserTrigger;
-	public GameObject triggerContainer;
 
-	//Acquired
-	[System.NonSerialized]
-	public Transform shipModuleContainer;
+	//Hierarchy references
+	private Transform _moduleContainer;
+	public Transform ModuleContainer {
+		get {
+			return _moduleContainer;
+		}
+	}
+	private ParticleSystem thrustEffect;
 
 	//Cached from inspector
 	[System.NonSerialized]
@@ -122,7 +129,7 @@ public class ShipController : MonoBehaviour
 
 	//Private variables
 	private float ratioOfNodeToSpace = 2F;
-	private IPilotInput input;
+	private PilotInput input;
 	private ScriptShipSheet scriptShipSheet;
 	private bool rigidbodyResetPending = false;
 	private Vector2 lastVelocity;
@@ -131,18 +138,20 @@ public class ShipController : MonoBehaviour
 	//Status
 	[System.NonSerialized]
 	public bool isThrusting = false;
-	public bool shipIsActive = true;
+	private bool shipIsActive = false;
 
-	// Use this for initialization
 	void Start() {
 
 		//Get other objects
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
 		audioSource = GetComponent<AudioSource>();
 
-		Transform _pilotTransform = transform.Find("Modules/PilotModule");
+		_moduleContainer = transform.Find("Modules");
+		Transform _pilotTransform = _moduleContainer.Find("PilotModule");
 		_pilotModule = _pilotTransform.GetComponent<Module>();
-		_pilotRigidbody = _pilotRigidbody.GetComponent<Rigidbody2D>();
+		_pilotRigidbody = _pilotTransform.GetComponent<Rigidbody2D>();
+
+		thrustEffect = _pilotTransform.Find("Effects/ParticleSystem").GetComponent<ParticleSystem>();;
 
 		//Cache starting rigidbody values from inspector
 		rigidbodyMass = GetComponent<Rigidbody2D>().mass;
@@ -160,18 +169,16 @@ public class ShipController : MonoBehaviour
 		//Set rigidbody velocity to zero
 		//rigidbody2D.velocity = Vector2.zero;
 		//rigidbody2D.angularVelocity = 0F;
-
-
 	}
 	
 	// Update is called once per frame
 	void Update()
 	{
 		//Debug
-		Module[] iterationModules = shipModuleContainer.GetComponentsInChildren<Module>();
+		Module[] iterationModules = ModuleContainer.GetComponentsInChildren<Module>();
 		foreach (Module module in iterationModules) {
 			Node node = scriptShipSheet.GetNodeFromModule(module);
-			module.transform.FindChild("LabelModule").GetComponent<TextMesh>().text = node.snakeIndex.ToString();
+			module.Label.text = node.snakeIndex.ToString();
 		}
 		//if(Input.GetKeyDown("3")) 
 		//	{
@@ -269,22 +276,30 @@ public class ShipController : MonoBehaviour
 
 		}
 	}
-	public void SetPilotType(AgentType agent) {
+
+	public void Initialize(AgentType agent, int shipId) {
+		this._shipId = shipId;
+
+		this.playerControl = agent;
 		switch (agent) {
 			case AgentType.Human:
-				input = new HumanPilotInput();
+				input = gameObject.AddComponent<HumanPilotInput>();
 				break;
 			case AgentType.ScriptedAi:
-				input = new ScriptedPilotInput(this);
+				input = gameObject.AddComponent<ScriptedPilotInput>();
 				break;
 			case AgentType.ModelAi:
-				input = new ModelPilotInput(this);
+				input = gameObject.AddComponent<ModelPilotInput>();
 				break;
-				default:
-					Debug.LogWarning("No valid agent type specified.");
+			default:
+				Debug.LogWarning("No valid agent type specified.");
 				break;
 		}
+		input.Initialize(this);
+
+		shipIsActive = true;
 	}
+
 	public void AddModule(Module addedModule, GameObject assimilatingObject, Vector2 nodeCoordinates)
 	{
 		//Debug.Log (addedModule.moduleID);
@@ -294,13 +309,13 @@ public class ShipController : MonoBehaviour
 		//Register non-starting modules
 		if (addedModule.moduleType != ModuleType.Pilot) {
 			//Set ship as parent
-			addedModule.transform.parent = shipModuleContainer; //Make new module child to ship
+			addedModule.transform.parent = ModuleContainer; //Make new module child to ship
 			//Vector2 assimilatingModulePosition = assimilatingModule.transform.position;
 		}
 
 		//Log event
-		scriptModule.ownTime = Time.frameCount;
-		scriptModule.captureModule = assimilatingObject;
+		scriptModule.OwnTime = Time.frameCount;
+		scriptModule.CaptureModule = assimilatingObject;
 
 		//Update module
 		scriptModule.moduleNodeCoordinates = nodeCoordinates; //Log coordinates to module
@@ -361,7 +376,7 @@ public class ShipController : MonoBehaviour
 			//int[] schematicCoordinates = new int[]{(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y};
 			//(int)gridNodeCoordinates.x, (int)gridNodeCoordinates.y] = hotNode;
 		
-			Debug.Log(addedModule + " added to grid at " + gridNodeCoordinates);
+//			Debug.Log(addedModule + " added to grid at " + gridNodeCoordinates);
 			scriptShipSheet.AddModuleToGrid(addedModule, gridNodeCoordinates);
 				
 			//Reset pilot transform to prevent misalignment on collision
@@ -407,7 +422,7 @@ public class ShipController : MonoBehaviour
 	bool CoordinatesAreValid(Module hotMod)
 	{
 		//Throw error iff hotMod's coordinates match another child object of this ship's  module container
-		Module[] iterationScripts = shipModuleContainer.GetComponentsInChildren<Module>();
+		Module[] iterationScripts = ModuleContainer.GetComponentsInChildren<Module>();
 		foreach (Module otherMod in iterationScripts) {
 			if (hotMod.moduleNodeCoordinates == otherMod.moduleNodeCoordinates && hotMod != otherMod) {
 				Debug.LogError(hotMod.moduleID + "'s coordinates conflict with " + otherMod.moduleID + "'s.");

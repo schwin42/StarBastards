@@ -52,10 +52,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   humanInputModality: 1
-  players: 01000000020000000200000002000000
+  players: 0100000002000000
   startingModules: 25
   moduleSpawnSpacing: 5
   moduleSpawnOffset: {x: 10, y: -20}
+  shipSpawnMinimum: {x: -40, y: -30}
+  shipSpawnMaximum: {x: 40, y: 30}
   startingForceConstant: 10
   EJECTION_LINEAR_FORCE: 1500
   EJECTION_ANGULAR_FORCE: 2000
@@ -66,5 +68,5 @@ MonoBehaviour:
   activeArmorColor: {r: 0, g: 1, b: 0, a: 1}
   inactiveLaserColor: {r: 0, g: 0, b: 0.5882353, a: 1}
   activeLaserColor: {r: 0, g: 0, b: 1, a: 1}
-  shipPrefab: {fileID: 0}
+  shipPrefab: {fileID: 1466047729798512, guid: 5ef8db7e07353fc4c8eb97d4ef53c240, type: 2}
   modulePrefab: {fileID: 100000, guid: a48e3e0728a214eeeab9e68d6d7dcff4, type: 2}

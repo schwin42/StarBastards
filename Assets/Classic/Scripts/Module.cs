@@ -41,33 +41,51 @@ public class Module : MonoBehaviour {
 	//[System.NonSerialized] 
 	public Color activatedColor;
 
-	//Scriptable
-
-	//Inspector objects
-
-	public TextMesh textMesh;
-	public SpriteRenderer spriteRenderer;
-
 	//Prefabs
 	public GameObject explosionEffect;
-	
+
+	//State
 	public int maxHP = 10;
 	public int currentHP;
-	
-	//Error-checking
-	public int ownTime = -9999;
-	public GameObject captureModule;
+
+	//Hierarchy references
+	private TextMesh label;
+	public TextMesh Label {
+		get {
+			if (label == null) {
+				label = transform.Find("Label").GetComponent<TextMesh>();
+			}
+			return label;
+		}
+	}
+	private SpriteRenderer spriteRenderer;
+
+	//Debug
+	private int _ownTime = -9999;
+	public int OwnTime { get { return _ownTime; } set { _ownTime = value; } }
+	private GameObject _captureModule;
+	public GameObject CaptureModule { get { return _captureModule; } set { _captureModule = value; } }
 	//public Vector2 captureDirection;
-	
-	// Use this for initialization
+
+	public void SetActivation(bool willBeActivated) {
+		if (willBeActivated) {
+			spriteRenderer.color = activatedColor;
+			isActivated = true;
+
+		} else {
+			spriteRenderer.color = defaultColor;
+			isActivated = false;
+		}
+	}
+
 	void Start () {
-
-		//moduleBox = transform.FindChild("BoxModule").gameObject;
-
+		
 		currentHP = maxHP;
 
 		//Acquire objects
-		//spriteRenderer = moduleBox.GetComponent<SpriteRenderer> ();
+		spriteRenderer = transform.Find("SpriteRenderer").GetComponent<SpriteRenderer>();
+		label = transform.Find("Label").GetComponent<TextMesh>();
+
 		if(tag == "Ship")
 		{
 			moduleOwner = transform.parent.parent.gameObject.GetComponent<ShipController>();
@@ -198,18 +216,5 @@ public class Module : MonoBehaviour {
 			}
 		}
 		return hotVector;
-	}
-
-
-	public void SetActivation(bool willBeActivated)
-	{
-		if (willBeActivated) {
-			spriteRenderer.color = activatedColor;
-			isActivated = true;
-
-				} else {
-			spriteRenderer.color = defaultColor;
-			isActivated = false;
-				}
 	}
 }

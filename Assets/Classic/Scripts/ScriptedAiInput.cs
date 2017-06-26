@@ -10,25 +10,19 @@ public enum IntelligenceDirective
 	AlignToTarget,
 }
 
-public class ScriptedPilotInput : IPilotInput {
+public class ScriptedPilotInput : PilotInput {
 
 	private float _thrustInput;
-	public float ThrustInput { get { return _thrustInput; } }
+	public override float ThrustInput { get { return _thrustInput; } }
 
 	private float _turnInput;
-	public float TurnInput { get { return _turnInput; } }
+	public override float TurnInput { get { return _turnInput; } }
 	//public bool queueFire = false;
 	//public bool[] mainInput;
 	//public string playerInput;
 
 	public IntelligenceDirective intelligenceDirective = IntelligenceDirective.Initialize;
 	private GameObject target = null;
-
-	private ShipController shipController;
-
-	public ScriptedPilotInput (ShipController shipController) {
-		this.shipController = shipController;
-	}
 
 	// Update is called once per frame
 	void Update () {
@@ -61,16 +55,13 @@ public class ScriptedPilotInput : IPilotInput {
 
 	}
 
-	GameObject AcquireTarget()
-	{
+	GameObject AcquireTarget() {
 		float minimumDistance = Mathf.Infinity;
 		GameObject nearestModule = null;
-		foreach(Transform module in GameController.Instance.ModuleContainer)
-		{
+		foreach(Transform module in GameController.Instance.ModuleContainer) {
 			Vector3 differenceVector = module.transform.position - shipController.transform.position;
 			float distance = differenceVector.magnitude;
-			if(distance <= minimumDistance)
-			{
+			if(distance <= minimumDistance) {
 				minimumDistance = distance;
 				nearestModule = module.gameObject;
 			}
