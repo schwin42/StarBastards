@@ -115,15 +115,15 @@ public class ScriptGameController : MonoBehaviour {
 		foreach (GameObject ship in ships) {
 			if(value)
 			{
-			if(ship.rigidbody2D){
+			if(ship.GetComponent<Rigidbody2D>()){
 				Debug.Log ("Destroyed" + ship.name + "'s rigidbody2D");
-				Destroy(ship.rigidbody2D);
+				Destroy(ship.GetComponent<Rigidbody2D>());
 				}
 			} else {
 				ScriptShipController scriptShipController = ship.GetComponent<ScriptShipController>();
 				GameObject targetModule = scriptShipController.pilotModule;
 
-				Destroy(targetModule.rigidbody2D);
+				Destroy(targetModule.GetComponent<Rigidbody2D>());
 			}
 				}
 		//Change code to not remove module rigidbodies on collect 
@@ -221,7 +221,7 @@ public class ScriptGameController : MonoBehaviour {
 			hotMod.name = "Module" + scriptModule.moduleID;
 			
 			Vector2 normalizedRandomForce = new Vector2(Random.value * 2 - 1, Random.value * 2 - 1); 
-			hotMod.rigidbody2D.AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
+			hotMod.GetComponent<Rigidbody2D>().AddForce(normalizedRandomForce * (Random.value * startingForceConstant));
 			//GetNextID(hotModS.GetComponent<ScriptModule>());
 			//Debug.Log (i);
 			
@@ -262,7 +262,7 @@ public class ScriptGameController : MonoBehaviour {
 		//Vector2 ejectionLinearForce = new Vector2((Random.value -0.5F) * ejectionLinearForceConstant, (Random.value -0.5F) * ejectionLinearForceConstant);
 		Vector2 ejectionLinearForce = ejectionVector * ejectionLinearForceConstant;
 		float ejectionAngularForce = (Random.value - 0.5F) * ejectionAngularForceConstant;
-		hotMod.rigidbody2D.AddForce(ejectionLinearForce);
-		hotMod.rigidbody2D.AddTorque(ejectionAngularForce);
+		hotMod.GetComponent<Rigidbody2D>().AddForce(ejectionLinearForce);
+		hotMod.GetComponent<Rigidbody2D>().AddTorque(ejectionAngularForce);
 	}
 }

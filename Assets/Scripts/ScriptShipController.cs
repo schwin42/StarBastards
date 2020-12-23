@@ -146,7 +146,7 @@ public class ScriptShipController : MonoBehaviour {
 		scriptHumanInput = GetComponent<ScriptHumanInput>();
 		scriptShipIntelligence = GetComponent<ScriptShipIntelligence>();
 		scriptShipSheet = GetComponent<ScriptShipSheet>();
-		shipModuleContainer = transform.FindChild ("ContainerModule");
+		shipModuleContainer = transform.Find ("ContainerModule");
 		scriptModuleController = GameObject.Find ("ControllerGame").GetComponent<ScriptGameController> ();
 		audioSource = GetComponent<AudioSource>();
 		dynamicObjectsContainer = GameObject.Find ("ContainerDynamicObjects").transform;
@@ -166,9 +166,9 @@ public class ScriptShipController : MonoBehaviour {
 		//		}
 
 		//Cache starting rigidbody values from inspector
-		rigidbodyMass = rigidbody2D.mass;
-		rigidbodyLinearDrag = rigidbody2D.drag;
-		rigidbodyAngularDrag = rigidbody2D.angularDrag;
+		rigidbodyMass = GetComponent<Rigidbody2D>().mass;
+		rigidbodyLinearDrag = GetComponent<Rigidbody2D>().drag;
+		rigidbodyAngularDrag = GetComponent<Rigidbody2D>().angularDrag;
 
 
 		//for (int i = 0; i < shipModuleContainer.childCount; i++) {
@@ -193,7 +193,7 @@ public class ScriptShipController : MonoBehaviour {
 		foreach(ScriptModule module in iterationModules)
 		{
 			Node node = scriptShipSheet.GetNodeFromModule(module);
-			module.transform.FindChild("LabelModule").GetComponent<TextMesh>().text = node.snakeIndex.ToString();
+			module.transform.Find("LabelModule").GetComponent<TextMesh>().text = node.snakeIndex.ToString();
 		}
 		//if(Input.GetKeyDown("3")) 
 	//	{
@@ -236,16 +236,16 @@ public class ScriptShipController : MonoBehaviour {
 				//rigidCharacter = pilotModule.rigidbody2D;
 			Vector2 pilotModuleForward = pilotModule.transform.TransformDirection(Vector2.up);
 			//Debug.Log ("Pilot forward: " + pilotModuleForward);
-			UpdateVelocity(thrustInput, turnInput, pilotModule.rigidbody2D, pilotModuleForward);
+			UpdateVelocity(thrustInput, turnInput, pilotModule.GetComponent<Rigidbody2D>(), pilotModuleForward);
 				//Debug.Log ("pilot rigidbody mode");
 		} else {
 			Vector2 upVector = Vector2.up;
 			Vector2 shipForward = transform.TransformDirection (upVector);
 			//Debug.Log ("Ship forward: " + shipForward + "Up: " + upVector + Time.frameCount);
-			if(rigidbody2D)
+			if(GetComponent<Rigidbody2D>())
 			{
 				//Debug.Log (thrustInput + turnInput + rigidbody2D.gameObject.name + forwardDirection + Time.frameCount);
-				UpdateVelocity(thrustInput, turnInput, rigidbody2D, shipForward);
+				UpdateVelocity(thrustInput, turnInput, GetComponent<Rigidbody2D>(), shipForward);
 			//	Debug.Log ("Velocity Updated: " + thrustInput + ", " + turnInput);
 			} else if(rigidbodyResetPending){
 			//	Debug.Log ("Reset");
@@ -253,10 +253,10 @@ public class ScriptShipController : MonoBehaviour {
 				rigidbodyResetPending = false;
 				//Cache rigidbody
 				Vector2 newVelocity = lastVelocity;
-				rigidbody2D.mass = rigidbodyMass;
-				rigidbody2D.drag = rigidbodyLinearDrag;
-				rigidbody2D.angularDrag = rigidbodyAngularDrag;
-				rigidbody2D.velocity = newVelocity;
+				GetComponent<Rigidbody2D>().mass = rigidbodyMass;
+				GetComponent<Rigidbody2D>().drag = rigidbodyLinearDrag;
+				GetComponent<Rigidbody2D>().angularDrag = rigidbodyAngularDrag;
+				GetComponent<Rigidbody2D>().velocity = newVelocity;
 			}
 
 		}
@@ -372,8 +372,8 @@ public class ScriptShipController : MonoBehaviour {
 
 				//Rigidbody
 				DistanceJoint2D hotJoint = addedModule.gameObject.AddComponent<DistanceJoint2D>();
-				hotJoint.connectedBody = assimilatingObject.rigidbody2D;
-				hotJoint.collideConnected = true;
+				hotJoint.connectedBody = assimilatingObject.GetComponent<Rigidbody2D>();
+				hotJoint.enableCollision = true;
 				hotJoint.distance = 2;
 			//	hotJoint.anchor;
 			//	hotJoint.connectedAnchor;
@@ -386,13 +386,13 @@ public class ScriptShipController : MonoBehaviour {
 			addedModule.transform.localRotation = Quaternion.identity; //Set rotation
 
 			//Rigidbody
-			if (addedModule.rigidbody2D) 
+			if (addedModule.GetComponent<Rigidbody2D>()) 
 			{
-				Destroy (addedModule.gameObject.rigidbody2D); 
+				Destroy (addedModule.gameObject.GetComponent<Rigidbody2D>()); 
 			}
 			//Ship rigidbody
-			lastVelocity = rigidbody2D.velocity; //Cache rigidbody velocity
-			Destroy(rigidbody2D); //Destroy rigidbody for replacement
+			lastVelocity = GetComponent<Rigidbody2D>().velocity; //Cache rigidbody velocity
+			Destroy(GetComponent<Rigidbody2D>()); //Destroy rigidbody for replacement
 			//Debug.Log ("Destroyed ship rigidbody");
 			rigidbodyResetPending = true;
 		}
@@ -500,8 +500,8 @@ public class ScriptShipController : MonoBehaviour {
 					scriptProjectile.bulletDuration = snake.durationInSeconds;
 
 					//Add force
-					hotBullet.rigidbody2D.velocity = rigidbody2D.velocity;	
-					hotBullet.rigidbody2D.AddForce(attackVector * snake.shotForce); //Magic number
+					hotBullet.GetComponent<Rigidbody2D>().velocity = GetComponent<Rigidbody2D>().velocity;	
+					hotBullet.GetComponent<Rigidbody2D>().AddForce(attackVector * snake.shotForce); //Magic number
 
 				} else {
 
